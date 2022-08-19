@@ -44,8 +44,8 @@ All of these files above are compiled, depending on the analysis (e.g. for Alpha
              * ErrorMessages - if a Step through an error, a detail list of where the error occurred (Subject, Step, Choice) as well as the error message (in the file)
                                  is saved as txt
                                  
-     * Alpha_Context ... Folder for each Analysis, with the subfolder which task was analysed is created to contain the intermediate and final Forking Steps of the     
-                    Preprocessing will contain a lot of folders. The forks are coded by number (not name as it would exceed max file names).
+     * Alpha_Context ... Folder for each Analysis, with the subfolder which task was analysed is created to contain the intermediate and final Forking Steps of the 
+                    Preprocessing. This will contain a lot of folders. The forks are coded by number (not name as it would exceed max file names).
                    The forking Folders contain
                    * *.mat for the Subject, including the preprocessed data, information on the lab and previous steps etc.
                    * *error.mat if there was an error with this step, these files are used to terminate the processing of a fork with a similiar stephistory
