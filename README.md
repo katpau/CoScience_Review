@@ -2,8 +2,10 @@
 
 This Repository contains all Preprocessing and Analytical functions used in in the CoScience Project
 
+#########################################################
+To Run the Test, open and run TEST_RDF.m (or any of the others)
+#########################################################
 
-To Run the Test, open TEST_RDF.m (or any of the others)
 
 In detail, the folders contain
 * Analysis_Functions - contain all EEGLAB functions, including plugins, functions to export in BIDS format etc.
