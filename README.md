@@ -22,12 +22,12 @@ In detail, the folders contain
 All of these files above are compiled, depending on the analysis (e.g. for Alpha Context, the Step Functions for Preprocessing, Epoching Tasks, and Quantification Alpha are used together with the analysis functions). These compilations are then run on the server on parallel nodes to run multiple subjects in parallel. [not done for this test to better troubleshoot]
 
 
-*Only_ForGit_To_TestRun - includes some files that are only included to test the Scripts. The test scripts are adjusted to mirror the behaviour of the job scheduler on 
+* Only_ForGit_To_TestRun - includes some files that are only included to test the Scripts. The test scripts are adjusted to mirror the behaviour of the job scheduler on 
                         the high performance cluster. If the scripts are run, the data will be calculated here. The folders are:
                         
-    *RawData  - contains the eeg + behavioral data from three subjects from the resting and stroop task
+    * RawData  - contains the eeg + behavioral data from three subjects from the resting and stroop task
     
-    *ForkingFiles - contains the files that inform about the forks, contains the following for each analysis (Alpha_Context, Stroop_LPP)
+    * ForkingFiles - contains the files that inform about the forks, contains the following for each analysis (Alpha_Context, Stroop_LPP)
         * DESIGN.mat - overview of all Steps, their order, choices, and conditions. Contains information if intermediate Step should be saved.
                       This information has been read out of the header of the Step_Function Files
         * FORKS.mat - list of randomly drawn Forking combinations. For this test these are only 75 very different combinations. Ultimately these will be over 1000
