@@ -12,8 +12,8 @@ In detail, the folders contain
 * Step_Functions - for the different analyses and preprocessing the corresponding step functions. 
                     Each step function lists all choices (and conditions for these choices). These functions are called in the parfor_Forks scripts. 
 
-* Parfor_Functions - functions to run the forkin on the server in parallel, checking which path should be calculated
-                    contain 2 important functions: parfor_Forks and parfor_Forks_Other. The first one is for the primary analysis carried out
+* Parfor_Functions - functions to run the forking (for one subject) in parallel, checking which path should be calculated.
+                    They include 2 important functions: parfor_Forks and parfor_Forks_Other. The first one is for the primary analysis carried out
                     however, in order to save some time, the second function is used to run other analysis on the continous data. Eg. for the Alpha_Context analysis,
                     three tasks are preprocessed: Resting, Stroop, Gambling. Since the preprocessing is the same when data is kept continous, the other analyses 
                      (Stroop_LPP,
