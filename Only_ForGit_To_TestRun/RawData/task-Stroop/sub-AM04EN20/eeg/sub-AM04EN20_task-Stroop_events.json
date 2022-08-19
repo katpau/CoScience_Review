@@ -1,0 +1,123 @@
+{
+  "onset": {
+    "LongName": "Event onset",
+    "Description": "Onset (in seconds) of the event measured from the beginning of the acquisition of the first volume in the corresponding task imaging data file.",
+    "Units": "Sampling Points"
+  },
+  "duration": {
+    "LongName": "Event duration",
+    "Description": "Duration of the event (measured from onset) in seconds",
+    "Units": "second"
+  },
+  "sample": {
+    "LongName": "Sample",
+    "Description": "Onset of the event according to the sampling scheme of the recorded modality (i.e., referring to the raw data file that the events.tsv file accompanies)."
+  },
+  "trial_type": {
+    "LongName": "Event categorization",
+    "Description": "Complete categorisation of each trial to identify them as instances of the experimental conditions."
+  },
+  "value": {
+    "LongName": "Event marker",
+    "Description": "Marker value associated with the event.",
+    "Levels": {
+      "x1": "Response_Correct_",
+      "x2": "Response_Incorrect_",
+      "x11": "Tree_1",
+      "x12": "Tree_2",
+      "x13": "Tree_3",
+      "x14": "Tree_4",
+      "x15": "Tree_5",
+      "x16": "Tree_6",
+      "x17": "Tree_7",
+      "x18": "Tree_8",
+      "x21": "Erotic_Couple_1",
+      "x22": "Erotic_Couple_2",
+      "x23": "Erotic_Couple_3",
+      "x24": "Erotic_Couple_4",
+      "x25": "Erotic_Couple_5",
+      "x26": "Erotic_Couple_6",
+      "x27": "Erotic_Couple_7",
+      "x28": "Erotic_Couple_8",
+      "x31": "Erotic_Man_1",
+      "x32": "Erotic_Man_2",
+      "x33": "Erotic_Man_3",
+      "x34": "Erotic_Man_4",
+      "x35": "Erotic_Man_5",
+      "x36": "Erotic_Man_6",
+      "x37": "Erotic_Man_7",
+      "x38": "Erotic_Man_8",
+      "x41": "Neutral_1",
+      "x42": "Neutral_2",
+      "x43": "Neutral_3",
+      "x44": "Neutral_4",
+      "x45": "Neutral_5",
+      "x46": "Neutral_6",
+      "x47": "Neutral_7",
+      "x48": "Neutral_8",
+      "x51": "Neutral_Couple_1",
+      "x52": "Neutral_Couple_2",
+      "x53": "Neutral_Couple_3",
+      "x54": "Neutral_Couple_4",
+      "x55": "Neutral_Couple_5",
+      "x56": "Neutral_Couple_6",
+      "x57": "Neutral_Couple_7",
+      "x58": "Neutral_Couple_8",
+      "x61": "Positive_1",
+      "x62": "Positive_2",
+      "x63": "Positive_3",
+      "x64": "Positive_4",
+      "x65": "Positive_5",
+      "x66": "Positive_6",
+      "x67": "Positive_7",
+      "x68": "Positive_8",
+      "x71": "Erotic_Woman_1",
+      "x72": "Erotic_Woman_2",
+      "x73": "Erotic_Woman_3",
+      "x74": "Erotic_Woman_4",
+      "x75": "Erotic_Woman_5",
+      "x76": "Erotic_Woman_6",
+      "x77": "Erotic_Woman_7",
+      "x78": "Erotic_Woman_8",
+      "x99": "Target_with_coloured_Frame",
+      "x88": "Reminder_if_too_many_Errors"
+    }
+  },
+  "Event": {
+    "LongName": "Event",
+    "Description": "Verbal Description of Event"
+  },
+  "Trial": {
+    "LongName": "Trial",
+    "Description": "Trial count, starting with 0"
+  },
+  "RT": {
+    "LongName": "RT",
+    "Description": "Response time after Target.",
+    "Unit": "second"
+  },
+  "ACC": {
+    "LongName": "ACC",
+    "Description": "Accuracy of Response to Target; 0 = incorrect, 1 = correct"
+  },
+  "Post_Trial": {
+    "LongName": "Post_Trial",
+    "Description": "Previous Trial either Correct, Incorrect, or NA (for Breaks etc.)"
+  },
+  "ImageCondition": {
+    "LongName": "ImageCondition",
+    "Description": "Picture Category: tree, erotic_man, erotic_woman, erotic_couple, neutral_couple, neutral_man_woman, positive_man_woman, tree"
+  },
+  "ImageFile": {
+    "LongName": "ImageFile",
+    "Description": "ID of the picture presented (but without the color code, Seven Categories, and eight Pictures per Category"
+  },
+  "Colour": {
+    "LongName": "Colour",
+    "Description": "Colour of Frame around picture when Target. Red, Green, Blue, Yellow "
+  },
+  "Post_TrialCondition": {
+    "LongName": "Post_TrialCondition",
+    "Description": "Condition of the Picture of the Previous Trial (erotic man, tree etc.) or NA (for Breaks etc.)"
+  }
+}

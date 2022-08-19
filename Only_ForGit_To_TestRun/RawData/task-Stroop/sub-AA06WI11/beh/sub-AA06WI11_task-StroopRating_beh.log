@@ -1,0 +1,182 @@
+1.4979 	WARNING 	We strongly recommend you activate the PTB sound engine in PsychoPy prefs as the preferred audio engine. Its timing is vastly superior. Your prefs are currently set to use ['sounddevice', 'PTB', 'pyo', 'pygame'] (in that order).
+3.1085 	WARNING 	User requested fullscreen with size [1536  864], but screen is actually [1920, 1200]. Using actual size
+4.6210 	EXP 	Created window1 = Window(allowGUI=False, allowStencil=False, args=UNKNOWN, autoLog=True, bitsMode=UNKNOWN, blendMode='avg', bpc=(8, 8, 8), color=array([0., 0., 0.]), colorSpace='rgb', depthBits=8, fullscr=<method-wrapper '__getattribute__' of attributeSetter object at 0x00000147A7365B38>, gamma=None, gammaErrorPolicy='raise', kwargs=UNKNOWN, lms=UNKNOWN, monitor=<psychopy.monitors.calibTools.Monitor object at 0x00000147A774A6A0>, multiSample=False, name='window1', numSamples=2, pos=[0.0, 0.0], screen=0, size=array([1920, 1200]), stencilBits=0, stereo=False, units='height', useFBO=True, useRetina=False, viewOri=0.0, viewPos=None, viewScale=None, waitBlanking=True, winType='pyglet')
+4.6211 	EXP 	window1: recordFrameIntervals = False
+4.7864 	EXP 	window1: recordFrameIntervals = True
+4.9705 	EXP 	window1: recordFrameIntervals = False
+5.3254 	EXP 	Created text_2 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.03, italic=False, languageStyle='LTR', name='text_2', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+5.3376 	EXP 	Created text_4 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-2.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.025, italic=False, languageStyle='LTR', name='text_4', opacity=1.0, ori=0, pos=array([ 0. , -0.4]), rgb=array([0., 0., 0.]), text='Weiter mit Leertaste.', units='height', win=Window(...), wrapWidth=1)
+5.3419 	EXP 	Created text_3 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.03, italic=False, languageStyle='LTR', name='text_3', opacity=1.0, ori=0, pos=array([0.  , 0.45]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+5.3449 	EXP 	Created Picture = ImageStim(__class__=<class 'psychopy.visual.image.ImageStim'>, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, image='sin', interpolate=True, mask=None, maskParams=None, name='Picture', opacity=1.0, ori=0.0, pos=array([0. , 0.2]), size=array([1.2, 0.4]), texRes=128, units='height', win=Window(...))
+5.3465 	EXP 	Created Rating_Dimension = ImageStim(__class__=<class 'psychopy.visual.image.ImageStim'>, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=-2.0, flipHoriz=False, flipVert=False, image='sin', interpolate=True, mask=None, maskParams=None, name='Rating_Dimension', opacity=1.0, ori=0.0, pos=array([ 0.  , -0.25]), size=array([0.8 , 0.35]), texRes=128, units='height', win=Window(...))
+5.3788 	EXP 	text_2: autoDraw = True
+5.3788 	EXP 	text_4: autoDraw = True
+22.0401 	EXP 	Imported SummarySlides.xlsx as conditions, 7 conditions, 1 params
+22.0404 	EXP 	Created sequence: random, trialTypes=7, nReps=1, seed=None
+22.0406 	EXP 	New trial (rep=0, index=0): OrderedDict([('ConditionOverview', 'Rating/NeutralCouple.png')])
+22.0509 	EXP 	Imported Question_Ratings.xlsx as conditions, 2 conditions, 1 params
+22.0510 	EXP 	Created sequence: sequential, trialTypes=2, nReps=1, seed=None
+22.0512 	EXP 	New trial (rep=0, index=0): OrderedDict([('Question_Dimension', 'Rating/Valence.png')])
+22.1028 	DATA 	Keypress: space
+22.1106 	EXP 	text_2: autoDraw = False
+22.1106 	EXP 	text_4: autoDraw = False
+22.1106 	EXP 	Picture: image = 'Rating/NeutralCouple.png'
+22.1106 	EXP 	Rating_Dimension: image = 'Rating/Valence.png'
+22.1106 	EXP 	text_3: autoDraw = True
+22.1106 	EXP 	Picture: autoDraw = True
+22.1106 	EXP 	Rating_Dimension: autoDraw = True
+43.3081 	DATA 	Keypress: num_5
+49.3465 	DATA 	Keypress: num_5
+52.2817 	DATA 	Keypress: 5
+52.3012 	EXP 	New trial (rep=0, index=1): OrderedDict([('Question_Dimension', 'Rating/Arousal.png')])
+52.3342 	EXP 	text_3: autoDraw = False
+52.3342 	EXP 	Picture: autoDraw = False
+52.3342 	EXP 	Rating_Dimension: autoDraw = False
+52.3342 	EXP 	Picture: image = 'Rating/NeutralCouple.png'
+52.3342 	EXP 	Rating_Dimension: image = 'Rating/Arousal.png'
+52.3342 	EXP 	text_3: autoDraw = True
+52.3342 	EXP 	Picture: autoDraw = True
+52.3342 	EXP 	Rating_Dimension: autoDraw = True
+72.9842 	EXP 	New trial (rep=0, index=1): OrderedDict([('ConditionOverview', 'Rating/Neutral.png')])
+72.9970 	EXP 	Imported Question_Ratings.xlsx as conditions, 2 conditions, 1 params
+72.9973 	EXP 	Created sequence: sequential, trialTypes=2, nReps=1, seed=None
+72.9975 	EXP 	New trial (rep=0, index=0): OrderedDict([('Question_Dimension', 'Rating/Valence.png')])
+73.0210 	DATA 	Keypress: 8
+73.0285 	EXP 	text_3: autoDraw = False
+73.0285 	EXP 	Picture: autoDraw = False
+73.0285 	EXP 	Rating_Dimension: autoDraw = False
+73.0285 	EXP 	Picture: image = 'Rating/Neutral.png'
+73.0285 	EXP 	Rating_Dimension: image = 'Rating/Valence.png'
+73.0285 	EXP 	text_3: autoDraw = True
+73.0285 	EXP 	Picture: autoDraw = True
+73.0285 	EXP 	Rating_Dimension: autoDraw = True
+84.8621 	EXP 	New trial (rep=0, index=1): OrderedDict([('Question_Dimension', 'Rating/Arousal.png')])
+84.8882 	DATA 	Keypress: 5
+84.8955 	EXP 	text_3: autoDraw = False
+84.8955 	EXP 	Picture: autoDraw = False
+84.8955 	EXP 	Rating_Dimension: autoDraw = False
+84.8955 	EXP 	Picture: image = 'Rating/Neutral.png'
+84.8955 	EXP 	Rating_Dimension: image = 'Rating/Arousal.png'
+84.8955 	EXP 	text_3: autoDraw = True
+84.8955 	EXP 	Picture: autoDraw = True
+84.8955 	EXP 	Rating_Dimension: autoDraw = True
+87.8792 	EXP 	New trial (rep=0, index=2): OrderedDict([('ConditionOverview', 'Rating/Couple.png')])
+87.8947 	EXP 	Imported Question_Ratings.xlsx as conditions, 2 conditions, 1 params
+87.8951 	EXP 	Created sequence: sequential, trialTypes=2, nReps=1, seed=None
+87.8954 	EXP 	New trial (rep=0, index=0): OrderedDict([('Question_Dimension', 'Rating/Valence.png')])
+87.9199 	DATA 	Keypress: 8
+87.9277 	EXP 	text_3: autoDraw = False
+87.9277 	EXP 	Picture: autoDraw = False
+87.9277 	EXP 	Rating_Dimension: autoDraw = False
+87.9277 	EXP 	Picture: image = 'Rating/Couple.png'
+87.9277 	EXP 	Rating_Dimension: image = 'Rating/Valence.png'
+87.9277 	EXP 	text_3: autoDraw = True
+87.9277 	EXP 	Picture: autoDraw = True
+87.9277 	EXP 	Rating_Dimension: autoDraw = True
+103.2605 	EXP 	New trial (rep=0, index=1): OrderedDict([('Question_Dimension', 'Rating/Arousal.png')])
+103.2883 	DATA 	Keypress: 5
+103.2962 	EXP 	text_3: autoDraw = False
+103.2962 	EXP 	Picture: autoDraw = False
+103.2962 	EXP 	Rating_Dimension: autoDraw = False
+103.2962 	EXP 	Picture: image = 'Rating/Couple.png'
+103.2962 	EXP 	Rating_Dimension: image = 'Rating/Arousal.png'
+103.2962 	EXP 	text_3: autoDraw = True
+103.2962 	EXP 	Picture: autoDraw = True
+103.2962 	EXP 	Rating_Dimension: autoDraw = True
+109.5649 	EXP 	New trial (rep=0, index=3): OrderedDict([('ConditionOverview', 'Rating/Woman.png')])
+109.5768 	EXP 	Imported Question_Ratings.xlsx as conditions, 2 conditions, 1 params
+109.5770 	EXP 	Created sequence: sequential, trialTypes=2, nReps=1, seed=None
+109.5772 	EXP 	New trial (rep=0, index=0): OrderedDict([('Question_Dimension', 'Rating/Valence.png')])
+109.6006 	DATA 	Keypress: 3
+109.6083 	EXP 	text_3: autoDraw = False
+109.6083 	EXP 	Picture: autoDraw = False
+109.6083 	EXP 	Rating_Dimension: autoDraw = False
+109.6083 	EXP 	Picture: image = 'Rating/Woman.png'
+109.6083 	EXP 	Rating_Dimension: image = 'Rating/Valence.png'
+109.6083 	EXP 	text_3: autoDraw = True
+109.6083 	EXP 	Picture: autoDraw = True
+109.6083 	EXP 	Rating_Dimension: autoDraw = True
+119.8599 	EXP 	New trial (rep=0, index=1): OrderedDict([('Question_Dimension', 'Rating/Arousal.png')])
+119.8838 	DATA 	Keypress: 5
+119.8911 	EXP 	text_3: autoDraw = False
+119.8911 	EXP 	Picture: autoDraw = False
+119.8911 	EXP 	Rating_Dimension: autoDraw = False
+119.8911 	EXP 	Picture: image = 'Rating/Woman.png'
+119.8911 	EXP 	Rating_Dimension: image = 'Rating/Arousal.png'
+119.8911 	EXP 	text_3: autoDraw = True
+119.8911 	EXP 	Picture: autoDraw = True
+119.8911 	EXP 	Rating_Dimension: autoDraw = True
+122.0416 	EXP 	New trial (rep=0, index=4): OrderedDict([('ConditionOverview', 'Rating/Tree.png')])
+122.0536 	EXP 	Imported Question_Ratings.xlsx as conditions, 2 conditions, 1 params
+122.0539 	EXP 	Created sequence: sequential, trialTypes=2, nReps=1, seed=None
+122.0541 	EXP 	New trial (rep=0, index=0): OrderedDict([('Question_Dimension', 'Rating/Valence.png')])
+122.0746 	DATA 	Keypress: 3
+122.0823 	EXP 	text_3: autoDraw = False
+122.0823 	EXP 	Picture: autoDraw = False
+122.0823 	EXP 	Rating_Dimension: autoDraw = False
+122.0823 	EXP 	Picture: image = 'Rating/Tree.png'
+122.0823 	EXP 	Rating_Dimension: image = 'Rating/Valence.png'
+122.0823 	EXP 	text_3: autoDraw = True
+122.0823 	EXP 	Picture: autoDraw = True
+122.0823 	EXP 	Rating_Dimension: autoDraw = True
+138.5072 	EXP 	New trial (rep=0, index=1): OrderedDict([('Question_Dimension', 'Rating/Arousal.png')])
+138.5337 	DATA 	Keypress: 5
+138.5415 	EXP 	text_3: autoDraw = False
+138.5415 	EXP 	Picture: autoDraw = False
+138.5415 	EXP 	Rating_Dimension: autoDraw = False
+138.5415 	EXP 	Picture: image = 'Rating/Tree.png'
+138.5415 	EXP 	Rating_Dimension: image = 'Rating/Arousal.png'
+138.5415 	EXP 	text_3: autoDraw = True
+138.5415 	EXP 	Picture: autoDraw = True
+138.5415 	EXP 	Rating_Dimension: autoDraw = True
+141.6572 	EXP 	New trial (rep=0, index=5): OrderedDict([('ConditionOverview', 'Rating/Man.png')])
+141.6663 	EXP 	Imported Question_Ratings.xlsx as conditions, 2 conditions, 1 params
+141.6665 	EXP 	Created sequence: sequential, trialTypes=2, nReps=1, seed=None
+141.6668 	EXP 	New trial (rep=0, index=0): OrderedDict([('Question_Dimension', 'Rating/Valence.png')])
+141.6899 	DATA 	Keypress: 8
+141.6981 	EXP 	text_3: autoDraw = False
+141.6981 	EXP 	Picture: autoDraw = False
+141.6981 	EXP 	Rating_Dimension: autoDraw = False
+141.6981 	EXP 	Picture: image = 'Rating/Man.png'
+141.6981 	EXP 	Rating_Dimension: image = 'Rating/Valence.png'
+141.6981 	EXP 	text_3: autoDraw = True
+141.6981 	EXP 	Picture: autoDraw = True
+141.6981 	EXP 	Rating_Dimension: autoDraw = True
+148.0853 	EXP 	New trial (rep=0, index=1): OrderedDict([('Question_Dimension', 'Rating/Arousal.png')])
+148.1188 	DATA 	Keypress: 5
+148.1263 	EXP 	text_3: autoDraw = False
+148.1263 	EXP 	Picture: autoDraw = False
+148.1263 	EXP 	Rating_Dimension: autoDraw = False
+148.1263 	EXP 	Picture: image = 'Rating/Man.png'
+148.1263 	EXP 	Rating_Dimension: image = 'Rating/Arousal.png'
+148.1263 	EXP 	text_3: autoDraw = True
+148.1263 	EXP 	Picture: autoDraw = True
+148.1263 	EXP 	Rating_Dimension: autoDraw = True
+150.6822 	EXP 	New trial (rep=0, index=6): OrderedDict([('ConditionOverview', 'Rating/Positive.png')])
+150.6939 	EXP 	Imported Question_Ratings.xlsx as conditions, 2 conditions, 1 params
+150.6941 	EXP 	Created sequence: sequential, trialTypes=2, nReps=1, seed=None
+150.6944 	EXP 	New trial (rep=0, index=0): OrderedDict([('Question_Dimension', 'Rating/Valence.png')])
+150.7170 	DATA 	Keypress: 3
+150.7246 	EXP 	text_3: autoDraw = False
+150.7246 	EXP 	Picture: autoDraw = False
+150.7246 	EXP 	Rating_Dimension: autoDraw = False
+150.7246 	EXP 	Picture: image = 'Rating/Positive.png'
+150.7246 	EXP 	Rating_Dimension: image = 'Rating/Valence.png'
+150.7246 	EXP 	text_3: autoDraw = True
+150.7246 	EXP 	Picture: autoDraw = True
+150.7246 	EXP 	Rating_Dimension: autoDraw = True
+161.1401 	DATA 	Keypress: 8
+161.1602 	EXP 	New trial (rep=0, index=1): OrderedDict([('Question_Dimension', 'Rating/Arousal.png')])
+161.1950 	EXP 	text_3: autoDraw = False
+161.1950 	EXP 	Picture: autoDraw = False
+161.1950 	EXP 	Rating_Dimension: autoDraw = False
+161.1950 	EXP 	Picture: image = 'Rating/Positive.png'
+161.1950 	EXP 	Rating_Dimension: image = 'Rating/Arousal.png'
+161.1950 	EXP 	text_3: autoDraw = True
+161.1950 	EXP 	Picture: autoDraw = True
+161.1950 	EXP 	Rating_Dimension: autoDraw = True
+163.2747 	DATA 	Keypress: 8
+163.3023 	EXP 	text_3: autoDraw = False
+163.3023 	EXP 	Picture: autoDraw = False
+163.3023 	EXP 	Rating_Dimension: autoDraw = False
+163.3603 	EXP 	window1: mouseVisible = True
