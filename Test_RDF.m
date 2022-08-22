@@ -62,3 +62,4 @@ PrintLocation = "0"; % some lines can be printed to console to make it easier to
 parfor_Forks(IndexSubjectsSubset,      ListFile,  DesignFile, ForkingFile, OutputFolder, ...
     RawFolder, MatlabAnalysisName, MaxStep,    RetryError, LogFolder, ParPools, PrintLocation)
 
+% CS: comment for testing commits
