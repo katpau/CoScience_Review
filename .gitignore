@@ -1,3 +1,4 @@
-# enter files to be ignored
+# ignore folder:
 
+**/Only_ForGit_To_TestRun/Alpha_Context/task*
 
