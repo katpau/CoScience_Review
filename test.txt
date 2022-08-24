@@ -1,0 +1,2 @@
+Hier habe ich als Test neuen Text ergänzt.
+Wir wollen schauen, ob nur Katharina den Pull Request mergen kann.
