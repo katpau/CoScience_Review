@@ -1,4 +1,7 @@
-# ignore folder:
-
+# ignore folder with precomputed data to not upload similar calculations:
 **/Only_ForGit_To_TestRun/Alpha_Context/task*
+**/Only_ForGit_To_TestRun/Alpha_Context/Stats_Results/*
+**/Only_ForGit_To_TestRun/LPP_Stroop/task*
+**/Only_ForGit_To_TestRun/Logs/*
+
 
