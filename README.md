@@ -53,7 +53,7 @@ All of these files above are compiled, depending on the analysis (e.g. for Alpha
                          * *.mat* for the Subject, including the preprocessed data, information on the lab and previous steps etc.
                          * *error.mat* if there was an error with this step, these files are used to terminate the processing of a fork with a similiar stephistory
                          * *running.mat* if step is going to be saved and is currently in progress, this interim file is created and deleted as soon as the file is   saved
-            * **Group_Data** - contains one example file where all information from all single subjects of one fork are merged across all tasks
+            * **Group_Data** - contains two example files where all information from all single subjects of one fork are merged across all tasks [only 50 subjects for testing, otherwise it takes too long]
                   
     
     * **QuestionnaireData/Alpha_Context** contains 4 txt files where the relevant Personality Scores have been extracted, they differ if they are "filtered" (attention 

@@ -35,19 +35,18 @@ output =  merge(output,  Personality, by = c("ID"),
 #########################################################
 # (2) Center Behavioral Variables within Conditions
 #########################################################
+# only center if not group averages, since you cannot center across subs if all have the same value
+if (!(input$stephistory[["BehavCovariate"]]== "pleasant_arousal_av")) { 
 Relevant_Collumns =  names(output)[grep(c("Behav_"), names(output))]
 
-# Get Grouping Variables from colnames (between ID and EEG Signal)
-GroupingVariables = names(output)[2:(which(names(output)== "EEG_Signal"))]
-# For Frequency/Alpha Frequency Range can be individualized per subject
-if ("FrequencyRange" %in% GroupingVariables & length(unique(output$FrequencyRange)) > 2) 
-{ GroupingVariables = GroupingVariables[-which(GroupingVariables == "FrequencyRange")] }
+# Get Grouping Variables from previous step
+GroupingVariables = input$stephistory[["GroupingVariables"]]
 
 output = output %>%
   group_by(across(all_of(GroupingVariables ) ))%>%
   mutate(across(Relevant_Collumns,
                 ~ scale(.x, scale = FALSE)))
-}
+}}
 
 #No change needed below here - just for bookkeeping
 stephistory = input$stephistory

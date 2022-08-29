@@ -1,7 +1,7 @@
 function  OUTPUT = Electrodes(INPUT, Choice)
 % This script does the following:
 % Script only marks which Electrodes are used for quantification.
-% Nothing is done here as this will be used in a later 
+% Nothing is done here as this will be used in a later
 % Step (Quantificiation ERP).
 
 %#####################################################################
@@ -28,22 +28,22 @@ function  OUTPUT = Electrodes(INPUT, Choice)
 % saved on the harddrive (in order to be loaded and forked from there).
 % Order determines when it should be run.
 StepName = "Electrodes";
-Choices = ["Fz,Fcz,Cz", "Fcz,Cz", "Fcz", "Cz", "Fz"]; 
-Conditional = ["NaN", "NaN", "NaN", "NaN", "NaN"]; 
-SaveInterim = logical([0]); 
-Order = [20]; 
+Choices = ["Fz,Fcz,Cz", "Fcz,Cz", "Fcz", "Cz", "Fz"];
+Conditional = ["NaN", "NaN", "NaN", "NaN", "NaN"];
+SaveInterim = logical([0]);
+Order = [20];
 
 % For P300 save other electrodes
 if strcmp(Choice , "Fz,Fcz,Cz")
-	ChoiceP3 = "Cz,Cpz,Pz";
+    ChoiceP3 = "Cz,Cpz,Pz";
 elseif strcmp(Choice , "Fcz,Cz")
-	ChoiceP3 = "Pz,Fz,Cz";
+    ChoiceP3 = "Pz,Fz,Cz";
 elseif strcmp(Choice , "Fcz")
-	ChoiceP3 = "Cz";
+    ChoiceP3 = "Cz";
 elseif strcmp(Choice , "Cz")
-	ChoiceP3 = "Pz";
+    ChoiceP3 = "Pz";
 elseif strcmp(Choice , "Fz")
-	ChoiceP3 = "Pz";
+    ChoiceP3 = "Pz";
 end
 
 INPUT.StepHistory.Electrodes_P3 = ChoiceP3;
@@ -52,5 +52,5 @@ INPUT.StepHistory.Electrodes_P3 = ChoiceP3;
 % No changes should be made here.
 INPUT.StepHistory.(StepName) = Choice;
 OUTPUT = INPUT;
-end 
+end
 

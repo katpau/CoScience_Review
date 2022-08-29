@@ -10,6 +10,7 @@ output = input$data
 # (2) Depending on these choices the correct Personality Scoring File is loaded (have been prepared separately)
 # (3) Then only the relevant Scores are kept (for IV, DV and Covariates)
 # (4) Merge Personality Data with Personality Data
+# (5) Get Grouping Variables for later steps
 
 
 
@@ -33,8 +34,7 @@ Covariate_choice = choice
 #########################################################
 # load correct file, these files have been created separately
 
-QuestFolder = "/work/bay2875/QuestionnaireData/Alpha_Context/"
-#QuestFolder = "C:/Users/Paul/Documents/Work/PersonalityEEG/FINAL_RDF/HUMMEL/work/QuestionnaireData/Alpha_Context/"
+QuestFolder = paste0(input$stephistory["Root_Personality"], "Alpha_Context/")
 if (Attention_Checks_Personality_choice == "Applied") {
   if (Outliers_Personality_choice == "None") {
     QuestionnaireFile = "Personality-Scores-filtered_outliers-notremoved.csv"
@@ -58,15 +58,8 @@ ScoreData = read.csv(paste0(QuestFolder, QuestionnaireFile), header = TRUE)
 # (3) run Choice Relevant Personality Score 
 #########################################################
 # select only relevant personality score (and all covariates)
-
-# Depends  if Choice includes Factors from Factor analysis (then multiple scores)
-if (Personality_Variable_choice != "Factor_Analysis") {
   PersonalityData = ScoreData[, c("ID", Personality_Variable_choice)]
   names(PersonalityData) = c("ID", paste0("Personality_", Personality_Variable_choice))
-} else {
-  PersonalityData = ScoreData[, c(1, grep("FactorAnalysis", names(ScoreData)))]
-  names(PersonalityData) = c("ID", paste0("Personality_", names(PersonalityData[2:ncol(PersonalityData)])))
-}
 
 # Select only Relevant Covariate
 if (Covariate_choice != "None") {
@@ -95,7 +88,6 @@ if (Covariate_choice != "None") {
 #########################################################
 # (4) Prepare Output
 #########################################################
-
 # Merge Data with EEG Data
 output = merge(
   output,
@@ -113,6 +105,56 @@ output = merge(
   all.x = TRUE,
   all.y = FALSE
 )}
+  
+  
+# Make sure everything is in correct format
+
+NumericVariables = c("EEG_Signal", "SME", "Epochs", names(output)[grepl("Personality_|Covariate_", names(output))])
+GroupingVariables = c("ID", "Condition", "Hemisphere", "Electrode", "FrequencyBand", "Localisation", "FrequencyRange", names(output)[grepl("Covariate_Gender", names(output))])
+
+output[GroupingVariables] = lapply(output[GroupingVariables], as.factor)
+output[NumericVariables] = lapply(output[NumericVariables], as.numeric)
+
+# Unclear and still needs to be checked: Sometimes SME and EEG_Signal is Inf
+# Unclear why, but some EEG_Signal scores are -Inf
+output$EEG_Signal[abs(output$EEG_Signal)==Inf] = NA
+output$SME[abs(output$SME)==Inf] = NA
+
+
+#########################################################
+# (5) Prepare Grouping Variables
+#########################################################
+# Get possible additional factors to be included in the GLM
+# Added Factors to the GLM depend on combination of Electrodes and Quantification method (some are redundant!)
+Levels_H = length(unlist(unique(output$Hemisphere)))
+Levels_L = length(unlist(unique(output$Localisation)))
+Levels_E = length(unlist(unique(output$Electrode)))
+Levles_F = length(unlist(unique(output$FrequencyBand)))
+
+additional_Factors_Name = vector()
+additional_Factor_Formula = vector()
+if (Levels_H == 2) {
+  additional_Factors_Name = "Hemisphere"
+  additional_Factor_Formula = "* Hemisphere" 
+}
+#if (Levels_L == 2) {
+#  additional_Factors_Name = c(additional_Factors_Name, "Localisation")
+#  additional_Factor_Formula = paste(additional_Factor_Formula, "* Localisation") 
+#}
+if (Levels_E >1) { # && Levels_E > Levels_L) {
+  additional_Factors_Name = c(additional_Factors_Name, "Electrode")
+  additional_Factor_Formula = paste(additional_Factor_Formula, "* Electrode") 
+}
+if (Levles_F == 2) {
+  additional_Factors_Name = c(additional_Factors_Name, "FrequencyBand")
+  additional_Factor_Formula = paste(additional_Factor_Formula, "* FrequencyBand")
+}
+
+# Grouping Variables in all Files and Merge with additional Factors
+GroupingVariables = c("Condition", "Condition2", "Task", "AnalysisPhase", additional_Factors_Name )
+input$stephistory$GroupingVariables = GroupingVariables
+input$stephistory$additional_Factors_Name = additional_Factors_Name
+input$stephistory$additional_Factor_Formula = additional_Factor_Formula
 
 #No change needed below here - just for bookkeeping
 stephistory = input$stephistory

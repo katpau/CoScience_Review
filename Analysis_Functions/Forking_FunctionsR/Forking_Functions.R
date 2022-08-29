@@ -195,21 +195,22 @@ create_ForkingLists = function(CombinedForks,
 
 ## Run Steps
 run_Steps = function( OUTPUT_File,
-                      RootPath,
+                      RootPath, 
                       ListOfStepFunctionFolders,
                       collumnNamesEEGData,
-                      LogFile) {
+                      LogFile, Root) {
   
   
   Path_to_Merged_Files = paste0(RootPath,"Group_Data/" )
   Path_to_Export = paste0(RootPath,"Stats_Results/" )
+  
   if (!dir.exists(Path_to_Export)) {dir.create(Path_to_Export)}
   
   OUTPUT = read.table(OUTPUT_File,  sep = ";", header = TRUE)
   
   # Initate for summary
   # Create Function to run in Parallel
-  run_Steps_parallel = function (i_Fork, OUTPUT, Path_to_Merged_Files, Path_to_Export){
+  run_Steps_parallel = function (i_Fork, OUTPUT, Path_to_Merged_Files, Path_to_Export, Root){
 
     
     # Paste Filenames to check if already existing
@@ -230,6 +231,8 @@ run_Steps = function( OUTPUT_File,
       input$stephistory["Inputfile"] = filename_input
       input$stephistory["Final_File_Name"] = filename_output
       input$data = read.table(filename_input,  sep = ",", header = FALSE)
+      input$Root_Behavior = paste0(RootPath, "/BehaviouralData/")
+      input$Root_Personality =  paste0(RootPath, "/QuestionnaireData/")
       colnames(input$data) = collumnNamesEEGData 
       
       # Run in Try Catch to parse Error Messages to Parloop
@@ -255,7 +258,7 @@ run_Steps = function( OUTPUT_File,
   start_time <- Sys.time() 
   Protocol = invisible(foreach(i_Fork = 1:nrow(OUTPUT),
                     .errorhandling = 'pass',
-                    .combine = 'c') %dopar% run_Steps_parallel(i_Fork, OUTPUT, Path_to_Merged_Files,  Path_to_Export))
+                    .combine = 'c') %dopar% run_Steps_parallel(i_Fork, OUTPUT, Path_to_Merged_Files,  Path_to_Export, RootPath))
   # just for Troubleshooting
   # for (i_Fork in 1:nrow(OUTPUT)) {
   #  Ex =  run_Steps_parallel(i_Fork, OUTPUT, Path_to_Merged_Files,  Path_to_Export)

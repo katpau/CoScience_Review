@@ -53,7 +53,7 @@ try
     if strcmp(INPUT.StepHistory.Electrodes, "Relative")
         Electrodes = upper(["AFz", "Fz", "Fcz", "Cz", "Cpz", "Pz", "Poz", "Oz", ...
             "AF3", "F1", "FC1", "C1", "CP1", "P1", "PO3", "O1", ...
-            "AF5", "F2", "FC2", "C2", "CP2", "P2", "PO4", "O2"]);
+            "AF4", "F2", "FC2", "C2", "CP2", "P2", "PO4", "O2"]);
     else
         Electrodes = upper(strsplit(INPUT.StepHistory.Electrodes , ","));
     end
@@ -114,16 +114,28 @@ try
     % ********************************************************************************************
     % **** Epoch Data into different Conditions **************************************************
     % ********************************************************************************************
+     % For saving ERP, select only relevant channels
+     EEG_for_ERP = EEG;
+     Electrodes_ERP = upper([ "Fcz", "Cz", "Cpz", "Pz", "Poz", "C1", "CP1", "P1", "PO3", "C2", "CP2", "P2", "PO4"]);
+     EEG_for_ERP = pop_select(EEG_for_ERP, 'channel',Electrodes_ERP);
+     % For saving ERP, always downsample!
+      EEG_for_ERP =  pop_resample(EEG_for_ERP, 100);
+     
+     %Info on Epochs
     Event_Window = [-0.300 1.000];
     Condition_Triggers =  [ 11, 12, 13, 14, 15, 16, 17, 18; 21, 22, 23, 24, 25, 26, 27, 28; 31, 32, 33, 34, 35, 36, 37, 38; ...
         41, 42, 43, 44, 45, 46, 47, 48; 51, 52, 53, 54, 55, 56, 57, 58; 61, 62, 63, 64, 65, 66, 67, 68; ...
         71, 72, 73, 74, 75, 76, 77, 78]; % Picture Onset
     Condition_Names = ["Tree", "Erotic_Couple", "Erotic_Man", "Neutral_ManWoman", "Neutral_Couple", "Positive_ManWoman", "Erotic_Woman"];
     NrConditions = length(Condition_Names);
+    
+
+     
     for i_Cond = 1:NrConditions
         % * Epoch Data around predefined window and save each
-        Interim = pop_epoch( EEG, num2cell(Condition_Triggers(i_Cond,:)), Event_Window, 'epochinfo', 'yes');
-        ConditionData.(Condition_Names(i_Cond)) = Interim.data;
+        Interim = pop_epoch( EEG_for_ERP, num2cell(Condition_Triggers(i_Cond,:)), Event_Window, 'epochinfo', 'yes');
+        ForRelative = pop_epoch( EEG, num2cell(Condition_Triggers(i_Cond,:)), Event_Window, 'epochinfo', 'yes');
+        ConditionData.(Condition_Names(i_Cond)) = ForRelative.data;
         % Calculate ERP
         ERP_toExport.(Condition_Names(i_Cond)) = mean(Interim.data,3);
     end

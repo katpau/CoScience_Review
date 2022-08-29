@@ -31,13 +31,13 @@ Normalize = function(input = NULL, choice = NULL) {
         r = rank(data, na.last = "keep", ties.method = ("average"))
         n = sum(!is.na(r))
         x = (r - 1 / 2)/n
-        normal = qnorm(x, mean = mean(data,na.rm = T), sd = sd(data,na.rm = T), lower.tail = TRUE, log.p = FALSE)
+        normal = qnorm(x, mean = mean(data,na.rm = TRUE), sd = sd(data,na.rm = TRUE), lower.tail = TRUE, log.p = FALSE)
         
         # Apply Log
       } else if (choice == "Log")  {
         # Add Constant to each collum to make all values > 0
         Min = min(data, na.rm = TRUE)
-        if (Min<0) { data = data + Min +1 }
+        if (Min<0) { data = data + abs(Min) +1 }
         normal = log(data)
       } 
       return (normal)
@@ -57,16 +57,18 @@ Normalize = function(input = NULL, choice = NULL) {
     if (length(Relevant_Collumns)>1) {
       Not_Normal = sapply(Personality[,Relevant_Collumns], function(col) check_normality(col)) 
       Not_Normal_CollumnNames = Relevant_Collumns[as.logical(Not_Normal)]
-      # Apply Normalization
-      Personality[,Not_Normal_CollumnNames] = lapply(Personality[,Not_Normal_CollumnNames], function(col) normalize_data(col, choice))
-      
     } else {
       Not_Normal = check_normality(Personality[,Relevant_Collumns])
       Not_Normal_CollumnNames = Relevant_Collumns[as.logical(Not_Normal)]
-      # Apply Normalization
-      Personality[,Not_Normal_CollumnNames] = normalize_data(Personality[,Not_Normal_CollumnNames], choice)
     }
     
+    
+    # Apply Normalization
+    if (length(Not_Normal_CollumnNames)>1) {
+      Personality[,Not_Normal_CollumnNames] = lapply(Personality[,Not_Normal_CollumnNames], function(col) normalize_data(col, choice))
+    } else {
+      Personality[,Not_Normal_CollumnNames] = normalize_data(Personality[,Not_Normal_CollumnNames], choice)
+    }
     
     # Merge again with output
     output =  merge(output,  Personality, by = c("ID"),
@@ -77,12 +79,8 @@ Normalize = function(input = NULL, choice = NULL) {
     # (3) Normalize EEG and Behavioural Data
     #########################################################
     
-    # Get Grouping Variables from colnames (between ID and EEG Signal)
-    GroupingVariables = names(output)[2:(which(names(output)== "EEG_Signal")-1)]
-    # For Frequency/Alpha Frequency Range can be individualized per subject, 
-    # then this Frequency Range should not be used to group analyses
-    if ("FrequencyRange" %in% GroupingVariables & length(unique(output$FrequencyRange)) > 2) 
-    { GroupingVariables = GroupingVariables[-which(GroupingVariables == "FrequencyRange")] }
+    # Get Grouping Variables from previous step
+    GroupingVariables = input$stephistory[["GroupingVariables"]]
     
     # Get Relevant Collumns 
     Relevant_Collumns =  names(output)[grep(c("EEG_Signal|Behav_"), names(output))]
@@ -106,7 +104,7 @@ Normalize = function(input = NULL, choice = NULL) {
     
     # Apply Normalization
     if (length(Relevant_Collumns)>1) {
-     output[,Not_Normal_CollumnNames] = lapply(output[,Not_Normal_CollumnNames], function(col) normalize_data(col, choice))
+      output[,Not_Normal_CollumnNames] = lapply(output[,Not_Normal_CollumnNames], function(col) normalize_data(col, choice))
     } else {
       output[,Not_Normal_CollumnNames] = normalize_data(output[,Not_Normal_CollumnNames], choice)
     }

@@ -192,35 +192,35 @@ try
     elseif INPUT.StepHistory.Quantification_Asymmetry == "separate"
         switch  INPUT.StepHistory.Electrodes
             case "F3,F4"
-                ElectrodeNames = Electrodes;
+                ElectrodeNames = ["F34", "F34"];
                 Localisation = repmat("Frontal",1,length(Electrodes));
                 AlphaType = ["left", "right"];
                 
             case "F3,F4,F5,F6,AF3,AF4"
                 if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-                    ElectrodeNames = ["F3,F5,AF3", "F4,F6,AF4"];
+                    ElectrodeNames = ["F34,F56,AF34", "F34,F56,AF34"];
                     Localisation = ["Frontal", "Frontal"];
                     AlphaType = ["left", "right"];                  
                 else
-                    ElectrodeNames = Electrodes;
+                    ElectrodeNames = ["F34","F34","F56","F56","AF34","AF34"];
                     Localisation = repmat("Frontal",1,length(Electrodes));
                     AlphaType = repmat(["left", "right"],1,length(Electrodes)/2);
                 end
                 
                 
             case "F3,F4,P3,P4"
-                ElectrodeNames = Electrodes;
+                ElectrodeNames = ["F34","F34","P34","P34"];
                 Localisation = ["Frontal", "Frontal", "Parietal" "Parietal"];
                 AlphaType = ["left", "right", "left", "right"];
                 
             case "F3,F4,F5,F6,AF3,AF4,P3,P4,P5,P6,PO3,PO4"
                 if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-                    ElectrodeNames = ["F3,F5,AF3", "F4,F6,AF4", "P3,P5,PO3", "P4,P6,PO4"];
+                    ElectrodeNames = ["F34,F56,AF34", "F34,F56,AF34", "P34,P56,PO34", "P34,P56,PO34"];
                     Localisation = ["Frontal","Frontal", "Parietal", "Parietal"];
                     AlphaType = ["left",  "right", "left", "right"];
                     
                 else
-                    ElectrodeNames = Electrodes;
+                    ElectrodeNames = ["F34","F34","F56","F56","AF34","AF34", "P34","P34","P56","P56","PO34","PO34"];
                     Localisation = sort(repmat(["Frontal", "Parietal"],1,6));
                     AlphaType = repmat(["left", "right"],1,6);
                 end

@@ -14,8 +14,7 @@ output = input$data
 # (1) Preparations 
 #########################################################
 # Read Behavioural Data
-BehavFile = "/work/bay2875/BehaviouralData/task_StroopRating_beh.csv"
-#BehavFile = "C:/Users/Paul/Documents/Work/PersonalityEEG/FINAL_RDF/HUMMEL/work/BehaviouralData/task_StroopRating_beh.csv"
+BehavFile = paste0(input$stephistory["Root_Behavior"], "task_StroopRating_beh.csv")
 BehavData = read.csv(BehavFile, header = TRUE, sep = ";")
 
 
@@ -83,8 +82,14 @@ if (choice != "pleasant_arousal_av") {
   )
   colnames(output)[colnames(output) == "Response"] = "Behav_Pleasure"
   
+  # Drop dimension collumns
+  output= output[,-which(grepl("Dimension", names(output)))]
 }
 
+
+# Make sure every Variable is in correct format
+NumericVariables = c(names(output)[grepl("Behav_", names(output))])
+output[NumericVariables] = lapply(output[NumericVariables], as.numeric)
 
 
 

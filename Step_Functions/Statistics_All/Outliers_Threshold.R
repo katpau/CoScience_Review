@@ -28,13 +28,8 @@ output$Outliers_SME = 0
 output$Outliers_ACC = 0
 
 if (Threshold != "None") {
-  # Get Grouping Variables from colnames (between ID and EEG Signal)
-  GroupingVariables = names(output)[2:(which(names(output)== "EEG_Signal")-1)]
-  # For Frequency/Alpha Frequency Range can be individualized per subject
-  if ("FrequencyRange" %in% GroupingVariables & length(unique(output$FrequencyRange)) > 2) 
-  { GroupingVariables = GroupingVariables[-which(GroupingVariables == "FrequencyRange")] }
-  
-  
+  GroupingVariables = input$stephistory[["GroupingVariables"]]
+ 
   # Set up outlier function based on Choice on Thresholds, takes the corresponding values (central tendency, width),
   # returns 0&1, 1 for the values exceeding the acceptable range
   # can then be used quickly below in piping
@@ -112,7 +107,7 @@ if (Threshold != "None") {
                       by = GroupingVariables,    all.x = TRUE,    all.y = FALSE )
   
   # Add ID as first Variable again
-  output = output %>%  select("ID", everything())
+  output = output %>%  dplyr::select("ID", everything())
 }
 
 
