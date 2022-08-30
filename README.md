@@ -39,21 +39,21 @@ All of these files above are compiled, depending on the analysis (e.g. for Alpha
                   is listed, then the subject was completed before. These files will be created and updated before the parfor_Functions are run [not relevant for 
                   this test]
          * *StatFORKS.txt* - contains overview of some Forks of the statistical procedure, mentions which Groupfile should be taken, what the choice combination is (in numbers) and in  words
+         
      * **Logs** - contains Folder for each Analysis Name and Task, and these contain the following folders
-             * *CompletionStatus* - if all forks from FORK.mat have been completed, a file is created here (this is used to update the joblist before running the
+        * *CompletionStatus* - if all forks from FORK.mat have been completed, a file is created here (this is used to update the joblist before running the
                                    parfor_Functions)
-             * *ErrorMessages* - if a Step through an error, a detail list of where the error occurred (Subject, Step, Choice) as well as the error message (in the
+         * *ErrorMessages* - if a Step through an error, a detail list of where the error occurred (Subject, Step, Choice) as well as the error message (in the
                                 file) is saved as txt
-             * *Statistics* - a Logfile from R running the stats  is saved as txt
+         * *Statistics* - a Logfile from R running the stats  is saved as txt
                                                          
      * **Alpha_Context** - Folder for each Analysis, with the "task-" subfolders. These contain the intermediate and final Forking Steps of the 
-                    Preprocessing. 
-          **task-Resting /Stroop** ...
-                   This will contain a lot of folders. The forks are coded by number (not name as it would exceed max file names). The folders then contain
-                         * *.mat* for the Subject, including the preprocessed data, information on the lab and previous steps etc.
-                         * *error.mat* if there was an error with this step, these files are used to terminate the processing of a fork with a similiar stephistory
-                         * *running.mat* if step is going to be saved and is currently in progress, this interim file is created and deleted as soon as the file is   saved
-            * **Group_Data** - contains two example files where all information from all single subjects of one fork are merged across all tasks [only 50 subjects for testing, otherwise it takes too long]
+                    Preprocessing. Generates a Folder for each task 
+         * **task-Resting /Stroop** ..., each of them contains a lot of folders. The forks are coded by number (not name as it would exceed max file names). The folders then contain
+            * *.mat* for the Subject, including the preprocessed data, information on the lab and previous steps etc.
+            * *error.mat* if there was an error with this step, these files are used to terminate the processing of a fork with a similiar stephistory
+            * *running.mat* if step is going to be saved and is currently in progress, this interim file is created and deleted as soon as the file is   saved
+          * **Group_Data** - contains two example files where all information from all single subjects of one fork are merged across all tasks [only 50 subjects for testing, otherwise it takes too long]
                   
     
     * **QuestionnaireData/Alpha_Context** contains 4 txt files where the relevant Personality Scores have been extracted, they differ if they are "filtered" (attention 
