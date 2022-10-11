@@ -50,7 +50,7 @@ FORKS = read.table(FORKS_File,  sep = ";", header = TRUE)
 # Create Function to run in Parallel
 run_Steps_parallel = function (i_Fork, FORKS, Path_to_Merged_Files, Path_to_Export, Root){
   
-    # Added here again so that it can be done in parallel on windows.... -.-
+  # Added here again so that it can be done in parallel on windows.... -.-
   ListOfStepFunctionFolders=c("Statistics_All", "Statistics_Alpha_Context")
   StepFunctionFolder = paste0(Root, "/Step_Functions/")
   ListOfStepFunctionFolders = paste0(StepFunctionFolder, ListOfStepFunctionFolders, "/")

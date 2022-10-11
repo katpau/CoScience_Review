@@ -188,15 +188,16 @@ parpool(ParPools);
 % Retry if conflicts ocurred
 Retry_Loop_Max = 0;
 while sum(RetryFork)>1 && Retry_Loop_Max < 50
-    fprintf('Number of Combinations that need to be retried: %d. \n', sum(RetryFork));
+    fprintf('Subset %d. Number of Combinations that need to be retried/calculated: %d. \n', IndexSubset, sum(RetryFork));
     [CountErrors, CountCompleted, CountPreviouslyCompleted, ...
         RetryFork, OUTPUT_Choices, OUTPUT_FolderName] = run_Steps(Subject, AnalysisName, DESIGN, OUTPUT_Name, ...
         OUTPUT_Choices, OUTPUT_FolderName, ...
         ImportFolder, OutputFolder, LogFolder, ErrorFolder,   ...
         Steps, MaxStep, Dummy,  RetryError, PrintLocation, ParPools,  ...
         CountErrors, CountCompleted, CountPreviouslyCompleted, RetryFork);
-    fprintf('run_Steps Loop: %d finished after %d. \n', Retry_Loop_Max); toc
+    fprintf('Subset %d. run_Steps Loop: %d finished after %d. \n', IndexSubset, Retry_Loop_Max); toc
     Retry_Loop_Max = Retry_Loop_Max + 1;
+    pause(5)
 end
 
 % Make Note that this analysis was completed
@@ -252,6 +253,7 @@ parfor iPath = 1:size(OUTPUT_Choices,1)
                 FileFound = 1;
             elseif isfile(Test_InProgress) % is this step currently been calculated?
                 RetryForkOUT(iPath) = 1;
+                fprintf("Path in Progress, retry later")
                 StopPath = 1;
                 FileFound = 1;
             elseif isfile(Test_Error) & RetryError == 0; % did this step throw an error before and should not be redone?
@@ -304,6 +306,7 @@ parfor iPath = 1:size(OUTPUT_Choices,1)
                 fprintf('\n InterimStep Cannot be loaded \n')
                 delete(Test_completed);
                 RetryForkOUT(iPath) = 1;
+                fprintf("InterimStep cannot be loaded, retried later")
                 continue
             end
             

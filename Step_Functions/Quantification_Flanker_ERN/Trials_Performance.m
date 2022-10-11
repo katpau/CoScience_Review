@@ -46,35 +46,38 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
     %### Start Preprocessing Routine                               #######
     %#####################################################################
     
-    % Get EEGlab EEG structure from the provided Input Structure
-    EEG = INPUT.data;
-    
-    % ****** Find Trials to be excluded ******
-    if ~strcmpi(Choice, "all")
-        % Mark Trials with RTs faster than 0.1 and slower than 0.8s
-        IdxKeep = zeros(length(EEG.event),1);
-        IdxKeep =  cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {EEG.event.RT})
-        if strcmpi(Choice, "RTs_postcorrect")
-            % Mark Trials after based on performance of previous trial
-            IdxKeep2 = zeros(length(EEG.event),1);
-            IdxKeep2 = cellfun(@(x)~isempty(x) && contains(x, 'post_correct'), {EEG.event.Post_Trial});
-            IdxKeep = and(IdxKeep, IdxKeep2);
-        end
-        Epochs_to_Keep = {EEG.event.epoch};
-        Epochs_to_Keep = unique([Epochs_to_Keep{IdxKeep}]);
+    Conditions = fieldnames(INPUT.data);
+    for i_cond = 1:length(Conditions)
+        % Get EEGlab EEG structure from the provided Input Structure
+        EEG = INPUT.data.(Conditions{i_cond});
         
-        % ****** Keep only marked Trials ******
-        EEG = pop_select( EEG, 'trial', Epochs_to_Keep);
-                
+        % ****** Find Trials to be excluded ******
+        if ~strcmpi(Choice, "all")
+            % Mark Trials with RTs faster than 0.1 and slower than 0.8s
+            IdxKeep = zeros(length(EEG.event),1);
+            IdxKeep =  cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {EEG.event.RT})
+            if strcmpi(Choice, "RTs_postcorrect")
+                % Mark Trials after based on performance of previous trial
+                IdxKeep2 = zeros(length(EEG.event),1);
+                IdxKeep2 = cellfun(@(x)~isempty(x) && contains(x, 'post_correct'), {EEG.event.Post_Trial});
+                IdxKeep = and(IdxKeep, IdxKeep2);
+            end
+            Epochs_to_Keep = {EEG.event.epoch};
+            Epochs_to_Keep = unique([Epochs_to_Keep{IdxKeep}]);
+            
+            % ****** Keep only marked Trials ******
+            EEG = pop_select( EEG, 'trial', Epochs_to_Keep);
+            
+        end
+        %#####################################################################
+        %### Wrapping up Preprocessing Routine                         #######
+        %#####################################################################
+        % ****** Export ******
+        % Script creates an OUTPUT structure. Assign here what should be saved
+        % and made available for next step. Always save the EEG structure in
+        % the OUTPUT.data field, overwriting previous EEG information.
+        OUTPUT.data.(Conditions{i_cond}) = EEG;
     end
-    %#####################################################################
-    %### Wrapping up Preprocessing Routine                         #######
-    %#####################################################################
-    % ****** Export ******
-    % Script creates an OUTPUT structure. Assign here what should be saved
-    % and made available for next step. Always save the EEG structure in
-    % the OUTPUT.data field, overwriting previous EEG information.
-    OUTPUT.data = EEG;
     OUTPUT.StepDuration = [OUTPUT.StepDuration; toc];
     
     % ****** Error Management ******
@@ -86,5 +89,4 @@ catch e
         ErrorMessage = strcat(ErrorMessage, "//", num2str(e.stack(ierrors).name), ", Line: ",  num2str(e.stack(ierrors).line));
     end
     OUTPUT.Error = ErrorMessage;
-end
 end

@@ -132,7 +132,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         end
         
         % ****** Resting Tasks are epoched in consecutive overlapping epochs ******
-        if contains(INPUT.AnalysisName,  "Resting")
+        if contains(INPUT.AnalysisName,  "Resting") || INPUT.AnalysisName == "Alpha_Context"
             % If Resting data was epoched before, concatenate the
             % non-overlapping epochs first.
             if strcmp(INPUT.StepHistory.Epoching_AC, "epoched")

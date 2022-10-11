@@ -7,13 +7,14 @@ output = input$data
 # Handles all Choices listed above to add behavioral covariate to data
 # (1) Read and Restructure Data
 # (2) Extract Ratings and combine (either per Subject/Condition, Arousal or/and Valence, or Group Average by condition)
-
+# (3) Rename Stroop Conditions to reflect same-opposite Sex 
 
 
 #########################################################
 # (1) Preparations 
 #########################################################
 # Read Behavioural Data
+#BehavFile = "/work/bay2875/BehaviouralData/task_StroopRating_beh.csv"
 BehavFile = paste0(input$stephistory["Root_Behavior"], "task_StroopRating_beh.csv")
 BehavData = read.csv(BehavFile, header = TRUE, sep = ";")
 
@@ -91,6 +92,17 @@ if (choice != "pleasant_arousal_av") {
 NumericVariables = c(names(output)[grepl("Behav_", names(output))])
 output[NumericVariables] = lapply(output[NumericVariables], as.numeric)
 
+#########################################################
+# (3) Rename Stroop
+#########################################################
+# Comes from Limesurvey, 1= female, 2 = male
+output$Condition[output$Condition %in% "EroticMan" & output$Gender %in% 1] = "EroticOppositeSex"
+output$Condition[output$Condition %in% "EroticMan" & output$Gender %in% 2] = "EroticSameSex"
+output$Condition[output$Condition %in% "EroticWoman" & output$Gender %in% 2] = "EroticOppositeSex"
+output$Condition[output$Condition %in% "EroticWoman" & output$Gender %in% 1] = "EroticSameSex"
+output$EEG_Signal[is.na(output$Gender) & output$Condition %in% "EroticMan"] = NA
+output$EEG_Signal[is.na(output$Gender) & output$Condition %in% "EroticWoman"] = NA
+output  = output[,-which(names(output)=="Gender")]
 
 
 #No change needed below here - just for bookkeeping

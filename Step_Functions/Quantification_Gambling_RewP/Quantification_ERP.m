@@ -63,7 +63,7 @@ try
     % ********************************************************************************************
      % For saving ERP, select only relevant channels
       EEG_for_ERP = EEG;
-      Electrodes_ERP = upper([ "Fcz", "Cz", "Fz", "Pz", "Cpz"]);
+      Electrodes_ERP = {'FCZ', 'CZ', 'FZ', 'PZ', 'CPZ'};
       EEG_for_ERP = pop_select(EEG_for_ERP, 'channel',Electrodes_ERP);
       %For saving ERP,  downsample!
       EEG_for_ERP =  pop_resample(EEG_for_ERP, 100);
@@ -99,6 +99,7 @@ try
     NrElectrodes = length(Electrodes);
     
     % Get Index on Electrodes RewP ******
+    Electrodes = strrep(Electrodes, " ", "");
     ElectrodeIdx = zeros(1, length(Electrodes));
     for iel = 1:length(Electrodes)
         [~, ElectrodeIdx(iel)] = ismember(Electrodes(iel), upper({EEG.chanlocs.labels})); % Do it in this loop to maintain matching/order of Name and Index!
@@ -109,6 +110,7 @@ try
     NrElectrodesP3 = length(ElectrodesP3);
     
     % Get Index on Electrodes P3 ******
+    ElectrodesP3 = strrep(ElectrodesP3, " ", "");
     ElectrodeIdxP3 = zeros(1, length(ElectrodesP3));
     for iel = 1:length(ElectrodesP3)
         [~, ElectrodeIdxP3(iel)] = ismember(ElectrodesP3(iel), {EEG.chanlocs.labels}); % Do it in this loop to maintain matching/order of Name and Index!
@@ -251,8 +253,15 @@ try
         % ********************************************************************************************
         % ****** Prepare Labels ******
         % Subject is constant
-        Subject_L = repmat(INPUT.Subject, NrConditions*NrElectrodes,1 );
-        SubjectP3_L = repmat(INPUT.Subject, NrConditions*NrElectrodesP3,1 );
+        if isfield(INPUT, "Subject"); INPUT.SubjectName = INPUT.Subject; end
+        Subject_L = repmat(INPUT.SubjectName, NrConditions*NrElectrodes,1 );
+        SubjectP3_L = repmat(INPUT.SubjectName, NrConditions*NrElectrodesP3,1 );
+
+        Lab_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodes,1 );
+        LabP3_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodesP3,1 );
+
+        Experimenter_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodes,1 );
+        ExperimenterP3_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodesP3,1 );
         
         % Electrodes: if multiple electrodes, they simply alternate
         Electrodes_L = repmat(Electrodes', NrConditions, 1);
@@ -269,9 +278,9 @@ try
         TimeWindowP3_L = repmat(num2str(TimeWindowP3), NrConditions*NrElectrodesP3, 1);
         
         % ****** Prepare Table ******
-        Export = [cellstr([Subject_L, Conditions_L, Electrodes_L, TimeWindow_L]),...
+        Export = [cellstr([Subject_L, Lab_L, Experimenter_L, Conditions_L, Electrodes_L, TimeWindow_L]),...
             num2cell([ERP(:), SME(:), EpochCount(:)]);
-            cellstr([SubjectP3_L, ConditionsP3_L, ElectrodesP3_L, TimeWindowP3_L]),...
+            cellstr([SubjectP3_L, LabP3_L, ExperimenterP3_L, ConditionsP3_L, ElectrodesP3_L, TimeWindowP3_L]),...
             num2cell([ERPP3(:), SMEP3(:), EpochCountP3(:)])];
         
     end

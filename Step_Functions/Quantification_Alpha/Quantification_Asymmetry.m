@@ -421,12 +421,14 @@ try
     Frequency_Labels = num2str(FrequencyBand);
     FrequencyBandLabel_L = repelem(string(FrequencyBandLabel), 1, NrElectrodes*NrConditions)';
     Freq_L = repelem(string(Frequency_Labels)', 1, NrElectrodes*NrConditions)';
-    % Subject is constant
+    % Subject and Info on Lab is constant
     Subject_L = repmat(INPUT.Subject, NrConditions*NrElectrodes*NrFreqWindow,1 );
+    Lab_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodes*NrFreqWindow,1 );
+    Experimenter_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodes*NrFreqWindow,1 );
     % Prepare Table
-    % in Format AnalysisName - Subject - Condition - AlphaType - Electrode - Localisation - FreqWindow - Alpha - SME - Epoch Count
+    % in Format AnalysisName - Subject - Condition - AlphaType - Electrode - Localisation - FreqWindow - Alpha - SME - Epoch Count- Lab - Experimenter 
     
-    Alpha_Table = cellstr([Subject_L, Conditions_L, Electrodes_L', FrequencyBandLabel_L, Freq_L, [Alpha_Export(:)], [SME_Export(:)], EpochCount]);
+    Alpha_Table = cellstr([Subject_L, Conditions_L, Electrodes_L', FrequencyBandLabel_L, Freq_L, [Alpha_Export(:)], [SME_Export(:)], EpochCount, Lab_L, Experimenter_L,]);
     
     %#####################################################################
     %### Wrapping up Preprocessing Routine                         #######

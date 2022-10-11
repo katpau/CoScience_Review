@@ -298,7 +298,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   ###########################
-  # For Hypothesis Set 2, the tests are conducted on the Condition of the strongest correlation (if it was significant, otherwise the main effect)
+  # For Hypothesis Set 2, the tests are conducted on the Condition1 of the strongest correlation (if it was significant, otherwise the main effect)
   extract_StrongestCorrelation = function (SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Conditions, Average_Across_Conditions) {
     # This Function takes SignTest (the test of the interaction term with Condition1), if it is significant, the strongest correlation is found and exported
     if (!is.na(SignTest)) {
@@ -641,7 +641,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   Task = "Gambling"
   AnalysisPhase = "Consumption"
   # Take the larger effects of the two (interaction or main effect of magnitude)
-  
+
   if (all(is.na(c(H2.2.2_prepA[3], H2.2.2_prepB[3])))) {
     # Use Main Effect even if not meaningful
     ToExtract = "Main"
@@ -770,7 +770,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   H2.5x = test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, collumns_to_keep, Task, AnalysisPhase)
   
   
-  # Not a hypothesis but still add Association with just for different Phases 
+    # Not a hypothesis but still add Association with just for different Phases 
   Effect_of_Interest = Personality_Name
   lm_formula =   paste( "EEG_Signal ~ ((", Personality_Name, ")",additional_Factor_Formula, ")", Covariate_Formula)
   Task = c("Resting")
@@ -783,11 +783,11 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   AnalysisPhase = c("Anticipation")
   Name_Test = c("Personality_Gambling_Anticipation-EEG-OW")
   H2.5B1x = test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, collumns_to_keep, Task, AnalysisPhase)
-  
+ 
   AnalysisPhase = c("Consumption")
   Name_Test = c("Personality_Gambling_Consumption-EEG-OW")
   H2.5B2x = test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, collumns_to_keep, Task, AnalysisPhase)
-  
+
   # Not a hypothesis but still add Association with Resting
   Task = c("Stroop")
   AnalysisPhase = c("Anticipation")
@@ -858,7 +858,13 @@ Determine_Significance = function(input = NULL, choice = NULL) {
       }  }  }
   colnames(Estimate) = c("Effect_of_Interest", "Statistical_Test", "partial_Eta2", "CI_low", "CI90_high", "p_Value", "Estimate", "Std.Error", "n_participants", "av_epochs", "sd_epochs", "Singularity")
   
+ 
   
+
+  
+
+  
+
   
   #########################################################
   # (8) Correct for Multiple Comparisons for Hypothesis 1

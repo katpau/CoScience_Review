@@ -127,7 +127,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             Condition = {'Gambling_Anticipation', 'Gambling_Consumption'};
             
             % ****** Resting Tasks are epoched in consecutive epochs ******
-        elseif contains(INPUT.AnalysisName, 'Resting')           
+        elseif contains(INPUT.AnalysisName,  "Resting") || INPUT.AnalysisName == "Alpha_Context"           
             % Epoch Data in 1s intervals
             EEG = eeg_regepochs(EEG, 1,[0 1], 0, 'X', 'on');
             % Keep Collumn with urepochs to check continuity later

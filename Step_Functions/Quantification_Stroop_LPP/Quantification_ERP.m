@@ -60,6 +60,7 @@ try
     NrElectrodes = length(Electrodes);
     
     % Get Index on Electrodes ******
+    Electrodes = strrep(Electrodes, " ", "");
     ElectrodeIdx = zeros(1, length(Electrodes));
     for iel = 1:length(Electrodes)
         [~, ElectrodeIdx(iel)] = ismember(Electrodes(iel), upper({EEG.chanlocs.labels})); % Do it in this loop to maintain matching/order of Name and Index!
@@ -116,7 +117,7 @@ try
     % ********************************************************************************************
      % For saving ERP, select only relevant channels
      EEG_for_ERP = EEG;
-     Electrodes_ERP = upper([ "Fcz", "Cz", "Cpz", "Pz", "Poz", "C1", "CP1", "P1", "PO3", "C2", "CP2", "P2", "PO4"]);
+     Electrodes_ERP = { 'FCZ', 'CZ', 'CPZ', 'PZ', 'POZ', 'C1', 'CP1', 'P1', 'PO3', 'C2', 'CP2', 'P2', 'PO4'};
      EEG_for_ERP = pop_select(EEG_for_ERP, 'channel',Electrodes_ERP);
      % For saving ERP, always downsample!
       EEG_for_ERP =  pop_resample(EEG_for_ERP, 100);
@@ -196,8 +197,12 @@ try
         % **** Prepare Output Table    ***************************************************************
         % ********************************************************************************************     
         % ****** Prepare Labels ****** 
-        % Subject is constant
-        Subject_L = repmat(INPUT.Subject, NrConditions*NrElectrodes*NrTimeWindows,1 );
+        % Subject, Lab and experimenter is constant
+        if isfield(INPUT, "Subject"); INPUT.SubjectName = INPUT.Subject; end
+        Subject_L = repmat(INPUT.SubjectName, NrConditions*NrElectrodes*NrTimeWindows,1 );
+        Lab_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodes*NrFreqWindow,1 );
+        Experimenter_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodes*NrFreqWindow,1 );
+        
         % Electrodes: if multiple electrodes, they simply alternate
         Electrodes_L = repmat(Electrodes', NrConditions*NrTimeWindows, 1);
         % Conditions are blocked across electrodes, but alternate across time windows
@@ -211,7 +216,7 @@ try
         
         
         % ****** Prepare Table ****** 
-        Export = [cellstr([Subject_L, Conditions_L, Electrodes_L, TimeWindow_L]),...
+        Export = [cellstr([Subject_L, Lab_L, Experimenter_L, Conditions_L, Electrodes_L, TimeWindow_L]),...
             num2cell([ERP(:), SME(:), EpochCount(:)])];
         
         % Add ACC
