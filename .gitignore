@@ -5,4 +5,6 @@
 **/Only_ForGit_To_TestRun/Logs/*
 **/Step_Functions/Quantification_Flanker_ERN/*
 
+# ignore the following file types
+.DS_Store
 
