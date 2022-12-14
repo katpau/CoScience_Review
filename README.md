@@ -18,6 +18,17 @@ This Repository contains all Preprocessing and Analytical functions used in in t
 
 #########################################################
 
+Before Starting, please familiarize yourself a bit with github. 
+Christoph has prepared this excellent introduction:
+[GitHub_tutorial.pdf](https://github.com/katpau/CoScience_Review/files/10229627/GitHub_tutorial.pdf)
+
+And a bit of practical information on how to deal with this code here is collected here:
+[GitHub_Welcome.pdf](https://github.com/katpau/CoScience_Review/files/10229647/GitHub_Welcome.pdf)
+
+
+#########################################################
+
+
 
 In detail, the folders contain
 * **Analysis_Functions** - contain all EEGLAB functions, including plugins, functions to export in BIDS format etc. and custom made functions to handle the forking or functions for easier peak detection etc.
