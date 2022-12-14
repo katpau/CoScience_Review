@@ -84,8 +84,9 @@ All of these files above are compiled, depending on the analysis (e.g. for Alpha
                         checks and RT cutoffs applied or not) and if "outliers were removed" (based on mahalanobis)
             * 4 csv files describing the factor analysis
     
-      
-         * **RawData**  - contains the eeg + behavioral data from three subjects from the task in the BIDS format
+     * **Questionnaire_Prep** - contains R scripts to extract relevant questionnaire data (includes the Factor analysis!)
+     
+     * **RawData**  - contains the eeg + behavioral data from three subjects from the task in the BIDS format
 
          
                      
