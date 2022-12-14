@@ -4,8 +4,9 @@ This Repository contains all Preprocessing and Analytical functions used in in t
 
 ######################################################### 
 
-***To Run the Test, open and run TEST_RDF.m or TEST_RDF_Stats.R ****
-*** Change Analysis Name to what analysis you want to test  ****
+***To Run the Test, open and run TEST_RDF.m or TEST_RDF_Stats.R***
+
+***Change Analysis Name to what analysis you want to test***
  * Alpha_Resting (Cassie)
  * Alpha_Context (Kat)
  * Error_MVPA (Elisa)
