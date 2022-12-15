@@ -1,0 +1,22 @@
+
+Call:
+factanal(x = PCA_Subset[, 2:ncol(PCA_Subset)], factors = nr_factors,     scores = "regres", rotation = "promax")
+
+Uniquenesses:
+   BISBAS_BIS     RSTPQ_BIS PSWQ_Concerns   BFI_Anxiety 
+        0.307         0.288         0.201         0.304 
+
+Loadings:
+              Factor1
+BISBAS_BIS    0.833  
+RSTPQ_BIS     0.844  
+PSWQ_Concerns 0.894  
+BFI_Anxiety   0.834  
+
+               Factor1
+SS loadings      2.901
+Proportion Var   0.725
+
+Test of the hypothesis that 1 factor is sufficient.
+The chi square statistic is 33.62 on 2 degrees of freedom.
+The p-value is 5e-08 

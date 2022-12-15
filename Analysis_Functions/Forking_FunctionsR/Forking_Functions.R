@@ -58,7 +58,7 @@ source_Design = function (ListOfStepFunctionFolders) {
       imported =  readLines(StepFunctions[ifile])
       eval(parse(text = imported[grep("Order = ", imported)]))
       eval(parse(text = imported[grep("Choices = ", imported)]))
-      FunctionName = gsub(".R", "", StepFunctions_Short[ifile])
+      FunctionName = gsub("\\.R", "", StepFunctions_Short[ifile])
       FunctionOrder = c(FunctionOrder, Order)
       eval(parse(text = paste0(FunctionName, "= Choices")))
       FunctionNames = c(FunctionNames, FunctionName)
@@ -79,7 +79,53 @@ source_Design = function (ListOfStepFunctionFolders) {
 
 ## Combine the Forks
 combine_Choices = function(design, PreviousStep) {
-  Forking_List = do.call(expand.grid, design)
+  # This can easily result in sizes extending the available RAM
+  # One Solution is to Fork everything till Outliers, clean up, then merge with Rest
+  
+  highest_outlier = max(which(grepl("Outliers_", names(design))))
+  
+  Forking_List1 = do.call(expand.grid, design[1:highest_outlier])
+  
+  
+  # Drop outlier combinations that cannot be
+  # Get Indexes of Nones
+  outlier_collumns = names(design)[grepl("Outliers_", names(design))]
+  outlier_collumns = outlier_collumns[!grepl("Personality", outlier_collumns)]
+  Idx_None = Forking_List1[outlier_collumns] == "None"
+  All_None = apply(Idx_None, 1, all)
+  
+  # If all selected to None, then Threshold and Treatment must be none
+  Idx_To_Drop = c(which(Forking_List1$Outliers_Threshold != "None" & All_None),
+                  which(Forking_List1$Treat_Outliers != "None" & All_None))
+  
+  # If Threshold/Treatment are None, all others must be None 
+  Idx_To_Drop = c(Idx_To_Drop,
+                  which(Forking_List1$Outliers_Threshold == "None" & !All_None),
+                  which(Forking_List1$Treat_Outliers == "None" & !All_None))
+  
+  
+  # If Threshold is None, Treatment must be none and vice versa
+  Idx_To_Drop = c(Idx_To_Drop,
+                  which(Forking_List1$Outliers_Threshold == "None" & !Forking_List1$Treat_Outliers == "None"),
+                  which(!Forking_List1$Outliers_Threshold == "None" & Forking_List1$Treat_Outliers == "None"))
+  
+  Idx_To_Drop = c(Idx_To_Drop,
+                  which(Forking_List1$Outliers_EEG == "None" & Forking_List1$Treat_Outliers == "Replace"))
+  
+  
+  Idx_To_Drop = unique(Idx_To_Drop)
+  
+  # Drop these from combination
+  Forking_List1 = Forking_List1[-Idx_To_Drop,]
+  
+  
+  
+  # Fork second part and merge
+  Forking_List2 = do.call(expand.grid, design[(highest_outlier+1):length(design)])
+  Forking_List = tidyr::crossing(Forking_List1, Forking_List2)
+  
+
+  # Change Structure
   fac_cols = sapply(Forking_List, is.factor)
   Forking_List[fac_cols] <-
     lapply(Forking_List[fac_cols], as.character)
@@ -91,6 +137,8 @@ combine_Choices = function(design, PreviousStep) {
         labels = 1:length(unique(col))
       )
     )))
+  
+  # Create Output Numbering
   Combination_Number = ""
   for (i_Step in 1:ncol(Combination_Name)) {
     Combination_Number = paste0(Combination_Number,

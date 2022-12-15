@@ -1,0 +1,59 @@
+{
+  "onset": {
+    "LongName": "Event onset",
+    "Description": "Onset (in seconds) of the event measured from the beginning of the acquisition of the first volume in the corresponding task imaging data file.",
+    "Units": "Sampling Points"
+  },
+  "duration": {
+    "LongName": "Event duration",
+    "Description": "Duration of the event (measured from onset) in seconds",
+    "Units": "second"
+  },
+  "sample": {
+    "LongName": "Sample",
+    "Description": "Onset of the event according to the sampling scheme of the recorded modality (i.e., referring to the raw data file that the events.tsv file accompanies)."
+  },
+  "trial_type": {
+    "LongName": "Event categorization",
+    "Description": "Complete categorisation of each trial to identify them as instances of the experimental conditions."
+  },
+  "value": {
+    "LongName": "Event marker",
+    "Description": "Marker value associated with the event.",
+    "Levels": {
+      "x1": "Offer_1.9",
+      "x2": "Offer_5.5",
+      "x3": "Offer_3.7",
+      "x11": "Choice_Accepted_1.9",
+      "x12": "Choice_Accepted_5.5",
+      "x13": "Choice_Accepted_3.7",
+      "x21": "Choice_Rejected_1.9",
+      "x22": "Choice_Rejected_5.5",
+      "x23": "Choice_Rejected_3.7",
+      "x91": "Feedback_Too_Slow_1.9",
+      "x92": "Feedback_Too_Slow_5.5",
+      "x93": "Feedback_Too_Slow_3.7"
+    }
+  },
+  "Event": {
+    "LongName": "Event",
+    "Description": "Verbal Description of Event"
+  },
+  "Trial": {
+    "LongName": "Trial",
+    "Description": "Trial count, starting with 0"
+  },
+  "RT": {
+    "LongName": "RT",
+    "Description": "Response time after Target.",
+    "Unit": "second"
+  },
+  "Response": {
+    "LongName": "Response",
+    "Description": "Three Levels Accept offer, Reject offer, NA when too slow "
+  },
+  "OfferSelf": {
+    "LongName": "OfferSelf",
+    "Description": "Three Levels, 5 = Five to Participants and 5 to Proposer, 3 = 3 to Participant and 7 to Proposer, 1 = 1 to Participant and 9 to Proposer"
+  }
+}

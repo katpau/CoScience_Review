@@ -1,0 +1,25 @@
+
+Call:
+factanal(x = PCA_Subset[, 2:ncol(PCA_Subset)], factors = nr_factors,     scores = "regres", rotation = "promax")
+
+Uniquenesses:
+MPQPE_SocialPotency   MPQPE_Achievement     MPQPE_Wellbeing   BFI_Assertiveness     BFI_EnergyLevel          BISBAS_BAS           RSTPQ_BAS 
+              0.637               0.855               0.665               0.682               0.454               0.535               0.289 
+
+Loadings:
+                    Factor1
+MPQPE_SocialPotency 0.602  
+MPQPE_Achievement   0.381  
+MPQPE_Wellbeing     0.578  
+BFI_Assertiveness   0.564  
+BFI_EnergyLevel     0.739  
+BISBAS_BAS          0.682  
+RSTPQ_BAS           0.843  
+
+               Factor1
+SS loadings      2.884
+Proportion Var   0.412
+
+Test of the hypothesis that 1 factor is sufficient.
+The chi square statistic is 610.62 on 14 degrees of freedom.
+The p-value is 2.93e-121 

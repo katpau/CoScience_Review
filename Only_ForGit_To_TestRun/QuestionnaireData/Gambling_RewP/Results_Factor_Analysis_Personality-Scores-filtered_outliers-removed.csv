@@ -1,0 +1,19 @@
+
+Call:
+factanal(x = PCA_Subset[, 2:ncol(PCA_Subset)], factors = nr_factors,     scores = "regres", rotation = "promax")
+
+Uniquenesses:
+      RSTPQ_RewardInterest MPQPE_PositiveEmotionality                 BISBAS_BAS 
+                     0.367                      0.465                      0.620 
+
+Loadings:
+                           Factor1
+RSTPQ_RewardInterest       0.795  
+MPQPE_PositiveEmotionality 0.731  
+BISBAS_BAS                 0.617  
+
+               Factor1
+SS loadings      1.547
+Proportion Var   0.516
+
+The degrees of freedom for the model is 0 and the fit was 0 

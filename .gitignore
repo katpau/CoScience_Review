@@ -1,8 +1,36 @@
+# ignore the following file types
+.DS_Store
 # ignore folder with precomputed data to not upload similar calculations:
+**/Only_ForGit_To_TestRun/Logs/*
 **/Only_ForGit_To_TestRun/Alpha_Context/task*
 **/Only_ForGit_To_TestRun/Alpha_Context/Stats_Results/*
 **/Only_ForGit_To_TestRun/LPP_Stroop/task*
-**/Only_ForGit_To_TestRun/Logs/*
-**/Step_Functions/Quantification_Flanker_ERN/*
-
-
+**/Only_ForGit_To_TestRun/LPP_Stroop/Stats_Results/*
+**/Only_ForGit_To_TestRun/Preproc_forked/GoNoGo_Conflict/task*
+**/Only_ForGit_To_TestRun/Preproc_forked/GoNoGo_Conflict/Stats*
+**/Only_ForGit_To_TestRun/Preproc_forked/Alpha_Context/task*
+**/Only_ForGit_To_TestRun/Preproc_forked/Alpha_Context/Stats*
+**/Only_ForGit_To_TestRun/Preproc_forked/Alpha_Resting/task*
+**/Only_ForGit_To_TestRun/Preproc_forked/Alpha_Resting/Stats*
+**/Only_ForGit_To_TestRun/Preproc_forked/Error_MVPA/task*
+**/Only_ForGit_To_TestRun/Preproc_forked/Error_MVPA/Stats*
+**/Only_ForGit_To_TestRun/Preproc_forked/Flanker_Conflict/task*
+**/Only_ForGit_To_TestRun/Preproc_forked/Flanker_Conflict/Stats*
+**/Only_ForGit_To_TestRun/Preproc_forked/Flanker_Error*
+**/Only_ForGit_To_TestRun/Preproc_forked/Gambling_N300H/task*
+**/Only_ForGit_To_TestRun/Preproc_forked/Gambling_N300H/Stats*
+**/Only_ForGit_To_TestRun/Preproc_forked/Gambling_RewP/task*
+**/Only_ForGit_To_TestRun/Preproc_forked/Gambling_RewP/Stats*
+**/Only_ForGit_To_TestRun/Preproc_forked/GoNoGo_Conflict/task*
+**/Only_ForGit_To_TestRun/Preproc_forked/GoNoGo_Conflict/Stats*
+**/Only_ForGit_To_TestRun/Preproc_forked/Ultimatum_Offer/task*
+**/Only_ForGit_To_TestRun/Preproc_forked/Ultimatum_Offer/Stats*
+**/Only_ForGit_To_TestRun/Preparing_PersonalityData/Test*
+# Also ignore incomplete/untested scripts
+**/Only_ForGit_To_TestRun/ForkingFiles/Flanker_Error*
+**/Only_ForGit_To_TestRun/ForkingFiles/Flanker_Error*
+**/Step_Functions/Quantification_Error_Perfectionism/*
+**/Step_Functions/Quantification_Flanker_Error/*
+**/Step_Functions/Quantification_Gambling_RewP_Relative/*
+**/Step_Functions/Quantification_Error_Perfectionism/*
+**/Step_Functions/Statistics_Error_Perfectionism/*

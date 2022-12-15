@@ -1,0 +1,1898 @@
+1.3268 	WARNING 	User requested fullscreen with size [1536  864], but screen is actually [1920, 1200]. Using actual size
+2.2320 	EXP 	Created window1 = Window(allowGUI=False, allowStencil=False, args=UNKNOWN, autoLog=True, bitsMode=UNKNOWN, blendMode='avg', bpc=(8, 8, 8), color=array([0.004, 0.004, 0.004]), colorSpace='rgb', depthBits=8, fullscr=<method-wrapper '__getattribute__' of attributeSetter object at 0x000000001BC1EB38>, gamma=None, gammaErrorPolicy='raise', kwargs=UNKNOWN, lms=UNKNOWN, monitor=<psychopy.monitors.calibTools.Monitor object at 0x000000001BC35BE0>, multiSample=False, name='window1', numSamples=2, pos=[0.0, 0.0], screen=0, size=array([1920, 1200]), stencilBits=0, stereo=False, units='height', useFBO=True, useRetina=False, viewOri=0.0, viewPos=None, viewScale=None, waitBlanking=True, winType='pyglet')
+2.2321 	EXP 	window1: recordFrameIntervals = False
+2.3983 	EXP 	window1: recordFrameIntervals = True
+2.5819 	EXP 	window1: recordFrameIntervals = False
+2.9251 	EXP 	Created Intro = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.034, italic=False, languageStyle='LTR', name='Intro', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text='Es folgt eine neue Aufgabe.', units='height', win=Window(...), wrapWidth=1)
+2.9631 	EXP 	Created Intro2 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-2.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.034, italic=False, languageStyle='LTR', name='Intro2', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+2.9715 	EXP 	Created text_10 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-4.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.025, italic=False, languageStyle='LTR', name='text_10', opacity=1.0, ori=0, pos=array([ 0. , -0.4]), rgb=array([0., 0., 0.]), text='Weiter mit Leertaste.', units='height', win=Window(...), wrapWidth=1)
+3.0040 	EXP 	Created IntroProposer = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.034, italic=False, languageStyle='LTR', name='IntroProposer', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+3.0065 	EXP 	Created ContSl = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-2.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.025, italic=False, languageStyle='LTR', name='ContSl', opacity=1.0, ori=0, pos=array([ 0. , -0.4]), rgb=array([0., 0., 0.]), text='Weiter mit Leertaste', units='height', win=Window(...), wrapWidth=1)
+3.0150 	EXP 	Created OfferProposers = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.0238, italic=False, languageStyle='LTR', name='OfferProposers', opacity=1.0, ori=0, pos=array([0.  , 0.05]), rgb=array([0., 0., 0.]), text='default text', units='height', win=Window(...), wrapWidth=1)
+3.0285 	EXP 	Created DescriptionOffer3 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.02, italic=False, languageStyle='LTR', name='DescriptionOffer3', opacity=1.0, ori=0, pos=array([ 0.4, -0.1]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+3.0333 	EXP 	Created DescriptionOffer2 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-2.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.02, italic=False, languageStyle='LTR', name='DescriptionOffer2', opacity=1.0, ori=0, pos=array([ 0. , -0.1]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+3.0379 	EXP 	Created DescriptionOffer1 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-3.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.02, italic=False, languageStyle='LTR', name='DescriptionOffer1', opacity=1.0, ori=0, pos=array([-0.4, -0.1]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+3.0403 	EXP 	Created Example1 = ImageStim(__class__=<class 'psychopy.visual.image.ImageStim'>, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=-4.0, flipHoriz=False, flipVert=False, image='sin', interpolate=True, mask=None, maskParams=None, name='Example1', opacity=1.0, ori=0.0, pos=array([-0.4, -0.3]), size=array([0.2, 0.2]), texRes=128, units='height', win=Window(...))
+3.0420 	EXP 	Created Example2 = ImageStim(__class__=<class 'psychopy.visual.image.ImageStim'>, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=-5.0, flipHoriz=False, flipVert=False, image='sin', interpolate=True, mask=None, maskParams=None, name='Example2', opacity=1.0, ori=0.0, pos=array([ 0. , -0.3]), size=array([0.2, 0.2]), texRes=128, units='height', win=Window(...))
+3.0435 	EXP 	Created Example3 = ImageStim(__class__=<class 'psychopy.visual.image.ImageStim'>, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=-6.0, flipHoriz=False, flipVert=False, image='sin', interpolate=True, mask=None, maskParams=None, name='Example3', opacity=1.0, ori=0.0, pos=array([ 0.4, -0.3]), size=array([0.2, 0.2]), texRes=128, units='height', win=Window(...))
+3.0788 	EXP 	Created text_2 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.034, italic=False, languageStyle='LTR', name='text_2', opacity=1.0, ori=0, pos=array([ 0. , -0.1]), rgb=array([0., 0., 0.]), text='default text', units='height', win=Window(...), wrapWidth=1)
+3.0870 	EXP 	Created text_3 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-2.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.025, italic=False, languageStyle='LTR', name='text_3', opacity=1.0, ori=0, pos=array([ 0. , -0.4]), rgb=array([0., 0., 0.]), text='Weiter mit Leertaste.', units='height', win=Window(...), wrapWidth=1)
+3.1394 	EXP 	Created example = ImageStim(__class__=<class 'psychopy.visual.image.ImageStim'>, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=-4.0, flipHoriz=False, flipVert=False, image='ExampleTrial_Ultimatum.png', interpolate=True, mask=None, maskParams=None, name='example', opacity=1.0, ori=0.0, pos=array([0.  , 0.24]), size=array([0.6 , 0.18]), texRes=128, units='height', win=Window(...))
+3.1506 	EXP 	Created exampletext = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-5.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.027200000000000002, italic=False, languageStyle='LTR', name='exampletext', opacity=1.0, ori=0, pos=array([0. , 0.4]), rgb=array([0., 0., 0.]), text='So sieht ein Durchgang aus.', units='height', win=Window(...), wrapWidth=1)
+3.1818 	EXP 	Created image = ImageStim(__class__=<class 'psychopy.visual.image.ImageStim'>, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, image='ExampleTrial_Ultimatum.png', interpolate=True, mask=None, maskParams=None, name='image', opacity=1.0, ori=0.0, pos=array([0.  , 0.24]), size=array([0.6 , 0.18]), texRes=128, units='height', win=Window(...))
+3.2149 	EXP 	Created text_5 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-2.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.034, italic=False, languageStyle='LTR', name='text_5', opacity=1.0, ori=0, pos=array([ 0.  , -0.05]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+3.2224 	EXP 	Created text_6 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-4.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.025, italic=False, languageStyle='LTR', name='text_6', opacity=1.0, ori=0, pos=array([ 0. , -0.4]), rgb=array([0., 0., 0.]), text='Weiter mit Leertaste.', units='height', win=Window(...), wrapWidth=1)
+3.2260 	EXP 	Created textExample = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-5.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.027200000000000002, italic=False, languageStyle='LTR', name='textExample', opacity=1.0, ori=0, pos=array([0. , 0.4]), rgb=array([0., 0., 0.]), text='So sieht ein Durchgang aus.', units='height', win=Window(...), wrapWidth=1)
+3.2343 	EXP 	Created fixationcross = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.1, italic=False, languageStyle='LTR', name='fixationcross', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text='+', units='height', win=Window(...), wrapWidth=1)
+3.2361 	EXP 	Created offerSlide_pract = ImageStim(__class__=<class 'psychopy.visual.image.ImageStim'>, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, image='sin', interpolate=True, mask=None, maskParams=None, name='offerSlide_pract', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([0.24, 0.24]), texRes=128, units='height', win=Window(...))
+3.2470 	EXP 	Created text_12 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-3.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.03, italic=False, languageStyle='LTR', name='text_12', opacity=1.0, ori=0, pos=array([0. , 0.3]), rgb=array([0., 0., 0.]), text='Das ist das Angebot.', units='height', win=Window(...), wrapWidth=1)
+3.2568 	EXP 	Created FB_tooSlow_pract = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.03, italic=False, languageStyle='LTR', name='FB_tooSlow_pract', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+3.2650 	EXP 	Created feedback_slide_pract = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.04, italic=False, languageStyle='LTR', name='feedback_slide_pract', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text='default text', units='height', win=Window(...), wrapWidth=1)
+3.2794 	EXP 	Created IntroExpSlide = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.034, italic=False, languageStyle='LTR', name='IntroExpSlide', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+3.2862 	EXP 	Created text_11 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.025, italic=False, languageStyle='LTR', name='text_11', opacity=1.0, ori=0, pos=array([ 0. , -0.4]), rgb=array([0., 0., 0.]), text='Weiter mit Leertaste.', units='height', win=Window(...), wrapWidth=1)
+3.2892 	EXP 	Created fixationcross = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.1, italic=False, languageStyle='LTR', name='fixationcross', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text='+', units='height', win=Window(...), wrapWidth=1)
+3.2908 	EXP 	Created offerSlide = ImageStim(__class__=<class 'psychopy.visual.image.ImageStim'>, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, image='sin', interpolate=True, mask=None, maskParams=None, name='offerSlide', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([0.24, 0.24]), texRes=128, units='height', win=Window(...))
+3.2978 	EXP 	Created text_4 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-3.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.03, italic=False, languageStyle='LTR', name='text_4', opacity=1.0, ori=0, pos=array([0. , 0.3]), rgb=array([0., 0., 0.]), text='Das ist das Angebot.', units='height', win=Window(...), wrapWidth=1)
+3.3007 	EXP 	Created Square = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-4.0, flipHoriz=False, flipVert=False, font='Wingdings', fontFiles=[], height=0.03, italic=False, languageStyle='LTR', name='Square', opacity=1.0, ori=0, pos=array([-0.77, -0.4 ]), rgb=array([0., 0., 0.]), text='n', units='height', win=Window(...), wrapWidth=1)
+3.3116 	EXP 	Created tooSlowSlide = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.03, italic=False, languageStyle='LTR', name='tooSlowSlide', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+3.3167 	EXP 	Created feedback_slide = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.04, italic=False, languageStyle='LTR', name='feedback_slide', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text='default text', units='height', win=Window(...), wrapWidth=1)
+3.3181 	EXP 	Created Square2 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='white', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Wingdings', fontFiles=[], height=0.03, italic=False, languageStyle='LTR', name='Square2', opacity=1.0, ori=0, pos=array([-0.77, -0.4 ]), rgb=array([255., 255., 255.]), text='n', units='height', win=Window(...), wrapWidth=1)
+3.3236 	EXP 	Created text_7 = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.025, italic=False, languageStyle='LTR', name='text_7', opacity=1.0, ori=0, pos=array([ 0. , -0.4]), rgb=array([0., 0., 0.]), text='Weiter mit Leertaste.', units='height', win=Window(...), wrapWidth=1)
+3.3337 	EXP 	Created break_slide = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-2.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.034, italic=False, languageStyle='LTR', name='break_slide', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text=str(...), units='height', win=Window(...), wrapWidth=1)
+3.3385 	EXP 	Created FeedbackMoney = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.034, italic=False, languageStyle='LTR', name='FeedbackMoney', opacity=1.0, ori=0, pos=array([0. , 0.1]), rgb=array([0., 0., 0.]), text='default text', units='height', win=Window(...), wrapWidth=1)
+3.3507 	EXP 	Created Amount = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.065, italic=False, languageStyle='LTR', name='Amount', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text='2.50 Euro', units='height', win=Window(...), wrapWidth=1)
+3.3570 	EXP 	Created FinalGB = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color='black', colorSpace='named', contrast=1.0, depth=-2.0, flipHoriz=False, flipVert=False, font='Arial', fontFiles=[], height=0.034, italic=False, languageStyle='LTR', name='FinalGB', opacity=1.0, ori=0, pos=array([0., 0.]), rgb=array([0., 0., 0.]), text='Vielen Dank. Das ist das Ende dieser Aufgabe.', units='height', win=Window(...), wrapWidth=1)
+3.3897 	EXP 	Intro: autoDraw = True
+6.3516 	EXP 	Intro2: autoDraw = True
+6.3516 	EXP 	text_10: autoDraw = True
+6.4017 	EXP 	Intro: autoDraw = False
+57.7318 	DATA 	Keypress: space
+57.7454 	EXP 	Intro: autoDraw = False
+57.7454 	EXP 	Intro2: autoDraw = False
+57.7454 	EXP 	text_10: autoDraw = False
+57.7454 	EXP 	IntroProposer: autoDraw = True
+57.7454 	EXP 	ContSl: autoDraw = True
+105.6794 	EXP 	Imported Proposer.xlsx as conditions, 4 conditions, 1 params
+105.6797 	EXP 	Created sequence: sequential, trialTypes=4, nReps=1, seed=None
+105.6799 	EXP 	New trial (rep=0, index=0): OrderedDict([('InstructionText', '\n\n\n\n\n\n\n\nBitte Teilen Sie nun den Betrag von 10 Credits auf, wie Sie ihn aufteilen würden, wenn der/die Empfänger/in darüber entscheiden kann, ob die Aufteilung zugeteilt wird.\nDabei haben Sie nur eine Aufteilung des Betrages, bis der/die Empfänger/in endgültig darüber entscheidet.\nDieses Angebot wird jedem/r Empfänger/in nur einmal vorgelegt.\n\nSe können drei verschiedene Angebote machen:\n(1) Sie bieten 1, und behalten 9 Credits.\n(2) Sie bieten 5, und behalten 5 Credits.\n(3) Sie bieten 3, und behalten 7 Credits.\n\nSie wählen Ihr Angebot mit der entsprechenden Taste (1, 2, 3) auf der Tastatur.\n\n\n\n\nWeiter mit Taste 1.\n\n\n\n\n\n\n')])
+105.7696 	DATA 	Keypress: space
+105.7863 	EXP 	IntroProposer: autoDraw = False
+105.7863 	EXP 	ContSl: autoDraw = False
+105.7863 	EXP 	Example1: image = '9_1_V2.png'
+105.7863 	EXP 	Example2: image = '5_5_V2.png'
+105.7863 	EXP 	Example3: image = '7_3_V2.png'
+105.7863 	EXP 	OfferProposers: autoDraw = True
+105.7863 	EXP 	DescriptionOffer3: autoDraw = True
+105.7863 	EXP 	DescriptionOffer2: autoDraw = True
+105.7863 	EXP 	DescriptionOffer1: autoDraw = True
+105.7863 	EXP 	Example1: autoDraw = True
+105.7863 	EXP 	Example2: autoDraw = True
+105.7863 	EXP 	Example3: autoDraw = True
+160.9185 	DATA 	Keypress: 2
+160.9357 	EXP 	New trial (rep=0, index=1): OrderedDict([('InstructionText', 'Bitte wählen Sie Ihr erstes von drei Angeboten mit der Taste 1, 2 oder 3.')])
+160.9665 	EXP 	OfferProposers: autoDraw = False
+160.9665 	EXP 	DescriptionOffer3: autoDraw = False
+160.9665 	EXP 	DescriptionOffer2: autoDraw = False
+160.9665 	EXP 	DescriptionOffer1: autoDraw = False
+160.9665 	EXP 	Example1: autoDraw = False
+160.9665 	EXP 	Example2: autoDraw = False
+160.9665 	EXP 	Example3: autoDraw = False
+160.9665 	EXP 	Example1: image = '9_1_V2.png'
+160.9665 	EXP 	Example2: image = '5_5_V2.png'
+160.9665 	EXP 	Example3: image = '7_3_V2.png'
+160.9665 	EXP 	OfferProposers: autoDraw = True
+160.9665 	EXP 	DescriptionOffer3: autoDraw = True
+160.9665 	EXP 	DescriptionOffer2: autoDraw = True
+160.9665 	EXP 	DescriptionOffer1: autoDraw = True
+160.9665 	EXP 	Example1: autoDraw = True
+160.9665 	EXP 	Example2: autoDraw = True
+160.9665 	EXP 	Example3: autoDraw = True
+165.6396 	EXP 	New trial (rep=0, index=2): OrderedDict([('InstructionText', 'Bitte wählen Sie Ihr zweites von drei Angeboten mit der Taste 1, 2 oder 3.')])
+165.6569 	DATA 	Keypress: 2
+165.6705 	EXP 	OfferProposers: autoDraw = False
+165.6705 	EXP 	DescriptionOffer3: autoDraw = False
+165.6705 	EXP 	DescriptionOffer2: autoDraw = False
+165.6705 	EXP 	DescriptionOffer1: autoDraw = False
+165.6705 	EXP 	Example1: autoDraw = False
+165.6705 	EXP 	Example2: autoDraw = False
+165.6705 	EXP 	Example3: autoDraw = False
+165.6705 	EXP 	Example1: image = '9_1_V2.png'
+165.6705 	EXP 	Example2: image = '5_5_V2.png'
+165.6705 	EXP 	Example3: image = '7_3_V2.png'
+165.6705 	EXP 	OfferProposers: autoDraw = True
+165.6705 	EXP 	DescriptionOffer3: autoDraw = True
+165.6705 	EXP 	DescriptionOffer2: autoDraw = True
+165.6705 	EXP 	DescriptionOffer1: autoDraw = True
+165.6705 	EXP 	Example1: autoDraw = True
+165.6705 	EXP 	Example2: autoDraw = True
+165.6705 	EXP 	Example3: autoDraw = True
+180.2182 	EXP 	New trial (rep=0, index=3): OrderedDict([('InstructionText', 'Bitte wählen Sie Ihr drittes und letzes Angebot mit der Taste 1, 2 oder 3.')])
+180.2355 	DATA 	Keypress: 2
+180.2496 	EXP 	OfferProposers: autoDraw = False
+180.2496 	EXP 	DescriptionOffer3: autoDraw = False
+180.2496 	EXP 	DescriptionOffer2: autoDraw = False
+180.2496 	EXP 	DescriptionOffer1: autoDraw = False
+180.2496 	EXP 	Example1: autoDraw = False
+180.2496 	EXP 	Example2: autoDraw = False
+180.2496 	EXP 	Example3: autoDraw = False
+180.2496 	EXP 	Example1: image = '9_1_V2.png'
+180.2496 	EXP 	Example2: image = '5_5_V2.png'
+180.2496 	EXP 	Example3: image = '7_3_V2.png'
+180.2496 	EXP 	OfferProposers: autoDraw = True
+180.2496 	EXP 	DescriptionOffer3: autoDraw = True
+180.2496 	EXP 	DescriptionOffer2: autoDraw = True
+180.2496 	EXP 	DescriptionOffer1: autoDraw = True
+180.2496 	EXP 	Example1: autoDraw = True
+180.2496 	EXP 	Example2: autoDraw = True
+180.2496 	EXP 	Example3: autoDraw = True
+184.3314 	EXP 	Imported Instruction_Receiver.xlsx as conditions, 5 conditions, 3 params
+184.3319 	EXP 	Created sequence: sequential, trialTypes=5, nReps=1, seed=None
+184.3325 	EXP 	New trial (rep=0, index=0): OrderedDict([('Instruction_Slides', 'In diesem Versuchsteil werden Sie ökonomische Entscheidungen bezüglich Angeboten von anderen Spielenden treffen. \n\nSie werden mit Ihren Mitspielenden jedoch nicht außerhalb Ihrer kurzen ökonomischen Interaktion in Kontakt kommen.'), ('ShowPicExample', 0), ('ResponseMappingSlide', 0)])
+184.3653 	DATA 	Keypress: 2
+184.3698 	EXP 	OfferProposers: autoDraw = False
+184.3698 	EXP 	DescriptionOffer3: autoDraw = False
+184.3698 	EXP 	DescriptionOffer2: autoDraw = False
+184.3698 	EXP 	DescriptionOffer1: autoDraw = False
+184.3698 	EXP 	Example1: autoDraw = False
+184.3698 	EXP 	Example2: autoDraw = False
+184.3698 	EXP 	Example3: autoDraw = False
+184.3698 	EXP 	text_2: autoDraw = True
+184.3698 	EXP 	text_3: autoDraw = True
+184.3698 	EXP 	example: autoDraw = True
+184.3698 	EXP 	exampletext: autoDraw = True
+199.4849 	EXP 	New trial (rep=0, index=1): OrderedDict([('Instruction_Slides', 'In jeder Runde werden Sie Angebote von anderen Spielenden erhalten.\n\nIn jeder Runde werden die Angebote von anderen Spielenden stammen. Sie werden niemals mit den gleichen Mitspielenden interagieren.\n\nSie erhalten in diesem Versuch Credits, die Sie am Ende gegen Euro eintauschen werden.\nDer Wechselkurs ist: 1 Credit = 1 Cent'), ('ShowPicExample', 0), ('ResponseMappingSlide', 0)])
+199.5081 	DATA 	Keypress: space
+199.5160 	EXP 	text_2: autoDraw = False
+199.5160 	EXP 	text_3: autoDraw = False
+199.5160 	EXP 	example: autoDraw = False
+199.5160 	EXP 	exampletext: autoDraw = False
+199.5160 	EXP 	image: autoDraw = False
+199.5160 	EXP 	text_5: autoDraw = False
+199.5160 	EXP 	text_6: autoDraw = False
+199.5160 	EXP 	textExample: autoDraw = False
+199.5160 	EXP 	text_2: autoDraw = True
+199.5160 	EXP 	text_3: autoDraw = True
+199.5160 	EXP 	example: autoDraw = True
+199.5160 	EXP 	exampletext: autoDraw = True
+210.3442 	EXP 	New trial (rep=0, index=2): OrderedDict([('Instruction_Slides', 'In diesem Versuch ist es Ihre Aufgabe, in jeder Runde eine Entscheidung über die Annahme oder die Ablehnung einer Aufteilung eines Geldbetrages zu treffen, der von einem anderen Spielenden gemacht wurde.\n\nWird das Angebot angenommen, dann erhalten beide Spielenden, Sie und der/die Anbietende, den entsprechenden Betrag gutgeschrieben.\n\nWird das Angebot abgelehnt, dann erhält niemand einen Betrag gutgeschrieben.'), ('ShowPicExample', 0), ('ResponseMappingSlide', 0)])
+210.3635 	DATA 	Keypress: space
+210.3752 	EXP 	text_2: autoDraw = False
+210.3752 	EXP 	text_3: autoDraw = False
+210.3752 	EXP 	example: autoDraw = False
+210.3752 	EXP 	exampletext: autoDraw = False
+210.3752 	EXP 	image: autoDraw = False
+210.3752 	EXP 	text_5: autoDraw = False
+210.3752 	EXP 	text_6: autoDraw = False
+210.3752 	EXP 	textExample: autoDraw = False
+210.3752 	EXP 	text_2: autoDraw = True
+210.3752 	EXP 	text_3: autoDraw = True
+210.3752 	EXP 	example: autoDraw = True
+210.3752 	EXP 	exampletext: autoDraw = True
+227.6420 	EXP 	New trial (rep=0, index=3): OrderedDict([('Instruction_Slides', 'Die Aufteilungen werden mittels eines Kreisdiagramms dargestellt.\nEs werden stets 10 Credits zwischen den Mitspielenden aufgeteilt.\nIn diesem Beispiel hat Ihnen der/die Mitspielende 5 Credits angeboten, während er/sie 5 Credits behaltet.'), ('ShowPicExample', 1), ('ResponseMappingSlide', 1)])
+227.6543 	DATA 	Keypress: space
+227.6566 	EXP 	text_2: autoDraw = False
+227.6566 	EXP 	text_3: autoDraw = False
+227.6566 	EXP 	example: autoDraw = False
+227.6566 	EXP 	exampletext: autoDraw = False
+227.6566 	EXP 	image: autoDraw = False
+227.6566 	EXP 	text_5: autoDraw = False
+227.6566 	EXP 	text_6: autoDraw = False
+227.6566 	EXP 	textExample: autoDraw = False
+227.6566 	EXP 	text_2: autoDraw = True
+227.6566 	EXP 	text_3: autoDraw = True
+227.6566 	EXP 	example: autoDraw = True
+227.6566 	EXP 	exampletext: autoDraw = True
+237.4521 	DATA 	Keypress: space
+237.4649 	EXP 	text_2: autoDraw = False
+237.4649 	EXP 	text_3: autoDraw = False
+237.4649 	EXP 	example: autoDraw = False
+237.4649 	EXP 	exampletext: autoDraw = False
+237.4649 	EXP 	image: autoDraw = True
+237.4649 	EXP 	text_5: autoDraw = True
+237.4649 	EXP 	text_6: autoDraw = True
+237.4649 	EXP 	textExample: autoDraw = True
+254.4809 	EXP 	New trial (rep=0, index=4): OrderedDict([('Instruction_Slides', 'Sie haben nun noch die Gelegenheit, dem Versuchsleiter Fragen zu stellen.\n\nWenn Sie keine Fragen haben, machen Sie bitte weiter mit ein paar Übungsdurchgängen.'), ('ShowPicExample', 0), ('ResponseMappingSlide', 0)])
+254.4904 	DATA 	Keypress: space
+254.4961 	EXP 	image: autoDraw = False
+254.4961 	EXP 	text_5: autoDraw = False
+254.4961 	EXP 	text_6: autoDraw = False
+254.4961 	EXP 	textExample: autoDraw = False
+254.4961 	EXP 	text_2: autoDraw = True
+254.4961 	EXP 	text_3: autoDraw = True
+254.4961 	EXP 	example: autoDraw = True
+254.4961 	EXP 	exampletext: autoDraw = True
+259.3839 	EXP 	Imported Offers.xlsx as conditions, 3 conditions, 4 params
+259.3845 	EXP 	Created sequence: fullRandom, trialTypes=3, nReps=2, seed=None
+259.3852 	EXP 	New trial (rep=0, index=0): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+259.3871 	DATA 	Keypress: space
+259.4003 	EXP 	text_2: autoDraw = False
+259.4003 	EXP 	text_3: autoDraw = False
+259.4003 	EXP 	example: autoDraw = False
+259.4003 	EXP 	exampletext: autoDraw = False
+259.4003 	EXP 	image: autoDraw = False
+259.4003 	EXP 	text_5: autoDraw = False
+259.4003 	EXP 	text_6: autoDraw = False
+259.4003 	EXP 	textExample: autoDraw = False
+259.4003 	EXP 	fixationcross: autoDraw = True
+260.0341 	EXP 	fixationcross: autoDraw = False
+260.0341 	EXP 	fixationcross: autoDraw = False
+260.0341 	EXP 	offerSlide_pract: autoDraw = True
+260.0341 	EXP 	text_12: autoDraw = True
+261.7714 	DATA 	Keypress: 4
+261.7856 	EXP 	offerSlide_pract: autoDraw = False
+261.7856 	EXP 	text_12: autoDraw = False
+261.7856 	EXP 	FB_tooSlow_pract: autoDraw = False
+261.7856 	EXP 	feedback_slide_pract: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+261.7856 	EXP 	feedback_slide_pract: autoDraw = True
+262.7705 	EXP 	New trial (rep=0, index=1): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+262.7865 	EXP 	feedback_slide_pract: autoDraw = False
+262.7865 	EXP 	feedback_slide_pract: autoDraw = False
+262.7865 	EXP 	fixationcross: autoDraw = True
+263.3870 	EXP 	fixationcross: autoDraw = False
+263.3870 	EXP 	fixationcross: autoDraw = False
+263.3870 	EXP 	offerSlide_pract: autoDraw = True
+263.3870 	EXP 	text_12: autoDraw = True
+264.1774 	DATA 	Keypress: 4
+264.1877 	EXP 	offerSlide_pract: autoDraw = False
+264.1877 	EXP 	text_12: autoDraw = False
+264.1877 	EXP 	FB_tooSlow_pract: autoDraw = False
+264.1877 	EXP 	feedback_slide_pract: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+264.1877 	EXP 	feedback_slide_pract: autoDraw = True
+265.1725 	EXP 	New trial (rep=0, index=2): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+265.1885 	EXP 	feedback_slide_pract: autoDraw = False
+265.1885 	EXP 	feedback_slide_pract: autoDraw = False
+265.1885 	EXP 	fixationcross: autoDraw = True
+265.8224 	EXP 	fixationcross: autoDraw = False
+265.8224 	EXP 	fixationcross: autoDraw = False
+265.8224 	EXP 	offerSlide_pract: autoDraw = True
+265.8224 	EXP 	text_12: autoDraw = True
+266.5336 	DATA 	Keypress: 4
+266.5397 	EXP 	offerSlide_pract: autoDraw = False
+266.5397 	EXP 	text_12: autoDraw = False
+266.5397 	EXP 	FB_tooSlow_pract: autoDraw = False
+266.5397 	EXP 	feedback_slide_pract: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+266.5397 	EXP 	feedback_slide_pract: autoDraw = True
+267.5246 	EXP 	New trial (rep=1, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+267.5405 	EXP 	feedback_slide_pract: autoDraw = False
+267.5405 	EXP 	feedback_slide_pract: autoDraw = False
+267.5405 	EXP 	fixationcross: autoDraw = True
+268.0910 	EXP 	fixationcross: autoDraw = False
+268.0910 	EXP 	fixationcross: autoDraw = False
+268.0910 	EXP 	offerSlide_pract: autoDraw = True
+268.0910 	EXP 	text_12: autoDraw = True
+268.7197 	DATA 	Keypress: 4
+268.7249 	EXP 	offerSlide_pract: autoDraw = False
+268.7249 	EXP 	text_12: autoDraw = False
+268.7249 	EXP 	FB_tooSlow_pract: autoDraw = False
+268.7249 	EXP 	feedback_slide_pract: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+268.7249 	EXP 	feedback_slide_pract: autoDraw = True
+269.7097 	EXP 	New trial (rep=1, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+269.7257 	EXP 	feedback_slide_pract: autoDraw = False
+269.7257 	EXP 	feedback_slide_pract: autoDraw = False
+269.7257 	EXP 	fixationcross: autoDraw = True
+270.2595 	EXP 	fixationcross: autoDraw = False
+270.2595 	EXP 	fixationcross: autoDraw = False
+270.2595 	EXP 	offerSlide_pract: autoDraw = True
+270.2595 	EXP 	text_12: autoDraw = True
+270.7208 	DATA 	Keypress: 4
+270.7266 	EXP 	offerSlide_pract: autoDraw = False
+270.7266 	EXP 	text_12: autoDraw = False
+270.7266 	EXP 	FB_tooSlow_pract: autoDraw = False
+270.7266 	EXP 	feedback_slide_pract: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+270.7266 	EXP 	feedback_slide_pract: autoDraw = True
+271.7118 	EXP 	New trial (rep=1, index=2): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+271.7275 	EXP 	feedback_slide_pract: autoDraw = False
+271.7275 	EXP 	feedback_slide_pract: autoDraw = False
+271.7275 	EXP 	fixationcross: autoDraw = True
+272.3613 	EXP 	fixationcross: autoDraw = False
+272.3613 	EXP 	fixationcross: autoDraw = False
+272.3613 	EXP 	offerSlide_pract: autoDraw = True
+272.3613 	EXP 	text_12: autoDraw = True
+272.9228 	DATA 	Keypress: 4
+272.9284 	EXP 	offerSlide_pract: autoDraw = False
+272.9284 	EXP 	text_12: autoDraw = False
+272.9284 	EXP 	FB_tooSlow_pract: autoDraw = False
+272.9284 	EXP 	feedback_slide_pract: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+272.9284 	EXP 	feedback_slide_pract: autoDraw = True
+273.9293 	EXP 	feedback_slide_pract: autoDraw = False
+273.9293 	EXP 	feedback_slide_pract: autoDraw = False
+273.9293 	EXP 	IntroExpSlide: autoDraw = True
+273.9293 	EXP 	text_11: autoDraw = True
+280.7873 	DATA 	Keypress: space
+284.7294 	EXP 	Imported Offers.xlsx as conditions, 3 conditions, 4 params
+284.7296 	EXP 	Created sequence: fullRandom, trialTypes=3, nReps=25, seed=None
+284.7301 	EXP 	New trial (rep=0, index=0): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+284.7313 	DATA 	Keypress: space
+284.7389 	EXP 	IntroExpSlide: autoDraw = False
+284.7389 	EXP 	text_11: autoDraw = False
+284.7389 	EXP 	fixationcross: autoDraw = True
+285.3060 	EXP 	fixationcross: autoDraw = False
+285.3060 	EXP 	fixationcross: autoDraw = False
+285.3060 	EXP 	offerSlide: autoDraw = True
+285.3060 	EXP 	text_4: autoDraw = True
+285.3060 	EXP 	Square: autoDraw = True
+285.7452 	DATA 	Keypress: 4
+285.7731 	EXP 	offerSlide: autoDraw = False
+285.7731 	EXP 	text_4: autoDraw = False
+285.7731 	EXP 	Square: autoDraw = False
+285.7731 	EXP 	tooSlowSlide: autoDraw = False
+285.7731 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+285.7731 	EXP 	feedback_slide: autoDraw = True
+285.7731 	EXP 	Square2: autoDraw = True
+286.7603 	EXP 	New trial (rep=0, index=1): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+286.7739 	EXP 	feedback_slide: autoDraw = False
+286.7739 	EXP 	Square2: autoDraw = False
+286.7739 	EXP 	feedback_slide: autoDraw = False
+286.7739 	EXP 	Square2: autoDraw = False
+286.7739 	EXP 	text_7: autoDraw = False
+286.7739 	EXP 	break_slide: autoDraw = False
+286.7739 	EXP 	fixationcross: autoDraw = True
+287.4746 	EXP 	fixationcross: autoDraw = False
+287.4746 	EXP 	fixationcross: autoDraw = False
+287.4746 	EXP 	offerSlide: autoDraw = True
+287.4746 	EXP 	text_4: autoDraw = True
+287.4746 	EXP 	Square: autoDraw = True
+287.8473 	DATA 	Keypress: 4
+287.8749 	EXP 	offerSlide: autoDraw = False
+287.8749 	EXP 	text_4: autoDraw = False
+287.8749 	EXP 	Square: autoDraw = False
+287.8749 	EXP 	tooSlowSlide: autoDraw = False
+287.8749 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+287.8749 	EXP 	feedback_slide: autoDraw = True
+287.8749 	EXP 	Square2: autoDraw = True
+288.8617 	EXP 	New trial (rep=0, index=2): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+288.8757 	EXP 	feedback_slide: autoDraw = False
+288.8757 	EXP 	Square2: autoDraw = False
+288.8757 	EXP 	feedback_slide: autoDraw = False
+288.8757 	EXP 	Square2: autoDraw = False
+288.8757 	EXP 	text_7: autoDraw = False
+288.8757 	EXP 	break_slide: autoDraw = False
+288.8757 	EXP 	fixationcross: autoDraw = True
+289.4762 	EXP 	fixationcross: autoDraw = False
+289.4762 	EXP 	fixationcross: autoDraw = False
+289.4762 	EXP 	offerSlide: autoDraw = True
+289.4762 	EXP 	text_4: autoDraw = True
+289.4762 	EXP 	Square: autoDraw = True
+289.9324 	DATA 	Keypress: 4
+289.9600 	EXP 	offerSlide: autoDraw = False
+289.9600 	EXP 	text_4: autoDraw = False
+289.9600 	EXP 	Square: autoDraw = False
+289.9600 	EXP 	tooSlowSlide: autoDraw = False
+289.9600 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+289.9600 	EXP 	feedback_slide: autoDraw = True
+289.9600 	EXP 	Square2: autoDraw = True
+290.9468 	EXP 	New trial (rep=1, index=0): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+290.9608 	EXP 	feedback_slide: autoDraw = False
+290.9608 	EXP 	Square2: autoDraw = False
+290.9608 	EXP 	feedback_slide: autoDraw = False
+290.9608 	EXP 	Square2: autoDraw = False
+290.9608 	EXP 	text_7: autoDraw = False
+290.9608 	EXP 	break_slide: autoDraw = False
+290.9608 	EXP 	fixationcross: autoDraw = True
+291.5947 	EXP 	fixationcross: autoDraw = False
+291.5947 	EXP 	fixationcross: autoDraw = False
+291.5947 	EXP 	offerSlide: autoDraw = True
+291.5947 	EXP 	text_4: autoDraw = True
+291.5947 	EXP 	Square: autoDraw = True
+292.0175 	DATA 	Keypress: 4
+292.0451 	EXP 	offerSlide: autoDraw = False
+292.0451 	EXP 	text_4: autoDraw = False
+292.0451 	EXP 	Square: autoDraw = False
+292.0451 	EXP 	tooSlowSlide: autoDraw = False
+292.0451 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+292.0451 	EXP 	feedback_slide: autoDraw = True
+292.0451 	EXP 	Square2: autoDraw = True
+293.0319 	EXP 	New trial (rep=1, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+293.0459 	EXP 	feedback_slide: autoDraw = False
+293.0459 	EXP 	Square2: autoDraw = False
+293.0459 	EXP 	feedback_slide: autoDraw = False
+293.0459 	EXP 	Square2: autoDraw = False
+293.0459 	EXP 	text_7: autoDraw = False
+293.0459 	EXP 	break_slide: autoDraw = False
+293.0459 	EXP 	fixationcross: autoDraw = True
+293.7465 	EXP 	fixationcross: autoDraw = False
+293.7465 	EXP 	fixationcross: autoDraw = False
+293.7465 	EXP 	offerSlide: autoDraw = True
+293.7465 	EXP 	text_4: autoDraw = True
+293.7465 	EXP 	Square: autoDraw = True
+294.0855 	DATA 	Keypress: 4
+294.1135 	EXP 	offerSlide: autoDraw = False
+294.1135 	EXP 	text_4: autoDraw = False
+294.1135 	EXP 	Square: autoDraw = False
+294.1135 	EXP 	tooSlowSlide: autoDraw = False
+294.1135 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+294.1135 	EXP 	feedback_slide: autoDraw = True
+294.1135 	EXP 	Square2: autoDraw = True
+295.1000 	EXP 	New trial (rep=1, index=2): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+295.1144 	EXP 	feedback_slide: autoDraw = False
+295.1144 	EXP 	Square2: autoDraw = False
+295.1144 	EXP 	feedback_slide: autoDraw = False
+295.1144 	EXP 	Square2: autoDraw = False
+295.1144 	EXP 	text_7: autoDraw = False
+295.1144 	EXP 	break_slide: autoDraw = False
+295.1144 	EXP 	fixationcross: autoDraw = True
+295.7149 	EXP 	fixationcross: autoDraw = False
+295.7149 	EXP 	fixationcross: autoDraw = False
+295.7149 	EXP 	offerSlide: autoDraw = True
+295.7149 	EXP 	text_4: autoDraw = True
+295.7149 	EXP 	Square: autoDraw = True
+296.2550 	DATA 	Keypress: 4
+296.2987 	EXP 	offerSlide: autoDraw = False
+296.2987 	EXP 	text_4: autoDraw = False
+296.2987 	EXP 	Square: autoDraw = False
+296.2987 	EXP 	tooSlowSlide: autoDraw = False
+296.2987 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+296.2987 	EXP 	feedback_slide: autoDraw = True
+296.2987 	EXP 	Square2: autoDraw = True
+297.2851 	EXP 	New trial (rep=2, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+297.2996 	EXP 	feedback_slide: autoDraw = False
+297.2996 	EXP 	Square2: autoDraw = False
+297.2996 	EXP 	feedback_slide: autoDraw = False
+297.2996 	EXP 	Square2: autoDraw = False
+297.2996 	EXP 	text_7: autoDraw = False
+297.2996 	EXP 	break_slide: autoDraw = False
+297.2996 	EXP 	fixationcross: autoDraw = True
+298.0168 	EXP 	fixationcross: autoDraw = False
+298.0168 	EXP 	fixationcross: autoDraw = False
+298.0168 	EXP 	offerSlide: autoDraw = True
+298.0168 	EXP 	text_4: autoDraw = True
+298.0168 	EXP 	Square: autoDraw = True
+298.4561 	DATA 	Keypress: 4
+298.5006 	EXP 	offerSlide: autoDraw = False
+298.5006 	EXP 	text_4: autoDraw = False
+298.5006 	EXP 	Square: autoDraw = False
+298.5006 	EXP 	tooSlowSlide: autoDraw = False
+298.5006 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+298.5006 	EXP 	feedback_slide: autoDraw = True
+298.5006 	EXP 	Square2: autoDraw = True
+299.4871 	EXP 	New trial (rep=2, index=1): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+299.5014 	EXP 	feedback_slide: autoDraw = False
+299.5014 	EXP 	Square2: autoDraw = False
+299.5014 	EXP 	feedback_slide: autoDraw = False
+299.5014 	EXP 	Square2: autoDraw = False
+299.5014 	EXP 	text_7: autoDraw = False
+299.5014 	EXP 	break_slide: autoDraw = False
+299.5014 	EXP 	fixationcross: autoDraw = True
+300.0686 	EXP 	fixationcross: autoDraw = False
+300.0686 	EXP 	fixationcross: autoDraw = False
+300.0686 	EXP 	offerSlide: autoDraw = True
+300.0686 	EXP 	text_4: autoDraw = True
+300.0686 	EXP 	Square: autoDraw = True
+300.5249 	DATA 	Keypress: 4
+300.5523 	EXP 	offerSlide: autoDraw = False
+300.5523 	EXP 	text_4: autoDraw = False
+300.5523 	EXP 	Square: autoDraw = False
+300.5523 	EXP 	tooSlowSlide: autoDraw = False
+300.5523 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+300.5523 	EXP 	feedback_slide: autoDraw = True
+300.5523 	EXP 	Square2: autoDraw = True
+301.5383 	EXP 	New trial (rep=2, index=2): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+301.5532 	EXP 	feedback_slide: autoDraw = False
+301.5532 	EXP 	Square2: autoDraw = False
+301.5532 	EXP 	feedback_slide: autoDraw = False
+301.5532 	EXP 	Square2: autoDraw = False
+301.5532 	EXP 	text_7: autoDraw = False
+301.5532 	EXP 	break_slide: autoDraw = False
+301.5532 	EXP 	fixationcross: autoDraw = True
+302.2037 	EXP 	fixationcross: autoDraw = False
+302.2037 	EXP 	fixationcross: autoDraw = False
+302.2037 	EXP 	offerSlide: autoDraw = True
+302.2037 	EXP 	text_4: autoDraw = True
+302.2037 	EXP 	Square: autoDraw = True
+302.6429 	DATA 	Keypress: 4
+302.6708 	EXP 	offerSlide: autoDraw = False
+302.6708 	EXP 	text_4: autoDraw = False
+302.6708 	EXP 	Square: autoDraw = False
+302.6708 	EXP 	tooSlowSlide: autoDraw = False
+302.6708 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+302.6708 	EXP 	feedback_slide: autoDraw = True
+302.6708 	EXP 	Square2: autoDraw = True
+303.6574 	EXP 	New trial (rep=3, index=0): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+303.6716 	EXP 	feedback_slide: autoDraw = False
+303.6716 	EXP 	Square2: autoDraw = False
+303.6716 	EXP 	feedback_slide: autoDraw = False
+303.6716 	EXP 	Square2: autoDraw = False
+303.6716 	EXP 	text_7: autoDraw = False
+303.6716 	EXP 	break_slide: autoDraw = False
+303.6716 	EXP 	fixationcross: autoDraw = True
+304.2721 	EXP 	fixationcross: autoDraw = False
+304.2721 	EXP 	fixationcross: autoDraw = False
+304.2721 	EXP 	offerSlide: autoDraw = True
+304.2721 	EXP 	text_4: autoDraw = True
+304.2721 	EXP 	Square: autoDraw = True
+305.1120 	DATA 	Keypress: 4
+305.1396 	EXP 	offerSlide: autoDraw = False
+305.1396 	EXP 	text_4: autoDraw = False
+305.1396 	EXP 	Square: autoDraw = False
+305.1396 	EXP 	tooSlowSlide: autoDraw = False
+305.1396 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+305.1396 	EXP 	feedback_slide: autoDraw = True
+305.1396 	EXP 	Square2: autoDraw = True
+306.1254 	EXP 	New trial (rep=3, index=1): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+306.1404 	EXP 	feedback_slide: autoDraw = False
+306.1404 	EXP 	Square2: autoDraw = False
+306.1404 	EXP 	feedback_slide: autoDraw = False
+306.1404 	EXP 	Square2: autoDraw = False
+306.1404 	EXP 	text_7: autoDraw = False
+306.1404 	EXP 	break_slide: autoDraw = False
+306.1404 	EXP 	fixationcross: autoDraw = True
+306.8410 	EXP 	fixationcross: autoDraw = False
+306.8410 	EXP 	fixationcross: autoDraw = False
+306.8410 	EXP 	offerSlide: autoDraw = True
+306.8410 	EXP 	text_4: autoDraw = True
+306.8410 	EXP 	Square: autoDraw = True
+307.1971 	DATA 	Keypress: 4
+307.2247 	EXP 	offerSlide: autoDraw = False
+307.2247 	EXP 	text_4: autoDraw = False
+307.2247 	EXP 	Square: autoDraw = False
+307.2247 	EXP 	tooSlowSlide: autoDraw = False
+307.2247 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+307.2247 	EXP 	feedback_slide: autoDraw = True
+307.2247 	EXP 	Square2: autoDraw = True
+308.2115 	EXP 	New trial (rep=3, index=2): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+308.2255 	EXP 	feedback_slide: autoDraw = False
+308.2255 	EXP 	Square2: autoDraw = False
+308.2255 	EXP 	feedback_slide: autoDraw = False
+308.2255 	EXP 	Square2: autoDraw = False
+308.2255 	EXP 	text_7: autoDraw = False
+308.2255 	EXP 	break_slide: autoDraw = False
+308.2255 	EXP 	fixationcross: autoDraw = True
+308.8927 	EXP 	fixationcross: autoDraw = False
+308.8927 	EXP 	fixationcross: autoDraw = False
+308.8927 	EXP 	offerSlide: autoDraw = True
+308.8927 	EXP 	text_4: autoDraw = True
+308.8927 	EXP 	Square: autoDraw = True
+309.3992 	DATA 	Keypress: 4
+309.4265 	EXP 	offerSlide: autoDraw = False
+309.4265 	EXP 	text_4: autoDraw = False
+309.4265 	EXP 	Square: autoDraw = False
+309.4265 	EXP 	tooSlowSlide: autoDraw = False
+309.4265 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+309.4265 	EXP 	feedback_slide: autoDraw = True
+309.4265 	EXP 	Square2: autoDraw = True
+310.4126 	EXP 	New trial (rep=4, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+310.4274 	EXP 	feedback_slide: autoDraw = False
+310.4274 	EXP 	Square2: autoDraw = False
+310.4274 	EXP 	feedback_slide: autoDraw = False
+310.4274 	EXP 	Square2: autoDraw = False
+310.4274 	EXP 	text_7: autoDraw = False
+310.4274 	EXP 	break_slide: autoDraw = False
+310.4274 	EXP 	fixationcross: autoDraw = True
+310.9779 	EXP 	fixationcross: autoDraw = False
+310.9779 	EXP 	fixationcross: autoDraw = False
+310.9779 	EXP 	offerSlide: autoDraw = True
+310.9779 	EXP 	text_4: autoDraw = True
+310.9779 	EXP 	Square: autoDraw = True
+311.7673 	DATA 	Keypress: 4
+311.7952 	EXP 	offerSlide: autoDraw = False
+311.7952 	EXP 	text_4: autoDraw = False
+311.7952 	EXP 	Square: autoDraw = False
+311.7952 	EXP 	tooSlowSlide: autoDraw = False
+311.7952 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+311.7952 	EXP 	feedback_slide: autoDraw = True
+311.7952 	EXP 	Square2: autoDraw = True
+312.7817 	EXP 	New trial (rep=4, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+312.7961 	EXP 	feedback_slide: autoDraw = False
+312.7961 	EXP 	Square2: autoDraw = False
+312.7961 	EXP 	feedback_slide: autoDraw = False
+312.7961 	EXP 	Square2: autoDraw = False
+312.7961 	EXP 	text_7: autoDraw = False
+312.7961 	EXP 	break_slide: autoDraw = False
+312.7961 	EXP 	fixationcross: autoDraw = True
+313.5133 	EXP 	fixationcross: autoDraw = False
+313.5133 	EXP 	fixationcross: autoDraw = False
+313.5133 	EXP 	offerSlide: autoDraw = True
+313.5133 	EXP 	text_4: autoDraw = True
+313.5133 	EXP 	Square: autoDraw = True
+314.0524 	DATA 	Keypress: 4
+314.0805 	EXP 	offerSlide: autoDraw = False
+314.0805 	EXP 	text_4: autoDraw = False
+314.0805 	EXP 	Square: autoDraw = False
+314.0805 	EXP 	tooSlowSlide: autoDraw = False
+314.0805 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+314.0805 	EXP 	feedback_slide: autoDraw = True
+314.0805 	EXP 	Square2: autoDraw = True
+315.0668 	EXP 	New trial (rep=4, index=2): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+315.0813 	EXP 	feedback_slide: autoDraw = False
+315.0813 	EXP 	Square2: autoDraw = False
+315.0813 	EXP 	feedback_slide: autoDraw = False
+315.0813 	EXP 	Square2: autoDraw = False
+315.0813 	EXP 	text_7: autoDraw = False
+315.0813 	EXP 	break_slide: autoDraw = False
+315.0813 	EXP 	fixationcross: autoDraw = True
+315.7653 	EXP 	fixationcross: autoDraw = False
+315.7653 	EXP 	fixationcross: autoDraw = False
+315.7653 	EXP 	offerSlide: autoDraw = True
+315.7653 	EXP 	text_4: autoDraw = True
+315.7653 	EXP 	Square: autoDraw = True
+316.5889 	DATA 	Keypress: 4
+316.6327 	EXP 	offerSlide: autoDraw = False
+316.6327 	EXP 	text_4: autoDraw = False
+316.6327 	EXP 	Square: autoDraw = False
+316.6327 	EXP 	tooSlowSlide: autoDraw = False
+316.6327 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+316.6327 	EXP 	feedback_slide: autoDraw = True
+316.6327 	EXP 	Square2: autoDraw = True
+317.6190 	EXP 	New trial (rep=5, index=0): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+317.6335 	EXP 	feedback_slide: autoDraw = False
+317.6335 	EXP 	Square2: autoDraw = False
+317.6335 	EXP 	feedback_slide: autoDraw = False
+317.6335 	EXP 	Square2: autoDraw = False
+317.6335 	EXP 	text_7: autoDraw = False
+317.6335 	EXP 	break_slide: autoDraw = False
+317.6335 	EXP 	fixationcross: autoDraw = True
+318.3175 	EXP 	fixationcross: autoDraw = False
+318.3175 	EXP 	fixationcross: autoDraw = False
+318.3175 	EXP 	offerSlide: autoDraw = True
+318.3175 	EXP 	text_4: autoDraw = True
+318.3175 	EXP 	Square: autoDraw = True
+318.8406 	DATA 	Keypress: 4
+318.8679 	EXP 	offerSlide: autoDraw = False
+318.8679 	EXP 	text_4: autoDraw = False
+318.8679 	EXP 	Square: autoDraw = False
+318.8679 	EXP 	tooSlowSlide: autoDraw = False
+318.8679 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+318.8679 	EXP 	feedback_slide: autoDraw = True
+318.8679 	EXP 	Square2: autoDraw = True
+319.8540 	EXP 	New trial (rep=5, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+319.8688 	EXP 	feedback_slide: autoDraw = False
+319.8688 	EXP 	Square2: autoDraw = False
+319.8688 	EXP 	feedback_slide: autoDraw = False
+319.8688 	EXP 	Square2: autoDraw = False
+319.8688 	EXP 	text_7: autoDraw = False
+319.8688 	EXP 	break_slide: autoDraw = False
+319.8688 	EXP 	fixationcross: autoDraw = True
+320.5193 	EXP 	fixationcross: autoDraw = False
+320.5193 	EXP 	fixationcross: autoDraw = False
+320.5193 	EXP 	offerSlide: autoDraw = True
+320.5193 	EXP 	text_4: autoDraw = True
+320.5193 	EXP 	Square: autoDraw = True
+320.9917 	DATA 	Keypress: 4
+321.0197 	EXP 	offerSlide: autoDraw = False
+321.0197 	EXP 	text_4: autoDraw = False
+321.0197 	EXP 	Square: autoDraw = False
+321.0197 	EXP 	tooSlowSlide: autoDraw = False
+321.0197 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+321.0197 	EXP 	feedback_slide: autoDraw = True
+321.0197 	EXP 	Square2: autoDraw = True
+322.0062 	EXP 	New trial (rep=5, index=2): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+322.0206 	EXP 	feedback_slide: autoDraw = False
+322.0206 	EXP 	Square2: autoDraw = False
+322.0206 	EXP 	feedback_slide: autoDraw = False
+322.0206 	EXP 	Square2: autoDraw = False
+322.0206 	EXP 	text_7: autoDraw = False
+322.0206 	EXP 	break_slide: autoDraw = False
+322.0206 	EXP 	fixationcross: autoDraw = True
+322.6878 	EXP 	fixationcross: autoDraw = False
+322.6878 	EXP 	fixationcross: autoDraw = False
+322.6878 	EXP 	offerSlide: autoDraw = True
+322.6878 	EXP 	text_4: autoDraw = True
+322.6878 	EXP 	Square: autoDraw = True
+323.2938 	DATA 	Keypress: 4
+323.3217 	EXP 	offerSlide: autoDraw = False
+323.3217 	EXP 	text_4: autoDraw = False
+323.3217 	EXP 	Square: autoDraw = False
+323.3217 	EXP 	tooSlowSlide: autoDraw = False
+323.3217 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+323.3217 	EXP 	feedback_slide: autoDraw = True
+323.3217 	EXP 	Square2: autoDraw = True
+324.3082 	EXP 	New trial (rep=6, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+324.3225 	EXP 	feedback_slide: autoDraw = False
+324.3225 	EXP 	Square2: autoDraw = False
+324.3225 	EXP 	feedback_slide: autoDraw = False
+324.3225 	EXP 	Square2: autoDraw = False
+324.3225 	EXP 	text_7: autoDraw = False
+324.3225 	EXP 	break_slide: autoDraw = False
+324.3225 	EXP 	fixationcross: autoDraw = True
+324.9898 	EXP 	fixationcross: autoDraw = False
+324.9898 	EXP 	fixationcross: autoDraw = False
+324.9898 	EXP 	offerSlide: autoDraw = True
+324.9898 	EXP 	text_4: autoDraw = True
+324.9898 	EXP 	Square: autoDraw = True
+325.4793 	DATA 	Keypress: 4
+325.5236 	EXP 	offerSlide: autoDraw = False
+325.5236 	EXP 	text_4: autoDraw = False
+325.5236 	EXP 	Square: autoDraw = False
+325.5236 	EXP 	tooSlowSlide: autoDraw = False
+325.5236 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+325.5236 	EXP 	feedback_slide: autoDraw = True
+325.5236 	EXP 	Square2: autoDraw = True
+326.5103 	EXP 	New trial (rep=6, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+326.5244 	EXP 	feedback_slide: autoDraw = False
+326.5244 	EXP 	Square2: autoDraw = False
+326.5244 	EXP 	feedback_slide: autoDraw = False
+326.5244 	EXP 	Square2: autoDraw = False
+326.5244 	EXP 	text_7: autoDraw = False
+326.5244 	EXP 	break_slide: autoDraw = False
+326.5244 	EXP 	fixationcross: autoDraw = True
+327.1082 	EXP 	fixationcross: autoDraw = False
+327.1082 	EXP 	fixationcross: autoDraw = False
+327.1082 	EXP 	offerSlide: autoDraw = True
+327.1082 	EXP 	text_4: autoDraw = True
+327.1082 	EXP 	Square: autoDraw = True
+327.5480 	DATA 	Keypress: 4
+327.5753 	EXP 	offerSlide: autoDraw = False
+327.5753 	EXP 	text_4: autoDraw = False
+327.5753 	EXP 	Square: autoDraw = False
+327.5753 	EXP 	tooSlowSlide: autoDraw = False
+327.5753 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+327.5753 	EXP 	feedback_slide: autoDraw = True
+327.5753 	EXP 	Square2: autoDraw = True
+328.5614 	EXP 	New trial (rep=6, index=2): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+328.5762 	EXP 	feedback_slide: autoDraw = False
+328.5762 	EXP 	Square2: autoDraw = False
+328.5762 	EXP 	feedback_slide: autoDraw = False
+328.5762 	EXP 	Square2: autoDraw = False
+328.5762 	EXP 	text_7: autoDraw = False
+328.5762 	EXP 	break_slide: autoDraw = False
+328.5762 	EXP 	fixationcross: autoDraw = True
+329.2934 	EXP 	fixationcross: autoDraw = False
+329.2934 	EXP 	fixationcross: autoDraw = False
+329.2934 	EXP 	offerSlide: autoDraw = True
+329.2934 	EXP 	text_4: autoDraw = True
+329.2934 	EXP 	Square: autoDraw = True
+329.7331 	DATA 	Keypress: 4
+329.7605 	EXP 	offerSlide: autoDraw = False
+329.7605 	EXP 	text_4: autoDraw = False
+329.7605 	EXP 	Square: autoDraw = False
+329.7605 	EXP 	tooSlowSlide: autoDraw = False
+329.7605 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+329.7605 	EXP 	feedback_slide: autoDraw = True
+329.7605 	EXP 	Square2: autoDraw = True
+330.7465 	EXP 	New trial (rep=7, index=0): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+330.7613 	EXP 	feedback_slide: autoDraw = False
+330.7613 	EXP 	Square2: autoDraw = False
+330.7613 	EXP 	feedback_slide: autoDraw = False
+330.7613 	EXP 	Square2: autoDraw = False
+330.7613 	EXP 	text_7: autoDraw = False
+330.7613 	EXP 	break_slide: autoDraw = False
+330.7613 	EXP 	fixationcross: autoDraw = True
+331.4619 	EXP 	fixationcross: autoDraw = False
+331.4619 	EXP 	fixationcross: autoDraw = False
+331.4619 	EXP 	offerSlide: autoDraw = True
+331.4619 	EXP 	text_4: autoDraw = True
+331.4619 	EXP 	Square: autoDraw = True
+331.9512 	DATA 	Keypress: 4
+331.9791 	EXP 	offerSlide: autoDraw = False
+331.9791 	EXP 	text_4: autoDraw = False
+331.9791 	EXP 	Square: autoDraw = False
+331.9791 	EXP 	tooSlowSlide: autoDraw = False
+331.9791 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+331.9791 	EXP 	feedback_slide: autoDraw = True
+331.9791 	EXP 	Square2: autoDraw = True
+332.9656 	EXP 	New trial (rep=7, index=1): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+332.9799 	EXP 	feedback_slide: autoDraw = False
+332.9799 	EXP 	Square2: autoDraw = False
+332.9799 	EXP 	feedback_slide: autoDraw = False
+332.9799 	EXP 	Square2: autoDraw = False
+332.9799 	EXP 	text_7: autoDraw = False
+332.9799 	EXP 	break_slide: autoDraw = False
+332.9799 	EXP 	fixationcross: autoDraw = True
+333.5637 	EXP 	fixationcross: autoDraw = False
+333.5637 	EXP 	fixationcross: autoDraw = False
+333.5637 	EXP 	offerSlide: autoDraw = True
+333.5637 	EXP 	text_4: autoDraw = True
+333.5637 	EXP 	Square: autoDraw = True
+334.2033 	DATA 	Keypress: 4
+334.2310 	EXP 	offerSlide: autoDraw = False
+334.2310 	EXP 	text_4: autoDraw = False
+334.2310 	EXP 	Square: autoDraw = False
+334.2310 	EXP 	tooSlowSlide: autoDraw = False
+334.2310 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+334.2310 	EXP 	feedback_slide: autoDraw = True
+334.2310 	EXP 	Square2: autoDraw = True
+335.2177 	EXP 	New trial (rep=7, index=2): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+335.2318 	EXP 	feedback_slide: autoDraw = False
+335.2318 	EXP 	Square2: autoDraw = False
+335.2318 	EXP 	feedback_slide: autoDraw = False
+335.2318 	EXP 	Square2: autoDraw = False
+335.2318 	EXP 	text_7: autoDraw = False
+335.2318 	EXP 	break_slide: autoDraw = False
+335.2318 	EXP 	fixationcross: autoDraw = True
+335.7990 	EXP 	fixationcross: autoDraw = False
+335.7990 	EXP 	fixationcross: autoDraw = False
+335.7990 	EXP 	offerSlide: autoDraw = True
+335.7990 	EXP 	text_4: autoDraw = True
+335.7990 	EXP 	Square: autoDraw = True
+336.2054 	DATA 	Keypress: 4
+336.2327 	EXP 	offerSlide: autoDraw = False
+336.2327 	EXP 	text_4: autoDraw = False
+336.2327 	EXP 	Square: autoDraw = False
+336.2327 	EXP 	tooSlowSlide: autoDraw = False
+336.2327 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+336.2327 	EXP 	feedback_slide: autoDraw = True
+336.2327 	EXP 	Square2: autoDraw = True
+337.2188 	EXP 	New trial (rep=8, index=0): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+337.2335 	EXP 	feedback_slide: autoDraw = False
+337.2335 	EXP 	Square2: autoDraw = False
+337.2335 	EXP 	feedback_slide: autoDraw = False
+337.2335 	EXP 	Square2: autoDraw = False
+337.2335 	EXP 	text_7: autoDraw = False
+337.2335 	EXP 	break_slide: autoDraw = False
+337.2335 	EXP 	fixationcross: autoDraw = True
+337.7673 	EXP 	fixationcross: autoDraw = False
+337.7673 	EXP 	fixationcross: autoDraw = False
+337.7673 	EXP 	offerSlide: autoDraw = True
+337.7673 	EXP 	text_4: autoDraw = True
+337.7673 	EXP 	Square: autoDraw = True
+338.1908 	DATA 	Keypress: 4
+338.2344 	EXP 	offerSlide: autoDraw = False
+338.2344 	EXP 	text_4: autoDraw = False
+338.2344 	EXP 	Square: autoDraw = False
+338.2344 	EXP 	tooSlowSlide: autoDraw = False
+338.2344 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+338.2344 	EXP 	feedback_slide: autoDraw = True
+338.2344 	EXP 	Square2: autoDraw = True
+339.2352 	EXP 	feedback_slide: autoDraw = False
+339.2352 	EXP 	Square2: autoDraw = False
+339.2352 	EXP 	feedback_slide: autoDraw = False
+339.2352 	EXP 	Square2: autoDraw = False
+339.2352 	EXP 	text_7: autoDraw = True
+339.2352 	EXP 	break_slide: autoDraw = True
+341.5556 	DATA 	Keypress: space
+341.5616 	EXP 	New trial (rep=8, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+341.5705 	EXP 	text_7: autoDraw = False
+341.5705 	EXP 	break_slide: autoDraw = False
+341.5705 	EXP 	fixationcross: autoDraw = True
+342.1877 	EXP 	fixationcross: autoDraw = False
+342.1877 	EXP 	fixationcross: autoDraw = False
+342.1877 	EXP 	offerSlide: autoDraw = True
+342.1877 	EXP 	text_4: autoDraw = True
+342.1877 	EXP 	Square: autoDraw = True
+342.5606 	DATA 	Keypress: 4
+342.5881 	EXP 	offerSlide: autoDraw = False
+342.5881 	EXP 	text_4: autoDraw = False
+342.5881 	EXP 	Square: autoDraw = False
+342.5881 	EXP 	tooSlowSlide: autoDraw = False
+342.5881 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+342.5881 	EXP 	feedback_slide: autoDraw = True
+342.5881 	EXP 	Square2: autoDraw = True
+343.5740 	EXP 	New trial (rep=8, index=2): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+343.5889 	EXP 	feedback_slide: autoDraw = False
+343.5889 	EXP 	Square2: autoDraw = False
+343.5889 	EXP 	feedback_slide: autoDraw = False
+343.5889 	EXP 	Square2: autoDraw = False
+343.5889 	EXP 	text_7: autoDraw = False
+343.5889 	EXP 	break_slide: autoDraw = False
+343.5889 	EXP 	fixationcross: autoDraw = True
+344.2061 	EXP 	fixationcross: autoDraw = False
+344.2061 	EXP 	fixationcross: autoDraw = False
+344.2061 	EXP 	offerSlide: autoDraw = True
+344.2061 	EXP 	text_4: autoDraw = True
+344.2061 	EXP 	Square: autoDraw = True
+344.5117 	DATA 	Keypress: 4
+344.5397 	EXP 	offerSlide: autoDraw = False
+344.5397 	EXP 	text_4: autoDraw = False
+344.5397 	EXP 	Square: autoDraw = False
+344.5397 	EXP 	tooSlowSlide: autoDraw = False
+344.5397 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+344.5397 	EXP 	feedback_slide: autoDraw = True
+344.5397 	EXP 	Square2: autoDraw = True
+345.5261 	EXP 	New trial (rep=9, index=0): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+345.5406 	EXP 	feedback_slide: autoDraw = False
+345.5406 	EXP 	Square2: autoDraw = False
+345.5406 	EXP 	feedback_slide: autoDraw = False
+345.5406 	EXP 	Square2: autoDraw = False
+345.5406 	EXP 	text_7: autoDraw = False
+345.5406 	EXP 	break_slide: autoDraw = False
+345.5406 	EXP 	fixationcross: autoDraw = True
+346.0911 	EXP 	fixationcross: autoDraw = False
+346.0911 	EXP 	fixationcross: autoDraw = False
+346.0911 	EXP 	offerSlide: autoDraw = True
+346.0911 	EXP 	text_4: autoDraw = True
+346.0911 	EXP 	Square: autoDraw = True
+346.4138 	DATA 	Keypress: 4
+346.4414 	EXP 	offerSlide: autoDraw = False
+346.4414 	EXP 	text_4: autoDraw = False
+346.4414 	EXP 	Square: autoDraw = False
+346.4414 	EXP 	tooSlowSlide: autoDraw = False
+346.4414 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+346.4414 	EXP 	feedback_slide: autoDraw = True
+346.4414 	EXP 	Square2: autoDraw = True
+347.4282 	EXP 	New trial (rep=9, index=1): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+347.4422 	EXP 	feedback_slide: autoDraw = False
+347.4422 	EXP 	Square2: autoDraw = False
+347.4422 	EXP 	feedback_slide: autoDraw = False
+347.4422 	EXP 	Square2: autoDraw = False
+347.4422 	EXP 	text_7: autoDraw = False
+347.4422 	EXP 	break_slide: autoDraw = False
+347.4422 	EXP 	fixationcross: autoDraw = True
+348.0928 	EXP 	fixationcross: autoDraw = False
+348.0928 	EXP 	fixationcross: autoDraw = False
+348.0928 	EXP 	offerSlide: autoDraw = True
+348.0928 	EXP 	text_4: autoDraw = True
+348.0928 	EXP 	Square: autoDraw = True
+348.4489 	DATA 	Keypress: 4
+348.4764 	EXP 	offerSlide: autoDraw = False
+348.4764 	EXP 	text_4: autoDraw = False
+348.4764 	EXP 	Square: autoDraw = False
+348.4764 	EXP 	tooSlowSlide: autoDraw = False
+348.4764 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+348.4764 	EXP 	feedback_slide: autoDraw = True
+348.4764 	EXP 	Square2: autoDraw = True
+349.4633 	EXP 	New trial (rep=9, index=2): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+349.4773 	EXP 	feedback_slide: autoDraw = False
+349.4773 	EXP 	Square2: autoDraw = False
+349.4773 	EXP 	feedback_slide: autoDraw = False
+349.4773 	EXP 	Square2: autoDraw = False
+349.4773 	EXP 	text_7: autoDraw = False
+349.4773 	EXP 	break_slide: autoDraw = False
+349.4773 	EXP 	fixationcross: autoDraw = True
+350.0611 	EXP 	fixationcross: autoDraw = False
+350.0611 	EXP 	fixationcross: autoDraw = False
+350.0611 	EXP 	offerSlide: autoDraw = True
+350.0611 	EXP 	text_4: autoDraw = True
+350.0611 	EXP 	Square: autoDraw = True
+350.3670 	DATA 	Keypress: 4
+350.3947 	EXP 	offerSlide: autoDraw = False
+350.3947 	EXP 	text_4: autoDraw = False
+350.3947 	EXP 	Square: autoDraw = False
+350.3947 	EXP 	tooSlowSlide: autoDraw = False
+350.3947 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+350.3947 	EXP 	feedback_slide: autoDraw = True
+350.3947 	EXP 	Square2: autoDraw = True
+351.3814 	EXP 	New trial (rep=10, index=0): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+351.3956 	EXP 	feedback_slide: autoDraw = False
+351.3956 	EXP 	Square2: autoDraw = False
+351.3956 	EXP 	feedback_slide: autoDraw = False
+351.3956 	EXP 	Square2: autoDraw = False
+351.3956 	EXP 	text_7: autoDraw = False
+351.3956 	EXP 	break_slide: autoDraw = False
+351.3956 	EXP 	fixationcross: autoDraw = True
+352.0795 	EXP 	fixationcross: autoDraw = False
+352.0795 	EXP 	fixationcross: autoDraw = False
+352.0795 	EXP 	offerSlide: autoDraw = True
+352.0795 	EXP 	text_4: autoDraw = True
+352.0795 	EXP 	Square: autoDraw = True
+352.4020 	DATA 	Keypress: 4
+352.4298 	EXP 	offerSlide: autoDraw = False
+352.4298 	EXP 	text_4: autoDraw = False
+352.4298 	EXP 	Square: autoDraw = False
+352.4298 	EXP 	tooSlowSlide: autoDraw = False
+352.4298 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+352.4298 	EXP 	feedback_slide: autoDraw = True
+352.4298 	EXP 	Square2: autoDraw = True
+353.4164 	EXP 	New trial (rep=10, index=1): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+353.4306 	EXP 	feedback_slide: autoDraw = False
+353.4306 	EXP 	Square2: autoDraw = False
+353.4306 	EXP 	feedback_slide: autoDraw = False
+353.4306 	EXP 	Square2: autoDraw = False
+353.4306 	EXP 	text_7: autoDraw = False
+353.4306 	EXP 	break_slide: autoDraw = False
+353.4306 	EXP 	fixationcross: autoDraw = True
+354.0812 	EXP 	fixationcross: autoDraw = False
+354.0812 	EXP 	fixationcross: autoDraw = False
+354.0812 	EXP 	offerSlide: autoDraw = True
+354.0812 	EXP 	text_4: autoDraw = True
+354.0812 	EXP 	Square: autoDraw = True
+354.3701 	DATA 	Keypress: 4
+354.3981 	EXP 	offerSlide: autoDraw = False
+354.3981 	EXP 	text_4: autoDraw = False
+354.3981 	EXP 	Square: autoDraw = False
+354.3981 	EXP 	tooSlowSlide: autoDraw = False
+354.3981 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+354.3981 	EXP 	feedback_slide: autoDraw = True
+354.3981 	EXP 	Square2: autoDraw = True
+355.3845 	EXP 	New trial (rep=10, index=2): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+355.3990 	EXP 	feedback_slide: autoDraw = False
+355.3990 	EXP 	Square2: autoDraw = False
+355.3990 	EXP 	feedback_slide: autoDraw = False
+355.3990 	EXP 	Square2: autoDraw = False
+355.3990 	EXP 	text_7: autoDraw = False
+355.3990 	EXP 	break_slide: autoDraw = False
+355.3990 	EXP 	fixationcross: autoDraw = True
+356.0162 	EXP 	fixationcross: autoDraw = False
+356.0162 	EXP 	fixationcross: autoDraw = False
+356.0162 	EXP 	offerSlide: autoDraw = True
+356.0162 	EXP 	text_4: autoDraw = True
+356.0162 	EXP 	Square: autoDraw = True
+356.3392 	DATA 	Keypress: 4
+356.3665 	EXP 	offerSlide: autoDraw = False
+356.3665 	EXP 	text_4: autoDraw = False
+356.3665 	EXP 	Square: autoDraw = False
+356.3665 	EXP 	tooSlowSlide: autoDraw = False
+356.3665 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+356.3665 	EXP 	feedback_slide: autoDraw = True
+356.3665 	EXP 	Square2: autoDraw = True
+357.3526 	EXP 	New trial (rep=11, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+357.3673 	EXP 	feedback_slide: autoDraw = False
+357.3673 	EXP 	Square2: autoDraw = False
+357.3673 	EXP 	feedback_slide: autoDraw = False
+357.3673 	EXP 	Square2: autoDraw = False
+357.3673 	EXP 	text_7: autoDraw = False
+357.3673 	EXP 	break_slide: autoDraw = False
+357.3673 	EXP 	fixationcross: autoDraw = True
+357.9178 	EXP 	fixationcross: autoDraw = False
+357.9178 	EXP 	fixationcross: autoDraw = False
+357.9178 	EXP 	offerSlide: autoDraw = True
+357.9178 	EXP 	text_4: autoDraw = True
+357.9178 	EXP 	Square: autoDraw = True
+358.2733 	DATA 	Keypress: 4
+358.3014 	EXP 	offerSlide: autoDraw = False
+358.3014 	EXP 	text_4: autoDraw = False
+358.3014 	EXP 	Square: autoDraw = False
+358.3014 	EXP 	tooSlowSlide: autoDraw = False
+358.3014 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+358.3014 	EXP 	feedback_slide: autoDraw = True
+358.3014 	EXP 	Square2: autoDraw = True
+359.2877 	EXP 	New trial (rep=11, index=1): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+359.3023 	EXP 	feedback_slide: autoDraw = False
+359.3023 	EXP 	Square2: autoDraw = False
+359.3023 	EXP 	feedback_slide: autoDraw = False
+359.3023 	EXP 	Square2: autoDraw = False
+359.3023 	EXP 	text_7: autoDraw = False
+359.3023 	EXP 	break_slide: autoDraw = False
+359.3023 	EXP 	fixationcross: autoDraw = True
+359.8361 	EXP 	fixationcross: autoDraw = False
+359.8361 	EXP 	fixationcross: autoDraw = False
+359.8361 	EXP 	offerSlide: autoDraw = True
+359.8361 	EXP 	text_4: autoDraw = True
+359.8361 	EXP 	Square: autoDraw = True
+360.0924 	DATA 	Keypress: 4
+360.1197 	EXP 	offerSlide: autoDraw = False
+360.1197 	EXP 	text_4: autoDraw = False
+360.1197 	EXP 	Square: autoDraw = False
+360.1197 	EXP 	tooSlowSlide: autoDraw = False
+360.1197 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+360.1197 	EXP 	feedback_slide: autoDraw = True
+360.1197 	EXP 	Square2: autoDraw = True
+361.1060 	EXP 	New trial (rep=11, index=2): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+361.1205 	EXP 	feedback_slide: autoDraw = False
+361.1205 	EXP 	Square2: autoDraw = False
+361.1205 	EXP 	feedback_slide: autoDraw = False
+361.1205 	EXP 	Square2: autoDraw = False
+361.1205 	EXP 	text_7: autoDraw = False
+361.1205 	EXP 	break_slide: autoDraw = False
+361.1205 	EXP 	fixationcross: autoDraw = True
+361.6376 	EXP 	fixationcross: autoDraw = False
+361.6376 	EXP 	fixationcross: autoDraw = False
+361.6376 	EXP 	offerSlide: autoDraw = True
+361.6376 	EXP 	text_4: autoDraw = True
+361.6376 	EXP 	Square: autoDraw = True
+361.9434 	DATA 	Keypress: 4
+361.9712 	EXP 	offerSlide: autoDraw = False
+361.9712 	EXP 	text_4: autoDraw = False
+361.9712 	EXP 	Square: autoDraw = False
+361.9712 	EXP 	tooSlowSlide: autoDraw = False
+361.9712 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+361.9712 	EXP 	feedback_slide: autoDraw = True
+361.9712 	EXP 	Square2: autoDraw = True
+362.9579 	EXP 	New trial (rep=12, index=0): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+362.9721 	EXP 	feedback_slide: autoDraw = False
+362.9721 	EXP 	Square2: autoDraw = False
+362.9721 	EXP 	feedback_slide: autoDraw = False
+362.9721 	EXP 	Square2: autoDraw = False
+362.9721 	EXP 	text_7: autoDraw = False
+362.9721 	EXP 	break_slide: autoDraw = False
+362.9721 	EXP 	fixationcross: autoDraw = True
+363.6560 	EXP 	fixationcross: autoDraw = False
+363.6560 	EXP 	fixationcross: autoDraw = False
+363.6560 	EXP 	offerSlide: autoDraw = True
+363.6560 	EXP 	text_4: autoDraw = True
+363.6560 	EXP 	Square: autoDraw = True
+363.9285 	DATA 	Keypress: 4
+363.9563 	EXP 	offerSlide: autoDraw = False
+363.9563 	EXP 	text_4: autoDraw = False
+363.9563 	EXP 	Square: autoDraw = False
+363.9563 	EXP 	tooSlowSlide: autoDraw = False
+363.9563 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+363.9563 	EXP 	feedback_slide: autoDraw = True
+363.9563 	EXP 	Square2: autoDraw = True
+364.9429 	EXP 	New trial (rep=12, index=1): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+364.9571 	EXP 	feedback_slide: autoDraw = False
+364.9571 	EXP 	Square2: autoDraw = False
+364.9571 	EXP 	feedback_slide: autoDraw = False
+364.9571 	EXP 	Square2: autoDraw = False
+364.9571 	EXP 	text_7: autoDraw = False
+364.9571 	EXP 	break_slide: autoDraw = False
+364.9571 	EXP 	fixationcross: autoDraw = True
+365.5409 	EXP 	fixationcross: autoDraw = False
+365.5409 	EXP 	fixationcross: autoDraw = False
+365.5409 	EXP 	offerSlide: autoDraw = True
+365.5409 	EXP 	text_4: autoDraw = True
+365.5409 	EXP 	Square: autoDraw = True
+365.8636 	DATA 	Keypress: 4
+365.8912 	EXP 	offerSlide: autoDraw = False
+365.8912 	EXP 	text_4: autoDraw = False
+365.8912 	EXP 	Square: autoDraw = False
+365.8912 	EXP 	tooSlowSlide: autoDraw = False
+365.8912 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+365.8912 	EXP 	feedback_slide: autoDraw = True
+365.8912 	EXP 	Square2: autoDraw = True
+366.8780 	EXP 	New trial (rep=12, index=2): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+366.8921 	EXP 	feedback_slide: autoDraw = False
+366.8921 	EXP 	Square2: autoDraw = False
+366.8921 	EXP 	feedback_slide: autoDraw = False
+366.8921 	EXP 	Square2: autoDraw = False
+366.8921 	EXP 	text_7: autoDraw = False
+366.8921 	EXP 	break_slide: autoDraw = False
+366.8921 	EXP 	fixationcross: autoDraw = True
+367.4926 	EXP 	fixationcross: autoDraw = False
+367.4926 	EXP 	fixationcross: autoDraw = False
+367.4926 	EXP 	offerSlide: autoDraw = True
+367.4926 	EXP 	text_4: autoDraw = True
+367.4926 	EXP 	Square: autoDraw = True
+367.9317 	DATA 	Keypress: 4
+367.9597 	EXP 	offerSlide: autoDraw = False
+367.9597 	EXP 	text_4: autoDraw = False
+367.9597 	EXP 	Square: autoDraw = False
+367.9597 	EXP 	tooSlowSlide: autoDraw = False
+367.9597 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+367.9597 	EXP 	feedback_slide: autoDraw = True
+367.9597 	EXP 	Square2: autoDraw = True
+368.9461 	EXP 	New trial (rep=13, index=0): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+368.9605 	EXP 	feedback_slide: autoDraw = False
+368.9605 	EXP 	Square2: autoDraw = False
+368.9605 	EXP 	feedback_slide: autoDraw = False
+368.9605 	EXP 	Square2: autoDraw = False
+368.9605 	EXP 	text_7: autoDraw = False
+368.9605 	EXP 	break_slide: autoDraw = False
+368.9605 	EXP 	fixationcross: autoDraw = True
+369.5443 	EXP 	fixationcross: autoDraw = False
+369.5443 	EXP 	fixationcross: autoDraw = False
+369.5443 	EXP 	offerSlide: autoDraw = True
+369.5443 	EXP 	text_4: autoDraw = True
+369.5443 	EXP 	Square: autoDraw = True
+369.8498 	DATA 	Keypress: 4
+369.8780 	EXP 	offerSlide: autoDraw = False
+369.8780 	EXP 	text_4: autoDraw = False
+369.8780 	EXP 	Square: autoDraw = False
+369.8780 	EXP 	tooSlowSlide: autoDraw = False
+369.8780 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+369.8780 	EXP 	feedback_slide: autoDraw = True
+369.8780 	EXP 	Square2: autoDraw = True
+370.8642 	EXP 	New trial (rep=13, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+370.8788 	EXP 	feedback_slide: autoDraw = False
+370.8788 	EXP 	Square2: autoDraw = False
+370.8788 	EXP 	feedback_slide: autoDraw = False
+370.8788 	EXP 	Square2: autoDraw = False
+370.8788 	EXP 	text_7: autoDraw = False
+370.8788 	EXP 	break_slide: autoDraw = False
+370.8788 	EXP 	fixationcross: autoDraw = True
+371.5460 	EXP 	fixationcross: autoDraw = False
+371.5460 	EXP 	fixationcross: autoDraw = False
+371.5460 	EXP 	offerSlide: autoDraw = True
+371.5460 	EXP 	text_4: autoDraw = True
+371.5460 	EXP 	Square: autoDraw = True
+371.8349 	DATA 	Keypress: 4
+371.8630 	EXP 	offerSlide: autoDraw = False
+371.8630 	EXP 	text_4: autoDraw = False
+371.8630 	EXP 	Square: autoDraw = False
+371.8630 	EXP 	tooSlowSlide: autoDraw = False
+371.8630 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+371.8630 	EXP 	feedback_slide: autoDraw = True
+371.8630 	EXP 	Square2: autoDraw = True
+372.8493 	EXP 	New trial (rep=13, index=2): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+372.8638 	EXP 	feedback_slide: autoDraw = False
+372.8638 	EXP 	Square2: autoDraw = False
+372.8638 	EXP 	feedback_slide: autoDraw = False
+372.8638 	EXP 	Square2: autoDraw = False
+372.8638 	EXP 	text_7: autoDraw = False
+372.8638 	EXP 	break_slide: autoDraw = False
+372.8638 	EXP 	fixationcross: autoDraw = True
+373.5477 	EXP 	fixationcross: autoDraw = False
+373.5477 	EXP 	fixationcross: autoDraw = False
+373.5477 	EXP 	offerSlide: autoDraw = True
+373.5477 	EXP 	text_4: autoDraw = True
+373.5477 	EXP 	Square: autoDraw = True
+373.8540 	DATA 	Keypress: 4
+373.8814 	EXP 	offerSlide: autoDraw = False
+373.8814 	EXP 	text_4: autoDraw = False
+373.8814 	EXP 	Square: autoDraw = False
+373.8814 	EXP 	tooSlowSlide: autoDraw = False
+373.8814 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+373.8814 	EXP 	feedback_slide: autoDraw = True
+373.8814 	EXP 	Square2: autoDraw = True
+374.8673 	EXP 	New trial (rep=14, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+374.8822 	EXP 	feedback_slide: autoDraw = False
+374.8822 	EXP 	Square2: autoDraw = False
+374.8822 	EXP 	feedback_slide: autoDraw = False
+374.8822 	EXP 	Square2: autoDraw = False
+374.8822 	EXP 	text_7: autoDraw = False
+374.8822 	EXP 	break_slide: autoDraw = False
+374.8822 	EXP 	fixationcross: autoDraw = True
+375.5661 	EXP 	fixationcross: autoDraw = False
+375.5661 	EXP 	fixationcross: autoDraw = False
+375.5661 	EXP 	offerSlide: autoDraw = True
+375.5661 	EXP 	text_4: autoDraw = True
+375.5661 	EXP 	Square: autoDraw = True
+375.8720 	DATA 	Keypress: 4
+375.8997 	EXP 	offerSlide: autoDraw = False
+375.8997 	EXP 	text_4: autoDraw = False
+375.8997 	EXP 	Square: autoDraw = False
+375.8997 	EXP 	tooSlowSlide: autoDraw = False
+375.8997 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+375.8997 	EXP 	feedback_slide: autoDraw = True
+375.8997 	EXP 	Square2: autoDraw = True
+376.8865 	EXP 	New trial (rep=14, index=1): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+376.9006 	EXP 	feedback_slide: autoDraw = False
+376.9006 	EXP 	Square2: autoDraw = False
+376.9006 	EXP 	feedback_slide: autoDraw = False
+376.9006 	EXP 	Square2: autoDraw = False
+376.9006 	EXP 	text_7: autoDraw = False
+376.9006 	EXP 	break_slide: autoDraw = False
+376.9006 	EXP 	fixationcross: autoDraw = True
+377.4844 	EXP 	fixationcross: autoDraw = False
+377.4844 	EXP 	fixationcross: autoDraw = False
+377.4844 	EXP 	offerSlide: autoDraw = True
+377.4844 	EXP 	text_4: autoDraw = True
+377.4844 	EXP 	Square: autoDraw = True
+377.8405 	DATA 	Keypress: 4
+377.8848 	EXP 	offerSlide: autoDraw = False
+377.8848 	EXP 	text_4: autoDraw = False
+377.8848 	EXP 	Square: autoDraw = False
+377.8848 	EXP 	tooSlowSlide: autoDraw = False
+377.8848 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+377.8848 	EXP 	feedback_slide: autoDraw = True
+377.8848 	EXP 	Square2: autoDraw = True
+378.8716 	EXP 	New trial (rep=14, index=2): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+378.8856 	EXP 	feedback_slide: autoDraw = False
+378.8856 	EXP 	Square2: autoDraw = False
+378.8856 	EXP 	feedback_slide: autoDraw = False
+378.8856 	EXP 	Square2: autoDraw = False
+378.8856 	EXP 	text_7: autoDraw = False
+378.8856 	EXP 	break_slide: autoDraw = False
+378.8856 	EXP 	fixationcross: autoDraw = True
+379.5695 	EXP 	fixationcross: autoDraw = False
+379.5695 	EXP 	fixationcross: autoDraw = False
+379.5695 	EXP 	offerSlide: autoDraw = True
+379.5695 	EXP 	text_4: autoDraw = True
+379.5695 	EXP 	Square: autoDraw = True
+379.8922 	DATA 	Keypress: 4
+379.9198 	EXP 	offerSlide: autoDraw = False
+379.9198 	EXP 	text_4: autoDraw = False
+379.9198 	EXP 	Square: autoDraw = False
+379.9198 	EXP 	tooSlowSlide: autoDraw = False
+379.9198 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+379.9198 	EXP 	feedback_slide: autoDraw = True
+379.9198 	EXP 	Square2: autoDraw = True
+380.9066 	EXP 	New trial (rep=15, index=0): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+380.9207 	EXP 	feedback_slide: autoDraw = False
+380.9207 	EXP 	Square2: autoDraw = False
+380.9207 	EXP 	feedback_slide: autoDraw = False
+380.9207 	EXP 	Square2: autoDraw = False
+380.9207 	EXP 	text_7: autoDraw = False
+380.9207 	EXP 	break_slide: autoDraw = False
+380.9207 	EXP 	fixationcross: autoDraw = True
+381.4878 	EXP 	fixationcross: autoDraw = False
+381.4878 	EXP 	fixationcross: autoDraw = False
+381.4878 	EXP 	offerSlide: autoDraw = True
+381.4878 	EXP 	text_4: autoDraw = True
+381.4878 	EXP 	Square: autoDraw = True
+381.8273 	DATA 	Keypress: 4
+381.8548 	EXP 	offerSlide: autoDraw = False
+381.8548 	EXP 	text_4: autoDraw = False
+381.8548 	EXP 	Square: autoDraw = False
+381.8548 	EXP 	tooSlowSlide: autoDraw = False
+381.8548 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+381.8548 	EXP 	feedback_slide: autoDraw = True
+381.8548 	EXP 	Square2: autoDraw = True
+382.8407 	EXP 	New trial (rep=15, index=1): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+382.8557 	EXP 	feedback_slide: autoDraw = False
+382.8557 	EXP 	Square2: autoDraw = False
+382.8557 	EXP 	feedback_slide: autoDraw = False
+382.8557 	EXP 	Square2: autoDraw = False
+382.8557 	EXP 	text_7: autoDraw = False
+382.8557 	EXP 	break_slide: autoDraw = False
+382.8557 	EXP 	fixationcross: autoDraw = True
+383.3895 	EXP 	fixationcross: autoDraw = False
+383.3895 	EXP 	fixationcross: autoDraw = False
+383.3895 	EXP 	offerSlide: autoDraw = True
+383.3895 	EXP 	text_4: autoDraw = True
+383.3895 	EXP 	Square: autoDraw = True
+383.6784 	DATA 	Keypress: 4
+383.7064 	EXP 	offerSlide: autoDraw = False
+383.7064 	EXP 	text_4: autoDraw = False
+383.7064 	EXP 	Square: autoDraw = False
+383.7064 	EXP 	tooSlowSlide: autoDraw = False
+383.7064 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+383.7064 	EXP 	feedback_slide: autoDraw = True
+383.7064 	EXP 	Square2: autoDraw = True
+384.6929 	EXP 	New trial (rep=15, index=2): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+384.7072 	EXP 	feedback_slide: autoDraw = False
+384.7072 	EXP 	Square2: autoDraw = False
+384.7072 	EXP 	feedback_slide: autoDraw = False
+384.7072 	EXP 	Square2: autoDraw = False
+384.7072 	EXP 	text_7: autoDraw = False
+384.7072 	EXP 	break_slide: autoDraw = False
+384.7072 	EXP 	fixationcross: autoDraw = True
+385.2577 	EXP 	fixationcross: autoDraw = False
+385.2577 	EXP 	fixationcross: autoDraw = False
+385.2577 	EXP 	offerSlide: autoDraw = True
+385.2577 	EXP 	text_4: autoDraw = True
+385.2577 	EXP 	Square: autoDraw = True
+385.5305 	DATA 	Keypress: 4
+385.5580 	EXP 	offerSlide: autoDraw = False
+385.5580 	EXP 	text_4: autoDraw = False
+385.5580 	EXP 	Square: autoDraw = False
+385.5580 	EXP 	tooSlowSlide: autoDraw = False
+385.5580 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+385.5580 	EXP 	feedback_slide: autoDraw = True
+385.5580 	EXP 	Square2: autoDraw = True
+386.5439 	EXP 	New trial (rep=16, index=0): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+386.5588 	EXP 	feedback_slide: autoDraw = False
+386.5588 	EXP 	Square2: autoDraw = False
+386.5588 	EXP 	feedback_slide: autoDraw = False
+386.5588 	EXP 	Square2: autoDraw = False
+386.5588 	EXP 	text_7: autoDraw = False
+386.5588 	EXP 	break_slide: autoDraw = False
+386.5588 	EXP 	fixationcross: autoDraw = True
+387.1260 	EXP 	fixationcross: autoDraw = False
+387.1260 	EXP 	fixationcross: autoDraw = False
+387.1260 	EXP 	offerSlide: autoDraw = True
+387.1260 	EXP 	text_4: autoDraw = True
+387.1260 	EXP 	Square: autoDraw = True
+387.3815 	DATA 	Keypress: 4
+387.4095 	EXP 	offerSlide: autoDraw = False
+387.4095 	EXP 	text_4: autoDraw = False
+387.4095 	EXP 	Square: autoDraw = False
+387.4095 	EXP 	tooSlowSlide: autoDraw = False
+387.4095 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+387.4095 	EXP 	feedback_slide: autoDraw = True
+387.4095 	EXP 	Square2: autoDraw = True
+388.3959 	EXP 	New trial (rep=16, index=1): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+388.4104 	EXP 	feedback_slide: autoDraw = False
+388.4104 	EXP 	Square2: autoDraw = False
+388.4104 	EXP 	feedback_slide: autoDraw = False
+388.4104 	EXP 	Square2: autoDraw = False
+388.4104 	EXP 	text_7: autoDraw = False
+388.4104 	EXP 	break_slide: autoDraw = False
+388.4104 	EXP 	fixationcross: autoDraw = True
+389.0609 	EXP 	fixationcross: autoDraw = False
+389.0609 	EXP 	fixationcross: autoDraw = False
+389.0609 	EXP 	offerSlide: autoDraw = True
+389.0609 	EXP 	text_4: autoDraw = True
+389.0609 	EXP 	Square: autoDraw = True
+389.3006 	DATA 	Keypress: 4
+389.3278 	EXP 	offerSlide: autoDraw = False
+389.3278 	EXP 	text_4: autoDraw = False
+389.3278 	EXP 	Square: autoDraw = False
+389.3278 	EXP 	tooSlowSlide: autoDraw = False
+389.3278 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+389.3278 	EXP 	feedback_slide: autoDraw = True
+389.3278 	EXP 	Square2: autoDraw = True
+390.3287 	EXP 	feedback_slide: autoDraw = False
+390.3287 	EXP 	Square2: autoDraw = False
+390.3287 	EXP 	feedback_slide: autoDraw = False
+390.3287 	EXP 	Square2: autoDraw = False
+390.3287 	EXP 	text_7: autoDraw = True
+390.3287 	EXP 	break_slide: autoDraw = True
+396.0189 	DATA 	Keypress: space
+396.0249 	EXP 	New trial (rep=16, index=2): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+396.0335 	EXP 	text_7: autoDraw = False
+396.0335 	EXP 	break_slide: autoDraw = False
+396.0335 	EXP 	fixationcross: autoDraw = True
+396.5673 	EXP 	fixationcross: autoDraw = False
+396.5673 	EXP 	fixationcross: autoDraw = False
+396.5673 	EXP 	offerSlide: autoDraw = True
+396.5673 	EXP 	text_4: autoDraw = True
+396.5673 	EXP 	Square: autoDraw = True
+396.9070 	DATA 	Keypress: 4
+396.9343 	EXP 	offerSlide: autoDraw = False
+396.9343 	EXP 	text_4: autoDraw = False
+396.9343 	EXP 	Square: autoDraw = False
+396.9343 	EXP 	tooSlowSlide: autoDraw = False
+396.9343 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+396.9343 	EXP 	feedback_slide: autoDraw = True
+396.9343 	EXP 	Square2: autoDraw = True
+397.9204 	EXP 	New trial (rep=17, index=0): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+397.9352 	EXP 	feedback_slide: autoDraw = False
+397.9352 	EXP 	Square2: autoDraw = False
+397.9352 	EXP 	feedback_slide: autoDraw = False
+397.9352 	EXP 	Square2: autoDraw = False
+397.9352 	EXP 	text_7: autoDraw = False
+397.9352 	EXP 	break_slide: autoDraw = False
+397.9352 	EXP 	fixationcross: autoDraw = True
+398.5857 	EXP 	fixationcross: autoDraw = False
+398.5857 	EXP 	fixationcross: autoDraw = False
+398.5857 	EXP 	offerSlide: autoDraw = True
+398.5857 	EXP 	text_4: autoDraw = True
+398.5857 	EXP 	Square: autoDraw = True
+398.8080 	DATA 	Keypress: 4
+398.8359 	EXP 	offerSlide: autoDraw = False
+398.8359 	EXP 	text_4: autoDraw = False
+398.8359 	EXP 	Square: autoDraw = False
+398.8359 	EXP 	tooSlowSlide: autoDraw = False
+398.8359 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+398.8359 	EXP 	feedback_slide: autoDraw = True
+398.8359 	EXP 	Square2: autoDraw = True
+399.8225 	EXP 	New trial (rep=17, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+399.8368 	EXP 	feedback_slide: autoDraw = False
+399.8368 	EXP 	Square2: autoDraw = False
+399.8368 	EXP 	feedback_slide: autoDraw = False
+399.8368 	EXP 	Square2: autoDraw = False
+399.8368 	EXP 	text_7: autoDraw = False
+399.8368 	EXP 	break_slide: autoDraw = False
+399.8368 	EXP 	fixationcross: autoDraw = True
+400.5374 	EXP 	fixationcross: autoDraw = False
+400.5374 	EXP 	fixationcross: autoDraw = False
+400.5374 	EXP 	offerSlide: autoDraw = True
+400.5374 	EXP 	text_4: autoDraw = True
+400.5374 	EXP 	Square: autoDraw = True
+400.7431 	DATA 	Keypress: 4
+400.7709 	EXP 	offerSlide: autoDraw = False
+400.7709 	EXP 	text_4: autoDraw = False
+400.7709 	EXP 	Square: autoDraw = False
+400.7709 	EXP 	tooSlowSlide: autoDraw = False
+400.7709 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+400.7709 	EXP 	feedback_slide: autoDraw = True
+400.7709 	EXP 	Square2: autoDraw = True
+401.7575 	EXP 	New trial (rep=17, index=2): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+401.7718 	EXP 	feedback_slide: autoDraw = False
+401.7718 	EXP 	Square2: autoDraw = False
+401.7718 	EXP 	feedback_slide: autoDraw = False
+401.7718 	EXP 	Square2: autoDraw = False
+401.7718 	EXP 	text_7: autoDraw = False
+401.7718 	EXP 	break_slide: autoDraw = False
+401.7718 	EXP 	fixationcross: autoDraw = True
+402.4056 	EXP 	fixationcross: autoDraw = False
+402.4056 	EXP 	fixationcross: autoDraw = False
+402.4056 	EXP 	offerSlide: autoDraw = True
+402.4056 	EXP 	text_4: autoDraw = True
+402.4056 	EXP 	Square: autoDraw = True
+402.6282 	DATA 	Keypress: 4
+402.6558 	EXP 	offerSlide: autoDraw = False
+402.6558 	EXP 	text_4: autoDraw = False
+402.6558 	EXP 	Square: autoDraw = False
+402.6558 	EXP 	tooSlowSlide: autoDraw = False
+402.6558 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+402.6558 	EXP 	feedback_slide: autoDraw = True
+402.6558 	EXP 	Square2: autoDraw = True
+403.6426 	EXP 	New trial (rep=18, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+403.6567 	EXP 	feedback_slide: autoDraw = False
+403.6567 	EXP 	Square2: autoDraw = False
+403.6567 	EXP 	feedback_slide: autoDraw = False
+403.6567 	EXP 	Square2: autoDraw = False
+403.6567 	EXP 	text_7: autoDraw = False
+403.6567 	EXP 	break_slide: autoDraw = False
+403.6567 	EXP 	fixationcross: autoDraw = True
+404.2572 	EXP 	fixationcross: autoDraw = False
+404.2572 	EXP 	fixationcross: autoDraw = False
+404.2572 	EXP 	offerSlide: autoDraw = True
+404.2572 	EXP 	text_4: autoDraw = True
+404.2572 	EXP 	Square: autoDraw = True
+404.4963 	DATA 	Keypress: 4
+404.5241 	EXP 	offerSlide: autoDraw = False
+404.5241 	EXP 	text_4: autoDraw = False
+404.5241 	EXP 	Square: autoDraw = False
+404.5241 	EXP 	tooSlowSlide: autoDraw = False
+404.5241 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+404.5241 	EXP 	feedback_slide: autoDraw = True
+404.5241 	EXP 	Square2: autoDraw = True
+405.5107 	EXP 	New trial (rep=18, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+405.5249 	EXP 	feedback_slide: autoDraw = False
+405.5249 	EXP 	Square2: autoDraw = False
+405.5249 	EXP 	feedback_slide: autoDraw = False
+405.5249 	EXP 	Square2: autoDraw = False
+405.5249 	EXP 	text_7: autoDraw = False
+405.5249 	EXP 	break_slide: autoDraw = False
+405.5249 	EXP 	fixationcross: autoDraw = True
+406.2255 	EXP 	fixationcross: autoDraw = False
+406.2255 	EXP 	fixationcross: autoDraw = False
+406.2255 	EXP 	offerSlide: autoDraw = True
+406.2255 	EXP 	text_4: autoDraw = True
+406.2255 	EXP 	Square: autoDraw = True
+406.4484 	DATA 	Keypress: 4
+406.4758 	EXP 	offerSlide: autoDraw = False
+406.4758 	EXP 	text_4: autoDraw = False
+406.4758 	EXP 	Square: autoDraw = False
+406.4758 	EXP 	tooSlowSlide: autoDraw = False
+406.4758 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+406.4758 	EXP 	feedback_slide: autoDraw = True
+406.4758 	EXP 	Square2: autoDraw = True
+407.4618 	EXP 	New trial (rep=18, index=2): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+407.4766 	EXP 	feedback_slide: autoDraw = False
+407.4766 	EXP 	Square2: autoDraw = False
+407.4766 	EXP 	feedback_slide: autoDraw = False
+407.4766 	EXP 	Square2: autoDraw = False
+407.4766 	EXP 	text_7: autoDraw = False
+407.4766 	EXP 	break_slide: autoDraw = False
+407.4766 	EXP 	fixationcross: autoDraw = True
+408.0938 	EXP 	fixationcross: autoDraw = False
+408.0938 	EXP 	fixationcross: autoDraw = False
+408.0938 	EXP 	offerSlide: autoDraw = True
+408.0938 	EXP 	text_4: autoDraw = True
+408.0938 	EXP 	Square: autoDraw = True
+408.3335 	DATA 	Keypress: 4
+408.3607 	EXP 	offerSlide: autoDraw = False
+408.3607 	EXP 	text_4: autoDraw = False
+408.3607 	EXP 	Square: autoDraw = False
+408.3607 	EXP 	tooSlowSlide: autoDraw = False
+408.3607 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+408.3607 	EXP 	feedback_slide: autoDraw = True
+408.3607 	EXP 	Square2: autoDraw = True
+409.3469 	EXP 	New trial (rep=19, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+409.3615 	EXP 	feedback_slide: autoDraw = False
+409.3615 	EXP 	Square2: autoDraw = False
+409.3615 	EXP 	feedback_slide: autoDraw = False
+409.3615 	EXP 	Square2: autoDraw = False
+409.3615 	EXP 	text_7: autoDraw = False
+409.3615 	EXP 	break_slide: autoDraw = False
+409.3615 	EXP 	fixationcross: autoDraw = True
+410.0288 	EXP 	fixationcross: autoDraw = False
+410.0288 	EXP 	fixationcross: autoDraw = False
+410.0288 	EXP 	offerSlide: autoDraw = True
+410.0288 	EXP 	text_4: autoDraw = True
+410.0288 	EXP 	Square: autoDraw = True
+410.2515 	DATA 	Keypress: 4
+410.2790 	EXP 	offerSlide: autoDraw = False
+410.2790 	EXP 	text_4: autoDraw = False
+410.2790 	EXP 	Square: autoDraw = False
+410.2790 	EXP 	tooSlowSlide: autoDraw = False
+410.2790 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+410.2790 	EXP 	feedback_slide: autoDraw = True
+410.2790 	EXP 	Square2: autoDraw = True
+411.2649 	EXP 	New trial (rep=19, index=1): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+411.2799 	EXP 	feedback_slide: autoDraw = False
+411.2799 	EXP 	Square2: autoDraw = False
+411.2799 	EXP 	feedback_slide: autoDraw = False
+411.2799 	EXP 	Square2: autoDraw = False
+411.2799 	EXP 	text_7: autoDraw = False
+411.2799 	EXP 	break_slide: autoDraw = False
+411.2799 	EXP 	fixationcross: autoDraw = True
+411.9304 	EXP 	fixationcross: autoDraw = False
+411.9304 	EXP 	fixationcross: autoDraw = False
+411.9304 	EXP 	offerSlide: autoDraw = True
+411.9304 	EXP 	text_4: autoDraw = True
+411.9304 	EXP 	Square: autoDraw = True
+412.1366 	DATA 	Keypress: 4
+412.1639 	EXP 	offerSlide: autoDraw = False
+412.1639 	EXP 	text_4: autoDraw = False
+412.1639 	EXP 	Square: autoDraw = False
+412.1639 	EXP 	tooSlowSlide: autoDraw = False
+412.1639 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+412.1639 	EXP 	feedback_slide: autoDraw = True
+412.1639 	EXP 	Square2: autoDraw = True
+413.1500 	EXP 	New trial (rep=19, index=2): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+413.1648 	EXP 	feedback_slide: autoDraw = False
+413.1648 	EXP 	Square2: autoDraw = False
+413.1648 	EXP 	feedback_slide: autoDraw = False
+413.1648 	EXP 	Square2: autoDraw = False
+413.1648 	EXP 	text_7: autoDraw = False
+413.1648 	EXP 	break_slide: autoDraw = False
+413.1648 	EXP 	fixationcross: autoDraw = True
+413.7820 	EXP 	fixationcross: autoDraw = False
+413.7820 	EXP 	fixationcross: autoDraw = False
+413.7820 	EXP 	offerSlide: autoDraw = True
+413.7820 	EXP 	text_4: autoDraw = True
+413.7820 	EXP 	Square: autoDraw = True
+414.0207 	DATA 	Keypress: 4
+414.0489 	EXP 	offerSlide: autoDraw = False
+414.0489 	EXP 	text_4: autoDraw = False
+414.0489 	EXP 	Square: autoDraw = False
+414.0489 	EXP 	tooSlowSlide: autoDraw = False
+414.0489 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+414.0489 	EXP 	feedback_slide: autoDraw = True
+414.0489 	EXP 	Square2: autoDraw = True
+415.0351 	EXP 	New trial (rep=20, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+415.0497 	EXP 	feedback_slide: autoDraw = False
+415.0497 	EXP 	Square2: autoDraw = False
+415.0497 	EXP 	feedback_slide: autoDraw = False
+415.0497 	EXP 	Square2: autoDraw = False
+415.0497 	EXP 	text_7: autoDraw = False
+415.0497 	EXP 	break_slide: autoDraw = False
+415.0497 	EXP 	fixationcross: autoDraw = True
+415.6669 	EXP 	fixationcross: autoDraw = False
+415.6669 	EXP 	fixationcross: autoDraw = False
+415.6669 	EXP 	offerSlide: autoDraw = True
+415.6669 	EXP 	text_4: autoDraw = True
+415.6669 	EXP 	Square: autoDraw = True
+415.8728 	DATA 	Keypress: 4
+415.9004 	EXP 	offerSlide: autoDraw = False
+415.9004 	EXP 	text_4: autoDraw = False
+415.9004 	EXP 	Square: autoDraw = False
+415.9004 	EXP 	tooSlowSlide: autoDraw = False
+415.9004 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+415.9004 	EXP 	feedback_slide: autoDraw = True
+415.9004 	EXP 	Square2: autoDraw = True
+416.8872 	EXP 	New trial (rep=20, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+416.9013 	EXP 	feedback_slide: autoDraw = False
+416.9013 	EXP 	Square2: autoDraw = False
+416.9013 	EXP 	feedback_slide: autoDraw = False
+416.9013 	EXP 	Square2: autoDraw = False
+416.9013 	EXP 	text_7: autoDraw = False
+416.9013 	EXP 	break_slide: autoDraw = False
+416.9013 	EXP 	fixationcross: autoDraw = True
+417.4351 	EXP 	fixationcross: autoDraw = False
+417.4351 	EXP 	fixationcross: autoDraw = False
+417.4351 	EXP 	offerSlide: autoDraw = True
+417.4351 	EXP 	text_4: autoDraw = True
+417.4351 	EXP 	Square: autoDraw = True
+417.7239 	DATA 	Keypress: 4
+417.7520 	EXP 	offerSlide: autoDraw = False
+417.7520 	EXP 	text_4: autoDraw = False
+417.7520 	EXP 	Square: autoDraw = False
+417.7520 	EXP 	tooSlowSlide: autoDraw = False
+417.7520 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+417.7520 	EXP 	feedback_slide: autoDraw = True
+417.7520 	EXP 	Square2: autoDraw = True
+418.7383 	EXP 	New trial (rep=20, index=2): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+418.7529 	EXP 	feedback_slide: autoDraw = False
+418.7529 	EXP 	Square2: autoDraw = False
+418.7529 	EXP 	feedback_slide: autoDraw = False
+418.7529 	EXP 	Square2: autoDraw = False
+418.7529 	EXP 	text_7: autoDraw = False
+418.7529 	EXP 	break_slide: autoDraw = False
+418.7529 	EXP 	fixationcross: autoDraw = True
+419.2866 	EXP 	fixationcross: autoDraw = False
+419.2866 	EXP 	fixationcross: autoDraw = False
+419.2866 	EXP 	offerSlide: autoDraw = True
+419.2866 	EXP 	text_4: autoDraw = True
+419.2866 	EXP 	Square: autoDraw = True
+419.5259 	DATA 	Keypress: 4
+419.5535 	EXP 	offerSlide: autoDraw = False
+419.5535 	EXP 	text_4: autoDraw = False
+419.5535 	EXP 	Square: autoDraw = False
+419.5535 	EXP 	tooSlowSlide: autoDraw = False
+419.5535 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+419.5535 	EXP 	feedback_slide: autoDraw = True
+419.5535 	EXP 	Square2: autoDraw = True
+420.5404 	EXP 	New trial (rep=21, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+420.5544 	EXP 	feedback_slide: autoDraw = False
+420.5544 	EXP 	Square2: autoDraw = False
+420.5544 	EXP 	feedback_slide: autoDraw = False
+420.5544 	EXP 	Square2: autoDraw = False
+420.5544 	EXP 	text_7: autoDraw = False
+420.5544 	EXP 	break_slide: autoDraw = False
+420.5544 	EXP 	fixationcross: autoDraw = True
+421.0882 	EXP 	fixationcross: autoDraw = False
+421.0882 	EXP 	fixationcross: autoDraw = False
+421.0882 	EXP 	offerSlide: autoDraw = True
+421.0882 	EXP 	text_4: autoDraw = True
+421.0882 	EXP 	Square: autoDraw = True
+421.2940 	DATA 	Keypress: 4
+421.3217 	EXP 	offerSlide: autoDraw = False
+421.3217 	EXP 	text_4: autoDraw = False
+421.3217 	EXP 	Square: autoDraw = False
+421.3217 	EXP 	tooSlowSlide: autoDraw = False
+421.3217 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+421.3217 	EXP 	feedback_slide: autoDraw = True
+421.3217 	EXP 	Square2: autoDraw = True
+422.3084 	EXP 	New trial (rep=21, index=1): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+422.3226 	EXP 	feedback_slide: autoDraw = False
+422.3226 	EXP 	Square2: autoDraw = False
+422.3226 	EXP 	feedback_slide: autoDraw = False
+422.3226 	EXP 	Square2: autoDraw = False
+422.3226 	EXP 	text_7: autoDraw = False
+422.3226 	EXP 	break_slide: autoDraw = False
+422.3226 	EXP 	fixationcross: autoDraw = True
+422.9564 	EXP 	fixationcross: autoDraw = False
+422.9564 	EXP 	fixationcross: autoDraw = False
+422.9564 	EXP 	offerSlide: autoDraw = True
+422.9564 	EXP 	text_4: autoDraw = True
+422.9564 	EXP 	Square: autoDraw = True
+423.2461 	DATA 	Keypress: 4
+423.2734 	EXP 	offerSlide: autoDraw = False
+423.2734 	EXP 	text_4: autoDraw = False
+423.2734 	EXP 	Square: autoDraw = False
+423.2734 	EXP 	tooSlowSlide: autoDraw = False
+423.2734 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+423.2734 	EXP 	feedback_slide: autoDraw = True
+423.2734 	EXP 	Square2: autoDraw = True
+424.2595 	EXP 	New trial (rep=21, index=2): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+424.2742 	EXP 	feedback_slide: autoDraw = False
+424.2742 	EXP 	Square2: autoDraw = False
+424.2742 	EXP 	feedback_slide: autoDraw = False
+424.2742 	EXP 	Square2: autoDraw = False
+424.2742 	EXP 	text_7: autoDraw = False
+424.2742 	EXP 	break_slide: autoDraw = False
+424.2742 	EXP 	fixationcross: autoDraw = True
+424.8915 	EXP 	fixationcross: autoDraw = False
+424.8915 	EXP 	fixationcross: autoDraw = False
+424.8915 	EXP 	offerSlide: autoDraw = True
+424.8915 	EXP 	text_4: autoDraw = True
+424.8915 	EXP 	Square: autoDraw = True
+425.0972 	DATA 	Keypress: 4
+425.1249 	EXP 	offerSlide: autoDraw = False
+425.1249 	EXP 	text_4: autoDraw = False
+425.1249 	EXP 	Square: autoDraw = False
+425.1249 	EXP 	tooSlowSlide: autoDraw = False
+425.1249 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+425.1249 	EXP 	feedback_slide: autoDraw = True
+425.1249 	EXP 	Square2: autoDraw = True
+426.1116 	EXP 	New trial (rep=22, index=0): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+426.1258 	EXP 	feedback_slide: autoDraw = False
+426.1258 	EXP 	Square2: autoDraw = False
+426.1258 	EXP 	feedback_slide: autoDraw = False
+426.1258 	EXP 	Square2: autoDraw = False
+426.1258 	EXP 	text_7: autoDraw = False
+426.1258 	EXP 	break_slide: autoDraw = False
+426.1258 	EXP 	fixationcross: autoDraw = True
+426.7263 	EXP 	fixationcross: autoDraw = False
+426.7263 	EXP 	fixationcross: autoDraw = False
+426.7263 	EXP 	offerSlide: autoDraw = True
+426.7263 	EXP 	text_4: autoDraw = True
+426.7263 	EXP 	Square: autoDraw = True
+426.9493 	DATA 	Keypress: 4
+426.9766 	EXP 	offerSlide: autoDraw = False
+426.9766 	EXP 	text_4: autoDraw = False
+426.9766 	EXP 	Square: autoDraw = False
+426.9766 	EXP 	tooSlowSlide: autoDraw = False
+426.9766 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+426.9766 	EXP 	feedback_slide: autoDraw = True
+426.9766 	EXP 	Square2: autoDraw = True
+427.9626 	EXP 	New trial (rep=22, index=1): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+427.9774 	EXP 	feedback_slide: autoDraw = False
+427.9774 	EXP 	Square2: autoDraw = False
+427.9774 	EXP 	feedback_slide: autoDraw = False
+427.9774 	EXP 	Square2: autoDraw = False
+427.9774 	EXP 	text_7: autoDraw = False
+427.9774 	EXP 	break_slide: autoDraw = False
+427.9774 	EXP 	fixationcross: autoDraw = True
+428.5445 	EXP 	fixationcross: autoDraw = False
+428.5445 	EXP 	fixationcross: autoDraw = False
+428.5445 	EXP 	offerSlide: autoDraw = True
+428.5445 	EXP 	text_4: autoDraw = True
+428.5445 	EXP 	Square: autoDraw = True
+428.7503 	DATA 	Keypress: 4
+428.7781 	EXP 	offerSlide: autoDraw = False
+428.7781 	EXP 	text_4: autoDraw = False
+428.7781 	EXP 	Square: autoDraw = False
+428.7781 	EXP 	tooSlowSlide: autoDraw = False
+428.7781 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+428.7781 	EXP 	feedback_slide: autoDraw = True
+428.7781 	EXP 	Square2: autoDraw = True
+429.7648 	EXP 	New trial (rep=22, index=2): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+429.7789 	EXP 	feedback_slide: autoDraw = False
+429.7789 	EXP 	Square2: autoDraw = False
+429.7789 	EXP 	feedback_slide: autoDraw = False
+429.7789 	EXP 	Square2: autoDraw = False
+429.7789 	EXP 	text_7: autoDraw = False
+429.7789 	EXP 	break_slide: autoDraw = False
+429.7789 	EXP 	fixationcross: autoDraw = True
+430.3127 	EXP 	fixationcross: autoDraw = False
+430.3127 	EXP 	fixationcross: autoDraw = False
+430.3127 	EXP 	offerSlide: autoDraw = True
+430.3127 	EXP 	text_4: autoDraw = True
+430.3127 	EXP 	Square: autoDraw = True
+430.6514 	DATA 	Keypress: 4
+430.6797 	EXP 	offerSlide: autoDraw = False
+430.6797 	EXP 	text_4: autoDraw = False
+430.6797 	EXP 	Square: autoDraw = False
+430.6797 	EXP 	tooSlowSlide: autoDraw = False
+430.6797 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+430.6797 	EXP 	feedback_slide: autoDraw = True
+430.6797 	EXP 	Square2: autoDraw = True
+431.6658 	EXP 	New trial (rep=23, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+431.6805 	EXP 	feedback_slide: autoDraw = False
+431.6805 	EXP 	Square2: autoDraw = False
+431.6805 	EXP 	feedback_slide: autoDraw = False
+431.6805 	EXP 	Square2: autoDraw = False
+431.6805 	EXP 	text_7: autoDraw = False
+431.6805 	EXP 	break_slide: autoDraw = False
+431.6805 	EXP 	fixationcross: autoDraw = True
+432.3978 	EXP 	fixationcross: autoDraw = False
+432.3978 	EXP 	fixationcross: autoDraw = False
+432.3978 	EXP 	offerSlide: autoDraw = True
+432.3978 	EXP 	text_4: autoDraw = True
+432.3978 	EXP 	Square: autoDraw = True
+432.6375 	DATA 	Keypress: 4
+432.6647 	EXP 	offerSlide: autoDraw = False
+432.6647 	EXP 	text_4: autoDraw = False
+432.6647 	EXP 	Square: autoDraw = False
+432.6647 	EXP 	tooSlowSlide: autoDraw = False
+432.6647 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+432.6647 	EXP 	feedback_slide: autoDraw = True
+432.6647 	EXP 	Square2: autoDraw = True
+433.6509 	EXP 	New trial (rep=23, index=1): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+433.6655 	EXP 	feedback_slide: autoDraw = False
+433.6655 	EXP 	Square2: autoDraw = False
+433.6655 	EXP 	feedback_slide: autoDraw = False
+433.6655 	EXP 	Square2: autoDraw = False
+433.6655 	EXP 	text_7: autoDraw = False
+433.6655 	EXP 	break_slide: autoDraw = False
+433.6655 	EXP 	fixationcross: autoDraw = True
+434.3328 	EXP 	fixationcross: autoDraw = False
+434.3328 	EXP 	fixationcross: autoDraw = False
+434.3328 	EXP 	offerSlide: autoDraw = True
+434.3328 	EXP 	text_4: autoDraw = True
+434.3328 	EXP 	Square: autoDraw = True
+434.5886 	DATA 	Keypress: 4
+434.6164 	EXP 	offerSlide: autoDraw = False
+434.6164 	EXP 	text_4: autoDraw = False
+434.6164 	EXP 	Square: autoDraw = False
+434.6164 	EXP 	tooSlowSlide: autoDraw = False
+434.6164 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+434.6164 	EXP 	feedback_slide: autoDraw = True
+434.6164 	EXP 	Square2: autoDraw = True
+435.6030 	EXP 	New trial (rep=23, index=2): OrderedDict([('Offertype', 'Offer2'), ('OfferSelf', 5), ('OfferOther', 5), ('ConditionTrigger', 2)])
+435.6172 	EXP 	feedback_slide: autoDraw = False
+435.6172 	EXP 	Square2: autoDraw = False
+435.6172 	EXP 	feedback_slide: autoDraw = False
+435.6172 	EXP 	Square2: autoDraw = False
+435.6172 	EXP 	text_7: autoDraw = False
+435.6172 	EXP 	break_slide: autoDraw = False
+435.6172 	EXP 	fixationcross: autoDraw = True
+436.1510 	EXP 	fixationcross: autoDraw = False
+436.1510 	EXP 	fixationcross: autoDraw = False
+436.1510 	EXP 	offerSlide: autoDraw = True
+436.1510 	EXP 	text_4: autoDraw = True
+436.1510 	EXP 	Square: autoDraw = True
+436.3737 	DATA 	Keypress: 4
+436.4012 	EXP 	offerSlide: autoDraw = False
+436.4012 	EXP 	text_4: autoDraw = False
+436.4012 	EXP 	Square: autoDraw = False
+436.4012 	EXP 	tooSlowSlide: autoDraw = False
+436.4012 	EXP 	feedback_slide: text = 'Sie erhalten 5 Credits.\n\nIhr Mitspieler erhält 5 Credits'
+436.4012 	EXP 	feedback_slide: autoDraw = True
+436.4012 	EXP 	Square2: autoDraw = True
+437.3881 	EXP 	New trial (rep=24, index=0): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+437.4021 	EXP 	feedback_slide: autoDraw = False
+437.4021 	EXP 	Square2: autoDraw = False
+437.4021 	EXP 	feedback_slide: autoDraw = False
+437.4021 	EXP 	Square2: autoDraw = False
+437.4021 	EXP 	text_7: autoDraw = False
+437.4021 	EXP 	break_slide: autoDraw = False
+437.4021 	EXP 	fixationcross: autoDraw = True
+437.9358 	EXP 	fixationcross: autoDraw = False
+437.9358 	EXP 	fixationcross: autoDraw = False
+437.9358 	EXP 	offerSlide: autoDraw = True
+437.9358 	EXP 	text_4: autoDraw = True
+437.9358 	EXP 	Square: autoDraw = True
+438.1587 	DATA 	Keypress: 4
+438.1861 	EXP 	offerSlide: autoDraw = False
+438.1861 	EXP 	text_4: autoDraw = False
+438.1861 	EXP 	Square: autoDraw = False
+438.1861 	EXP 	tooSlowSlide: autoDraw = False
+438.1861 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+438.1861 	EXP 	feedback_slide: autoDraw = True
+438.1861 	EXP 	Square2: autoDraw = True
+439.1722 	EXP 	New trial (rep=24, index=1): OrderedDict([('Offertype', 'Offer1'), ('OfferSelf', 1), ('OfferOther', 9), ('ConditionTrigger', 1)])
+439.1869 	EXP 	feedback_slide: autoDraw = False
+439.1869 	EXP 	Square2: autoDraw = False
+439.1869 	EXP 	feedback_slide: autoDraw = False
+439.1869 	EXP 	Square2: autoDraw = False
+439.1869 	EXP 	text_7: autoDraw = False
+439.1869 	EXP 	break_slide: autoDraw = False
+439.1869 	EXP 	fixationcross: autoDraw = True
+439.7040 	EXP 	fixationcross: autoDraw = False
+439.7040 	EXP 	fixationcross: autoDraw = False
+439.7040 	EXP 	offerSlide: autoDraw = True
+439.7040 	EXP 	text_4: autoDraw = True
+439.7040 	EXP 	Square: autoDraw = True
+439.9098 	DATA 	Keypress: 4
+439.9375 	EXP 	offerSlide: autoDraw = False
+439.9375 	EXP 	text_4: autoDraw = False
+439.9375 	EXP 	Square: autoDraw = False
+439.9375 	EXP 	tooSlowSlide: autoDraw = False
+439.9375 	EXP 	feedback_slide: text = 'Sie erhalten 1 Credits.\n\nIhr Mitspieler erhält 9 Credits'
+439.9375 	EXP 	feedback_slide: autoDraw = True
+439.9375 	EXP 	Square2: autoDraw = True
+440.9243 	EXP 	New trial (rep=24, index=2): OrderedDict([('Offertype', 'Offer3'), ('OfferSelf', 3), ('OfferOther', 7), ('ConditionTrigger', 3)])
+440.9384 	EXP 	feedback_slide: autoDraw = False
+440.9384 	EXP 	Square2: autoDraw = False
+440.9384 	EXP 	feedback_slide: autoDraw = False
+440.9384 	EXP 	Square2: autoDraw = False
+440.9384 	EXP 	text_7: autoDraw = False
+440.9384 	EXP 	break_slide: autoDraw = False
+440.9384 	EXP 	fixationcross: autoDraw = True
+441.6557 	EXP 	fixationcross: autoDraw = False
+441.6557 	EXP 	fixationcross: autoDraw = False
+441.6557 	EXP 	offerSlide: autoDraw = True
+441.6557 	EXP 	text_4: autoDraw = True
+441.6557 	EXP 	Square: autoDraw = True
+441.8779 	DATA 	Keypress: 4
+441.9059 	EXP 	offerSlide: autoDraw = False
+441.9059 	EXP 	text_4: autoDraw = False
+441.9059 	EXP 	Square: autoDraw = False
+441.9059 	EXP 	tooSlowSlide: autoDraw = False
+441.9059 	EXP 	feedback_slide: text = 'Sie erhalten 3 Credits.\n\nIhr Mitspieler erhält 7 Credits'
+441.9059 	EXP 	feedback_slide: autoDraw = True
+441.9059 	EXP 	Square2: autoDraw = True
+442.9067 	EXP 	feedback_slide: autoDraw = False
+442.9067 	EXP 	Square2: autoDraw = False
+442.9067 	EXP 	feedback_slide: autoDraw = False
+442.9067 	EXP 	Square2: autoDraw = False
+442.9067 	EXP 	text_7: autoDraw = False
+442.9067 	EXP 	break_slide: autoDraw = False
+442.9067 	EXP 	FeedbackMoney: text = 'Gratulation! \nSie haben 225 Cents angesammelt.\nNichtsdestotrotz erhalten Sie'
+442.9067 	EXP 	FeedbackMoney: autoDraw = True
+442.9067 	EXP 	Amount: autoDraw = True
+452.8986 	EXP 	FinalGB: autoDraw = True
+452.9153 	EXP 	FeedbackMoney: autoDraw = False
+452.9153 	EXP 	Amount: autoDraw = False
+457.9028 	EXP 	FinalGB: autoDraw = False
+457.9028 	EXP 	FeedbackMoney: autoDraw = False
+457.9028 	EXP 	Amount: autoDraw = False
+457.9028 	EXP 	FinalGB: autoDraw = False
+458.3410 	EXP 	window1: mouseVisible = True
