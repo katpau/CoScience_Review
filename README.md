@@ -2,11 +2,19 @@
 
 This Repository contains all Preprocessing and Analytical functions used in in the CoScience Project
 
-######################################################### 
 
-***To Run the Test, open and run TEST_RDF.m or TEST_RDF_Stats.R***
 
-***Change Analysis Name to what analysis you want to test***
+## How to run the test?
+
+***To Run the Test, across all forking options:***
+
+run **TEST_RDF.m** for the preprocessing
+
+run **TEST_RDF_Stats.R** for the statistical analyses
+
+
+
+***Change the Analysis Name to what analysis you want to test***
  * Alpha_Resting (Cassie)
  * Alpha_Context (Kat)
  * Error_MVPA (Elisa)
@@ -16,18 +24,28 @@ This Repository contains all Preprocessing and Analytical functions used in in t
  * GoNoGo_Conflict (Andre)
  * Ultimatum_Offer (Jojo)
 
-#########################################################
+## Can I run the code line by line if I suspect something is wrong?
+Yes, please use the **Troubleshooting_RDF_** scripts for this. It is explained there how to use it.
+
+
+
+## Before You Get Started
 
 Before Starting, please familiarize yourself a bit with github. 
+
 Christoph has prepared this excellent introduction:
 [GitHub_tutorial.pdf](https://github.com/katpau/CoScience_Review/files/10229627/GitHub_tutorial.pdf)
+
 
 And a bit of practical information on how to deal with this code here is collected here:
 [GitHub_Welcome.pdf](https://github.com/katpau/CoScience_Review/files/10229647/GitHub_Welcome.pdf)
 
 
-#########################################################
 
+
+
+
+## More Details
 
 
 In detail, the folders contain
