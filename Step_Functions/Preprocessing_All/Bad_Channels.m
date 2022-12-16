@@ -1,4 +1,8 @@
 function  OUTPUT = Bad_Channels(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % It identifies bad channels based on forking criteria, and it interpolates
 % these bad channels.
@@ -103,12 +107,9 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         Clean_Channel_Mask = ones(EEG.nbchan,1);
         Clean_Channel_Mask(BadChannels_Index) = 0;
 
-        % Throw error if all Channels marked as bad
-
-
+   
         % Interpolate in the complete dataset if a channel was marked as
-        % bad
-        if ~isempty(BadChannels_Index) 
+        if ~isempty(BadChannels_Index)  
             if  sum(Clean_Channel_Mask) == 0 
                 e.message = 'All Channels marked as bad (100%!!) .';
                 error(e.message);

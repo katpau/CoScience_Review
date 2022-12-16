@@ -1,4 +1,8 @@
 function  OUTPUT = Electrodes(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Script only marks which Electrodes are used for quantification.
 % Nothing is done here as this will be used in a later 

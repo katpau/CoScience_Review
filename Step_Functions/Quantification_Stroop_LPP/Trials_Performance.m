@@ -1,4 +1,8 @@
 function  OUTPUT = Trials_Performance(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Depending on the forking choice, trials are excluded based on
 % performance in that trial. The event structure of the CoScience Data
@@ -39,7 +43,6 @@ Order = [17];
 % No changes should be made here.
 INPUT.StepHistory.(StepName) = Choice;
 OUTPUT = INPUT;
-tic % for keeping track of time
 try % For Error Handling, all steps are positioned in a try loop to capture errors
     
     %#####################################################################
@@ -80,7 +83,6 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         % the OUTPUT.data field, overwriting previous EEG information.
         OUTPUT.data.(Conditions{i_cond}) = EEG;
     end
-    OUTPUT.StepDuration = [OUTPUT.StepDuration; toc];
     
     % ****** Error Management ******
 catch e

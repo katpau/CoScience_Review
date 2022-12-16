@@ -1,4 +1,8 @@
 function  OUTPUT = TimeWindow(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Script only marks which Times are used for quantification.
 % Nothing is done here as this will be used in a later 

@@ -1,4 +1,8 @@
 function  OUTPUT = Detrending(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Depending on the forking choice, data is detrended (continously or per
 % trial.

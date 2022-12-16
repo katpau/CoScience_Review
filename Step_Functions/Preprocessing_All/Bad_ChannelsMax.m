@@ -1,4 +1,8 @@
 function  OUTPUT = Bad_ChannelsMax(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % It counts the number of bad channels and stops continuing the
 % preprocessing if more than 20 % of channels were flagged as bad (if that

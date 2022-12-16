@@ -4,10 +4,14 @@ Choices = c("Centered", "None")
 Order = 12
 output = input$data
 
+## Contributors
+# Last checked by KP 12/22
+# Planned/Completed Review by:
+
 # Handles all Choices listed above 
 # Normalizes the predictors (e.g. behavioral and personality) data within all conditions
 # (1) Center Personality Variables
-# (1) Center Behavioural Predictors
+# (2) Center Behavioural Predictors
 
 if (choice == "Centered")  {
   #########################################################

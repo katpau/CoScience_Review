@@ -1,9 +1,13 @@
 Covariate = function(input = NULL, choice = NULL) {
   StepName = "Covariate"
-  Choices = c("None", "Gender_MF", "Gender", "Age_MF", "Age",  "AGG_Anger", "WHO5_Depression", "BFI_Open.Mindedness", "BFI_Conscientiousness", "BFI_Agreeableness", "BFI_Negative_Emotionality", "Big5_OCAN")
+  Choices = c("None", "Gender_MF", "Gender", "Age_MF", "Age",  "AGG_Anger", "WHO5_Depression", "BFI_OpenMindedness", "BFI_Conscientiousness", "BFI_Agreeableness", "BFI_NegativeEmotionality", "Big5_OCAN")
   Order = 4
   output = input$data
   
+  ## Contributors
+  # Last checked by KP 12/22
+  # Planned/Completed Review by:
+
   # Handles all Choices listed above as well as choices from previous Steps 
   # (Attention Checks Personality, Outliers_Personality, Personality_Variable)
   # (1) Get Choices from previous Steps
@@ -35,7 +39,7 @@ Covariate = function(input = NULL, choice = NULL) {
   #########################################################
   # load correct file, these files have been created separately
   
-  QuestFolder = paste0(input$stephistory["Root_Personality"], "Alpha_Context/")
+  QuestFolder = input$stephistory["Root_Personality"]
   if (Attention_Checks_Personality_choice == "Applied") {
     if (Outliers_Personality_choice == "None") {
       QuestionnaireFile = "Personality-Scores-filtered_outliers-notremoved.csv"
@@ -52,8 +56,6 @@ Covariate = function(input = NULL, choice = NULL) {
     
   }
   
-  QuestFolder="C:/Users/Paul/Documents/Work/PersonalityEEG/FINAL_RDF/HUMMEL/home/ForCompiling/Only_ForGit_To_TestRun/QuestionnaireData/Alpha_Context/"
-  #QuestFolder="/work/bay2875/QuestionnaireData/Alpha_Context/"
   ScoreData = read.csv(paste0(QuestFolder, QuestionnaireFile), header = TRUE)
   
   
@@ -61,8 +63,8 @@ Covariate = function(input = NULL, choice = NULL) {
   # (3) run Choice Relevant Personality Score 
   #########################################################
   # select only relevant personality score (and all covariates)
-  PersonalityData = ScoreData[, c("ID", Personality_Variable_choice)]
-  names(PersonalityData) = c("ID", paste0("Personality_", Personality_Variable_choice))
+  PersonalityData = ScoreData[, c("ID", paste0("Personality_", Personality_Variable_choice))]
+ 
   
   # Select only Relevant Covariate
   if (Covariate_choice != "None") {
@@ -72,18 +74,18 @@ Covariate = function(input = NULL, choice = NULL) {
       Covariate_Variable = "Age"
     } else if (Covariate_choice == "Big5_OCAN") {
       Covariate_Variable = c(
-        "BFI_Open.Mindedness",
+        "BFI_OpenMindedness",
         "BFI_Conscientiousness",
         "BFI_Agreeableness",
-        "BFI_Negative_Emotionality"
+        "BFI_NegativeEmotionality"
       )
     } else  {
       Covariate_Variable = Covariate_choice
     }
+    Covariate_Variable = paste0("Covariate_", Covariate_Variable)
     CovariateData = ScoreData[, c("ID", Covariate_Variable)]
-    
-    names(CovariateData)[names(CovariateData)==Covariate_Variable] = paste0("Covariate_",Covariate_Variable)
-    AddCovariate = 1
+ 
+     AddCovariate = 1
   } else {AddCovariate = 0}
   
   
@@ -114,8 +116,9 @@ Covariate = function(input = NULL, choice = NULL) {
   #########################################################
   # (5) Rename Stroop Conditions
   #########################################################
-  # Add Gender to rename conditions later
-  Gender = ScoreData[, c("ID", "Gender")]
+  # Add Gender to rename conditions later after BehavCovariate
+  Gender = ScoreData[, c("ID", "Covariate_Gender")]
+  colnames(Gender ) = c("ID", "Gender")
   output = merge(
     output,
     Gender,
@@ -129,9 +132,9 @@ Covariate = function(input = NULL, choice = NULL) {
   
   # Make sure everything is in correct format
   NumericVariables = c("EEG_Signal", "SME", "Epochs", names(output)[grepl("Personality_|Covariate_", names(output))])
-  GroupingVariables = c("ID", "Condition", "Hemisphere", "Electrode", "FrequencyBand", "Localisation",  names(output)[grepl("Covariate_Gender", names(output))])
+  FactorVariables = c("ID", "Condition", "Hemisphere", "Electrode", "FrequencyBand", "Localisation",  names(output)[grepl("Covariate_Gender", names(output))])
   
-  output[GroupingVariables] = lapply(output[GroupingVariables], as.factor)
+  output[FactorVariables] = lapply(output[FactorVariables], as.factor)
   output[NumericVariables] = lapply(output[NumericVariables], as.numeric)
   
   # Unclear and still needs to be checked: Sometimes SME and EEG_Signal is Inf

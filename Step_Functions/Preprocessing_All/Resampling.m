@@ -1,4 +1,8 @@
 function  OUTPUT = Resampling(INPUT, Choice, SubjectName, FilePath_to_Import, File_to_Import)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following: 
 % It first determines and loads the EEGLAB data file.
 % Then it removes channels not used in the analysis.
@@ -65,6 +69,12 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             'Resting_run-2_eeg');
         File_to_Import = strrep(File_to_Import, 'Resting_run-3_eeg', ...
             'Resting_run-2_eeg');
+    elseif INPUT.AnalysisName == "Alpha_Resting"
+        % Context Alpha Resting takes second repetition!
+        File_to_Import = strrep(File_to_Import, 'Resting_run-2_eeg', ...
+            'Resting_run-1_eeg');
+        File_to_Import = strrep(File_to_Import, 'Resting_run-3_eeg', ...
+            'Resting_run-1_eeg');
     end
     
     % load the EEG File
@@ -80,6 +90,11 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         'FC1', 'FC2', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'T7', 'T8', 'TP7', 'TP8', 'CP5', 'CP6', 'CP3', 'CP4', 'CP1', 'CP2', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', ...
         'P7', 'P8', 'PO7', 'PO8', 'PO3', 'PO4', 'O1', 'O2', 'OZ', 'POZ', 'PZ', 'CPZ', 'CZ', 'FCZ', 'FZ', ... % 'AFZ', 'FPZ' are used as grounds in some labs
         'VOGabove', 'VOGbelow', 'HOGl', 'HOGr','MASTl', 'MASTr'};
+    
+    % add ECG if needed
+    if INPUT.AnalysisName == "Gambling_N300H"
+        Common_Channels = [Common_Channels, {'ECG_bipolar', 'ECG_1', 'ECG_2'}];
+    end
     Common_Channels = Common_Channels(ismember(Common_Channels, {EEG.chanlocs.labels})); % some labs miss e.g. VOGabove
     EEG = pop_select( EEG, 'channel',Common_Channels);
         
@@ -92,6 +107,28 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
     elseif strcmpi(Choice , "125")
         EEG = pop_resample(EEG, EEG.srate/4);
     end
+    
+    % put ECG separate for N300H analysis
+    if INPUT.AnalysisName == "Gambling_N300H"
+        if ismember('ECG_bipolar', {EEG.chanlocs.labels})
+            ECGbipolar = EEG.data(find(ismember({EEG.chanlocs.labels},'ECG_bipolar')),:);
+        else
+            ECGbipolar = EEG.data(find(ismember({EEG.chanlocs.labels}, 'ECG_1')),:) - ...
+                       EEG.data(find(ismember({EEG.chanlocs.labels},  'ECG_2')),:)  ;
+        end
+        ECG = pop_select( EEG, 'channel',1);
+        ECG.data = ECGbipolar;
+        ECG.chanlocs.labels = 'ECG_bipolar';
+        OUTPUT.ECG = ECG;
+        
+        %drop ECG channels
+        ECGChannels = Common_Channels(ismember(Common_Channels, {'ECG_bipolar', 'ECG_1', 'ECG_2'})); % some labs miss e.g. VOGabove    
+        EEG = pop_select( EEG, 'nochannel',ECGChannels);
+    
+    end
+
+    
+    
     
 %#####################################################################
 %### Wrapping up Preprocessing Routine                         #######

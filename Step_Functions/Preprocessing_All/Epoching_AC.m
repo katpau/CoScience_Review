@@ -1,4 +1,8 @@
 function  OUTPUT = Epoching_AC(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Depending on the forking choice, it epochs the data for preprocessing, or
 % it keeps it continously.
@@ -58,33 +62,33 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                     107, 117, 127, 137, 207, 217, 227, 237, 108, 118, 128, 138,  208, 218, ...
                     228, 238, 109, 119, 129, 139, 209, 219, 229, 239  ]; %Responses
                 
-            elseif INPUT.AnalysisName == "Flanker_ErrorMVPA"
+            elseif INPUT.AnalysisName == "Flanker_MVPA"
                 Event_Window = [-0.500 0.800]; % Epoch length in seconds
                 Relevant_Triggers = [ 106, 116, 126,  136, ...
                     107, 117, 127, 137, 108, 118, 128, 138, ...
                     109, 119, 129, 139  ]; %Responses Experimenter Absent
                 
-            elseif INPUT.AnalysisName == "GoNoGo_ErrorMVPA"
+            elseif INPUT.AnalysisName == "GoNoGo_MVPA"
                 Event_Window = [-0.500 0.800]; % Epoch length in seconds
                 Relevant_Triggers = [211, 220 ]; %Responses Speed/Acc emphasis
                 
             elseif INPUT.AnalysisName == "Flanker_Conflict"
                 Event_Window = [-0.500 .650];
-                Relevant_Triggers = [ 104, 114, 124, 134, 204, 214, 224, 234]; % Target Onset
+                Relevant_Triggers = [ 104, 114, 124, 134]; % Target Onset experimenter absent
                 
-            elseif INPUT.AnalysisName == "GoNoGo_Conflict"
+            elseif INPUT.AnalysisName == "GoNoGo_Conflict" 
                 Event_Window = [-0.200 0.500];
                 Relevant_Triggers = [101, 102, 201, 202 ]; % Target Onset
                 
-            elseif INPUT.AnalysisName == "Ultimatum_OfferTheta"
+            elseif INPUT.AnalysisName == "Ultimatum_Offer"
                 Event_Window = [-0.500 1.000];
                 Relevant_Triggers = [1,2,3 ]; % Offer Onset
                 
-            elseif INPUT.AnalysisName == "Gambling_FeedbackTheta" || INPUT.AnalysisName == "Gambling_FB_RewP"
+            elseif INPUT.AnalysisName == "Gambling_FeedbackTheta" || INPUT.AnalysisName == "Gambling_RewP"
                 Event_Window = [-0.500 1.000];
                 Relevant_Triggers = [100, 110, 150, 101, 111, 151, 200, 210, 250, 201, 211, 251]; % FB Onset
                 
-            elseif INPUT.AnalysisName == "Gambling_FB_N300H"
+            elseif INPUT.AnalysisName == "Gambling_N300H"
                 Event_Window = [-0.200 2.000];
                 Relevant_Triggers = [100, 110, 150, 101, 111, 151, 200, 210, 250, 201, 211, 251]; % FB Onset
                 

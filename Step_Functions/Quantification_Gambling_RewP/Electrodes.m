@@ -1,6 +1,11 @@
 function  OUTPUT = Electrodes(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Script only marks which Electrodes are used for quantification.
+% Also marks electrodes for P300
 % Nothing is done here as this will be used in a later
 % Step (Quantificiation ERP).
 
@@ -29,7 +34,7 @@ function  OUTPUT = Electrodes(INPUT, Choice)
 % Order determines when it should be run.
 StepName = "Electrodes";
 Choices = ["Fz,Fcz,Cz", "Fcz,Cz", "Fcz", "Cz", "Fz"];
-Conditional = ["NaN", "NaN", "NaN", "NaN", "NaN"];
+Conditional = ["NaN", "NaN", "Cluster_Electrodes == ""no_cluster"" ", "Cluster_Electrodes == ""no_cluster"" ", "Cluster_Electrodes == ""no_cluster"" ";
 SaveInterim = logical([0]);
 Order = [20];
 

@@ -1,4 +1,8 @@
 function  OUTPUT = LP_Filter_Early(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following: 
 % Depending on the forking choice, it applies a low-passfilter with the
 % default EEGlab settings.

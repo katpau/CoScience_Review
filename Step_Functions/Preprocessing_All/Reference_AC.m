@@ -1,4 +1,8 @@
 function  OUTPUT = Reference_AC(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % It first recreates the online references used in BrainProduct Settings.
 % Then it rereferences the data (temporarily) to do the data cleaning.

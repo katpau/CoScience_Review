@@ -1,6 +1,11 @@
 function  OUTPUT = TimeWindow(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Script only marks which Times are used for quantification.
+% Also determines the Time window for the P300
 % Nothing is done here as this will be used in a later 
 % Step (Quantificiation ERP).
 

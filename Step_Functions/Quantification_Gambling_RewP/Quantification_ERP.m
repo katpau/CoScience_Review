@@ -1,7 +1,11 @@
 function  OUTPUT = Quantification_ERP(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Based on information of previous steps, and depending on the forking
-% choice, ERPs are quantified based on Mean/Binned Means etc.
+% choice, ERPs are quantified based on Mean, peaks or peak-to-peak
 % Script also extracts Measurement error and reshapes Output to be easily
 % merged into a R-readable Dataframe for further analysis.
 %#####################################################################
@@ -29,264 +33,361 @@ function  OUTPUT = Quantification_ERP(INPUT, Choice)
 % Order determines when it should be run.
 StepName = "Quantification_ERP";
 Choices = ["Mean", "Peak", "Peak-to-Peak"];
-Conditional = ["NaN", "TimeWindow ~= ""Relative_Group_narrow"" & TimeWindow ~= ""Relative_Subject"" ", "TimeWindow ~= ""Relative_Group_narrow"" & TimeWindow ~= ""Relative_Subject"" "];
+Conditional = ["NaN", "TimeWindow ~= ""Relative_Group_narrow"" & TimeWindow ~= ""Relative_Subject"" ",  "TimeWindow ~= ""Relative_Group_narrow"" & ""TimeWindow ~= ""Relative_Group_wide"" & TimeWindow ~= ""Relative_Subject"" "];
 SaveInterim = logical([1]);
 Order = [22];
 
-
-% For P300 save other Quantification Method
-if strcmp(Choice , "Mean")
-    ChoiceP3 = "Mean";
-elseif strcmp(Choice, "Peak")
-    ChoiceP3 = "Peak";
-elseif strcmp(Choice, "Peak-to-Peak")
-    ChoiceP3 = "Peak";
-end
-
-INPUT.StepHistory.Quantification_P3 = ChoiceP3;
 
 
 %%%%%%%%%%%%%%%% Updating the SubjectStructure. No changes should be made here.
 INPUT.StepHistory.Quantification_ERP = Choice;
 OUTPUT = INPUT;
+OUTPUT.data = [];
 % Some Error Handling
 try
     %%%%%%%%%%%%%%%% Routine for the analysis of this step
-    % This functions starts from using INPUT and returns OUTPUT
-    
-    
-    
     EEG = INPUT.data.EEG;
     
     % ********************************************************************************************
-    % **** Epoch Data into different Conditions **************************************************
+    % **** Set Up Some Information 1 ***************************************************************
     % ********************************************************************************************
-     % For saving ERP, select only relevant channels
-      EEG_for_ERP = EEG;
-      Electrodes_ERP = {'FCZ', 'CZ', 'FZ', 'PZ', 'CPZ'};
-      EEG_for_ERP = pop_select(EEG_for_ERP, 'channel',Electrodes_ERP);
-      %For saving ERP,  downsample!
-      EEG_for_ERP =  pop_resample(EEG_for_ERP, 100);
+    % Get Info on ** Electrodes **
+    Electrodes_RewP = strrep(upper(strsplit(INPUT.StepHistory.Electrodes , ",")), " ", "");
+    NrElectrodes_RewP = length(Electrodes_RewP);
+    ElectrodeIdx_RewP = findElectrodeIdx(EEG.chanlocs, Electrodes_RewP);
     
-    % Info on Epochs
+    Electrodes_P3 = strrep(upper(strsplit(INPUT.StepHistory.Electrodes_P3 , ",")), " ", "");
+    NrElectrodes_P3 = length(Electrodes_P3);
+    ElectrodeIdx_P3 = findElectrodeIdx(EEG.chanlocs, Electrodes_P3);
+    
+    % Info on ** Time Window ** handled later as it can be relative
+    
+    % Info on ** Epochs **
     Event_Window = [-0.300 1.000];
-    Condition_Triggers =  [100; 110; 150 ; 101; 111; 151]; % Feedback Onset
+    Condition_Triggers =  [100; 110; 150 ; 101; 111; 151];
     Condition_Names = ["P0_Loss", "P10_Loss", "P50_Loss", "P0_Win", "P10_Win", "P50_Win" ];
     NrConditions = length(Condition_Names);
+    Condition_NamesDiff = ["P0_Diff", "P10_Diff", "P50_Diff", "PXX_Diff"];
+    NrConditionsDiff = length(Condition_NamesDiff);
+    % For Relative Data Difference Wave is needed
+    Neg_Triggers =  {100, 110, 150};
+    Pos_Triggers =  {101, 111, 151};
+    
+    % ********************************************************************************************
+    % **** Prepare ERP  ***************************************************************
+    % ********************************************************************************************
+    % For saving ERP, select only relevant channels
+    Electrodes_ERP = {'FCZ', 'CZ', 'FZ', 'PZ', 'CPZ'};
+    EEG_for_ERP = pop_select(EEG, 'channel',Electrodes_ERP);
+    % For saving ERP, downsample!
+    EEG_for_ERP =  pop_resample(EEG_for_ERP, 100);
+    for i_Cond = 1:NrConditions
+        try
+            ERP_forExport = pop_epoch( EEG_for_ERP, num2cell(Condition_Triggers(i_Cond,:)), Event_Window, 'epochinfo', 'yes');
+            ERP_forExport.(Condition_Names(i_Cond)) = mean(ERP_forExport.data,3);
+        end
+    end
+    
+    % Add Info on Exported ERP
+    ERP_forExport.times = ERP_forExport.times;
+    ERP_forExport.chanlocs = ERP_forExport.chanlocs;
     
     
+    % ********************************************************************************************
+    % **** Prepare Relative Data   ***************************************************************
+    % ********************************************************************************************
+    % if Time window is Relative to Peak across all Subjects or within a
+    % subject, an ERP Diff needs to be created across all Conditions.
     
+    
+    if contains(INPUT.StepHistory.TimeWindow, "Relative")
+        % select all relevant epochs
+        EEG_for_Relative_Pos = pop_epoch(EEG,  Pos_Triggers, Event_Window, 'epochinfo', 'yes');
+        EEG_for_Relative_Neg = pop_epoch(EEG,  Neg_Triggers, Event_Window, 'epochinfo', 'yes');
+        if contains(INPUT.StepHistory.TimeWindow, "Relative_Group")
+            % Due to different recording setup, Biosemi needs to be resampled
+            EEG_for_Relative_Export_Pos =  pop_resample(EEG_for_Relative_Pos, fix(EEG_for_Relative_Pos.srate/100)*100);
+            EEG_for_Relative_Export_Neg =  pop_resample(EEG_for_Relative_Neg, fix(EEG_for_Relative_Neg.srate/100)*100);
+            AV_RewP = mean(EEG_for_Relative_Export_Pos.data,3) - mean(EEG_for_Relative_Export_Neg.data,3);
+            % Get index of Data that should be exported (= used to find peaks)
+            ElectrodeIdxRel = [ElectrodeIdx_RewP, ElectrodeIdx_P3];
+            TimeIdxRel = findTimeIdx(EEG_for_Relative_Export_Pos.times, 200, 600);
+            % Get only relevant Data
+            For_Relative.ERP.AV = AV_RewP(ElectrodeIdxRel,TimeIdxRel,:);
+            For_Relative.ERP.times = EEG_for_Relative_Export_Pos.times(TimeIdxRel);
+            For_Relative.ERP.chanlocs = EEG_for_Relative_Export_Pos.chanlocs(ElectrodeIdxRel);
+        end
+    end
+    
+    % ********************************************************************************************
+    % **** Set Up Some Information 2 *************************************************************
+    % ********************************************************************************************
+    % ****** Get Info on TimeWindow ******
+    TimeWindow_RewP = INPUT.StepHistory.TimeWindow;
+    TimeWindow_P3 = INPUT.StepHistory.TimeWindow_P3;
+    if ~contains(TimeWindow_RewP, "Relative")
+        if ~strcmp(Choice, "Peak-to-Peak")
+            TimeWindow_RewP = str2double(strsplit(TimeWindow_RewP, ","));
+        else
+            TimeWindow_RewP = str2double(strsplit(TimeWindow_RewP, ","));
+            TimeWindow_RewP = [150, TimeWindow_RewP(2)];
+        end
+        TimeWindow_P3 = str2double(strsplit(TimeWindow_P3, ","));
+        
+        
+    elseif strcmp(TimeWindow_RewP, "Relative_Subject")
+        % find subset to find Peak
+        TimeIdx_RewP = findTimeIdx(EEG_for_Relative_Pos.times, 150, 400);
+        TimeIdx_P3 = findTimeIdx(EEG_for_Relative_Pos.times, 250, 600);
+        AV_RewP = mean(EEG_for_Relative_Pos.data, 3) - mean(EEG_for_Relative_Neg.data, 3);
+        % Find Peak in this Subset
+        [~, Latency_RewP] = Peaks_Detection(mean(AV_RewP(ElectrodeIdx_RewP,TimeIdx_RewP,:),1), "POS");
+        [~, Latency_P3] = Peaks_Detection(mean(AV_RewP(ElectrodeIdx_P3,TimeIdx_P3,:),1), "POS");
+        % Define Time Window Based on this
+        TimeWindow_RewP = [EEG_for_Relative_Pos.times(Latency_RewP+(TimeIdx_RewP(1))) - 25, EEG_for_Relative_Pos.times(Latency_RewP+(TimeIdx_RewP(1))) + 25];
+        TimeWindow_P3 = [EEG_for_Relative_Pos.times(Latency_P3+(TimeIdx_P3(1))) - 25, EEG_for_Relative_Pos.times(Latency_P3+(TimeIdx_P3(1))) + 25];
+        
+    elseif contains(TimeWindow_RewP, "Relative_Group")
+        % Time window needs to be longer since peak could be at edge
+        % this part of the data will be exported later.
+        TimeWindow_RewP = [150 450];
+        TimeWindow_P3 = [200 650];
+    end
+    
+    % Get Index of TimeWindow N2 [in Sampling Points]
+    TimeIdx_RewP = findTimeIdx(EEG.times, TimeWindow_RewP(1), TimeWindow_RewP(2));
+    TimeIdx_P3 = findTimeIdx(EEG.times, TimeWindow_P3(1), TimeWindow_P3(2));
+    
+    % ********************************************************************************************
+    % ****  Prepare Data *************************************************************************
+    % ********************************************************************************************
     for i_Cond = 1:NrConditions
         % * Epoch Data around predefined window and save each
-        Interim = pop_epoch( EEG_for_ERP, num2cell(Condition_Triggers(i_Cond,:)), Event_Window, 'epochinfo', 'yes');
-        ForRelative = pop_epoch( EEG, num2cell(Condition_Triggers(i_Cond,:)), Event_Window, 'epochinfo', 'yes');
-        ConditionData.(Condition_Names(i_Cond)) = ForRelative.data;
-        % Calculate ERP
-        ERP_toExport.(Condition_Names(i_Cond)) = mean(Interim.data,3);
-    end
-    ERP_toExport.times = Interim.times;
-    ERP_toExport.chanlocs = Interim.chanlocs;
-    
-    
-    
-    % ********************************************************************************************
-    % **** Prepare Indexes of  Data to be exported ***********************************************
-    % ********************************************************************************************
-    
-    
-    % **** Get Info on Electrodes RewP******
-    Electrodes = upper(strsplit(INPUT.StepHistory.Electrodes , ","));
-    NrElectrodes = length(Electrodes);
-    
-    % Get Index on Electrodes RewP ******
-    Electrodes = strrep(Electrodes, " ", "");
-    ElectrodeIdx = zeros(1, length(Electrodes));
-    for iel = 1:length(Electrodes)
-        [~, ElectrodeIdx(iel)] = ismember(Electrodes(iel), upper({EEG.chanlocs.labels})); % Do it in this loop to maintain matching/order of Name and Index!
+        EEGData = pop_epoch( EEG, num2cell(Condition_Triggers(i_Cond,:)), Event_Window, 'epochinfo', 'yes');
+        ConditionData_RewP.(Condition_Names(i_Cond)) = EEGData.data(ElectrodeIdx_RewP, TimeIdx_RewP,:);
+        ConditionData_P3.(Condition_Names(i_Cond)) = EEGData.data(ElectrodeIdx_P3, TimeIdx_P3,:);
+        
+        % Update Nr on Electrodes for Final OutputTable
+        if INPUT.StepHistory.Cluster_Electrodes == "cluster"
+            ConditionData_RewP.(Condition_Names(i_Cond)) = mean(ConditionData_RewP.(Condition_Names(i_Cond)),1);
+            ConditionData_P3.(Condition_Names(i_Cond)) = mean(ConditionData_P3.(Condition_Names(i_Cond)),1);
+        end
     end
     
-    % **** Get Info on Electrodes P3 ******
-    ElectrodesP3 = upper(strsplit(INPUT.StepHistory.Electrodes_P3 , ","));
-    NrElectrodesP3 = length(ElectrodesP3);
-    
-    % Get Index on Electrodes P3 ******
-    ElectrodesP3 = strrep(ElectrodesP3, " ", "");
-    ElectrodeIdxP3 = zeros(1, length(ElectrodesP3));
-    for iel = 1:length(ElectrodesP3)
-        [~, ElectrodeIdxP3(iel)] = ismember(ElectrodesP3(iel), {EEG.chanlocs.labels}); % Do it in this loop to maintain matching/order of Name and Index!
-    end
-    
-    % Update Nr on Electrodes for Final OutputTable
+    % update Label
     if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-        NrElectrodes = 1;
-        NrElectrodesP3 = 1;
-        Electrodes = strcat('Cluster ', join(Electrodes));
-        ElectrodesP3 = strcat('Cluster ', join(ElectrodesP3));
+        NrElectrodes_RewP = 1;
+        Electrodes_RewP = strcat('Cluster ', join(Electrodes_RewP));
+        NrElectrodes_P3 = 1;
+        Electrodes_P3 = strcat('Cluster ', join(Electrodes_P3));
     end
     
-    
-    % ****** Get Info on TimeWindow ******
-    TimeWindow = INPUT.StepHistory.TimeWindow;
-    TimeWindowP3 = INPUT.StepHistory.TimeWindow_P3;
-    if ~contains(TimeWindow, "Relative")
-        TimeWindow = str2double(strsplit(TimeWindow, ","));
-        TimeWindowP3 = str2double(strsplit(TimeWindowP3, ","));
-        
-    elseif strcmp(TimeWindow, "Relative_Subject")
-        % Calculate Difference Wave ERP
-        Positive_FB = ismember({EEG.event.type }, {'101', '111', '151'});
-        Negative_FB = ismember({EEG.event.type }, {'100', '110', '150'});
-        Positive_FB = [EEG.event(Positive_FB).epoch];
-        Negative_FB = [EEG.event(Negative_FB).epoch];
-        Positive_FB = mean(EEG.data(:,:,Positive_FB),3);
-        Negative_FB = mean(EEG.data(:,:,Negative_FB),3);
-        ERP = Positive_FB - Negative_FB;
-        
-        
-        % find subset to find Peak for RewP
-        TimeIdx = findTimeIdx(EEG.times, 200, 400);
-        
-        % find subset to find Peak for P3
-        TimeIdxP3 = findTimeIdx(EEG.times, 250, 600);
-        
-        % Find Peak in this Subset
-        [~, Latency] = Peaks_Detection(mean(ERP(ElectrodeIdx,TimeIdx),1), "POS");
-        [~, LatencyP3] = Peaks_Detection(mean(ERP(ElectrodeIdxP3,TimeIdxP3),1), "POS");
-        
-        % Define Time Window Based on this
-        TimeWindow = [EEG.times(Latency+(TimeIdx(1))) - 25, EEG.times(Latency+(TimeIdx(1))) + 25];
-        TimeWindowP3 = [EEG.times(LatencyP3+(TimeIdxP3(1))) - 50, EEG.times(LatencyP3+(TimeIdxP3(1))) + 50];
-        
-        
-    elseif contains(TimeWindow, "Relative_Group")
-        TimeWindow = [200 400];
-        TimeWindowP3 = [250 600];
-    end
-    
-    % Get Index of TimeWindow RewP
-    TimeIdx = findTimeIdx(EEG.times, TimeWindow(1), TimeWindow(2));
-    % Get Index of TimeWindow P3
-    TimeIdxP3 = findTimeIdx(EEG.times, TimeWindowP3(1), TimeWindowP3(2));
-    
-    
-    
-    
-    
     % ********************************************************************************************
-    % **** Loop Through each Condition and extract Data ******************************************
+    % **** Extract Data and prepare Output Table    **********************************************
     % ********************************************************************************************
-    % if depending on group, crop data and save data for now
     if contains(INPUT.StepHistory.TimeWindow, "Relative_Group")
-        Export.Data = EEG.data(ElectrodeIdx,TimeIdx,:);
-        Export.Times = EEG.times(TimeIdx);
-        Export.Electrodes = {EEG.chanlocs(ElectrodeIdx).labels};
+        For_Relative.RecordingLab = EEG.Info_Lab.RecordingLab;
+        For_Relative.Experimenter = EEG.Info_Lab.Experimenter;
         
-        Export.DataP3 = EEG.data(ElectrodeIdxP3,TimeIdxP3,:);
-        Export.TimesP3 = EEG.times(TimeIdxP3);
-        Export.ElectrodesP3 = {EEG.chanlocs(ElectrodeIdxP3).labels};
+        For_Relative.Data_RewP = ConditionData_RewP;
+        For_Relative.Times_RewP = EEGData.times(TimeIdx_RewP);
+        For_Relative.Electrodes_RewP = Electrodes_RewP;
+        
+        For_Relative.Data_P3 = ConditionData_P3;
+        For_Relative.Times_NP3 = EEGData.times(TimeIdx_P3);
+        For_Relative.Electrodes_P3 = Electrodes_P3;
         
     else
-        % if not dependent on group,
         % ****** Extract Amplitude, SME, Epoch Count ******
-        InitSize = [NrElectrodes,NrConditions];
-        EpochCount = NaN(InitSize);
-        ERP =NaN(InitSize); SME=NaN(InitSize);
-        InitSizeP3 = [NrElectrodesP3,NrConditions];
-        ERPP3 =NaN(InitSizeP3); SMEP3=NaN(InitSizeP3);
-        EpochCountP3 = NaN(InitSizeP3);
-        Trials = NaN(NrConditions);
+        InitSize_RewP = [NrElectrodes_RewP,NrConditions+NrConditionsDiff];
+        EpochCount_RewP = NaN(InitSize_RewP);
+        ERP_RewP =NaN(InitSize_RewP); SME_RewP=NaN(InitSize_RewP);
+        
+        InitSize_P3 = [NrElectrodes_P3,NrConditions+NrConditionsDiff];
+        EpochCount_P3 = NaN(InitSize_P3);
+        ERP_P3 =NaN(InitSize_P3); SME_P3=NaN(InitSize_P3);
         
         for i_Cond = 1:NrConditions
-            % Select relevant Data
-            Data = ConditionData.(Condition_Names(i_Cond))(ElectrodeIdx,TimeIdx,:);
-            DataP3 = ConditionData.(Condition_Names(i_Cond))(ElectrodeIdxP3,TimeIdxP3,:);
-            
-            % check if Electrodes should be averaged across, or kept
-            % separate
-            if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-                Data = mean(Data, 1); % first dimensions are Electrodes
-                DataP3 = mean(DataP3, 1); % first dimensions are Electrodes
-            end
+            Data_RewP = ConditionData_RewP.(Condition_Names(i_Cond));
+            Data_P3 = ConditionData_P3.(Condition_Names(i_Cond));
             
             % Count Epochs
-            EpochCount(:,i_Cond,:) = size(Data,3);
-            EpochCountP3(:,i_Cond,:) = size(Data,3);
-            if Trials(i_Cond) < str2double(INPUT.StepHistory.Trials_MinNumber)
-                ERP(:,i_Cond,:) = NaN;
-                SME(:,i_Cond,:) = NaN;
-                ERPP3(:,i_Cond,:) = NaN;
-                SMEP3(:,i_Cond,:) = NaN;
+            EpochCount_RewP(:,i_Cond,:) = size(Data_RewP,3);
+            EpochCount_P3(:,i_Cond,:) = size(Data_P3,3);
+            if size(Data_RewP,3) < str2double(INPUT.StepHistory.Trials_MinNumber)
+                ERP_RewP(:,i_Cond,:) = NaN;
+                SME_RewP(:,i_Cond,:) = NaN;
+                ERP_P3(:,i_Cond,:) = NaN;
+                SME_P3(:,i_Cond,:) = NaN;
             else
-                % Calculate Mean if enough epochs there
+                % Calculate ERP if enough epochs there
                 if strcmp(Choice, "Mean")
-                    ERP(:,i_Cond,1) = mean(mean(Data,3),2);
-                    SME(:,i_Cond,1) = Mean_SME(Data);
+                    ERP_RewP(:,i_Cond,1) = mean(mean(Data_RewP,3),2);
+                    SME_RewP(:,i_Cond,1) = Mean_SME(Data_RewP);
+                    
+                    ERP_P3(:,i_Cond,1) = mean(mean(Data_P3,3),2);
+                    SME_P3(:,i_Cond,1) = Mean_SME(Data_P3);
+                    
                 elseif strcmp(Choice, "Peak")
-                    [ERP(:,i_Cond,1), ~] = Peaks_Detection(mean(Data,3), "NEG");
-                    SME(:,i_Cond,1) = Peaks_SME(Data, "NEG");
+                    [ERP_RewP(:,i_Cond,1), ~] = Peaks_Detection(mean(Data_RewP,3), "NEG");
+                    SME_RewP(:,i_Cond,1) = Peaks_SME(Data_RewP, "NEG");
+                    
+                    [ERP_P3(:,i_Cond,1), ~] = Peaks_Detection(mean(Data_P3,3), "POS");
+                    SME_P3(:,i_Cond,1) = Peaks_SME(Data_P3, "POS");
+                    
                 elseif strcmp(Choice, "Peak-to-Peak")
-                    [~, TimeIdxP2(1)]=min(abs(EEG.times - 150));
-                    [~, TimeIdxP2(2)]=min(abs(EEG.times - 250));
-                    TimeIdxP2 = TimeIdxP2(1):TimeIdxP2(2);
-                    DataP2 = ConditionData.(Condition_Names(i_Cond))(ElectrodeIdx,TimeIdxP2,:);
-                    if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-                        DataP2 = mean(DataP2, 1);
+                    % Peak to Peak for RewP (P2 - FRN)
+                    % Get Time Window for P2 and FRN
+                    TimeIdx_P2 = findTimeIdx(EEG.times(TimeIdx_RewP), 150, 250);
+                    if isstring(TimeWindow_RewP)
+                        TimeWindow_RewP = str2double(strsplit(TimeWindow_RewP, ","));
                     end
+                    TimeIdx_RewP_P2P = findTimeIdx(EEG.times(TimeIdx_RewP), TimeWindow_RewP(1),TimeWindow_RewP(2) );
+                    
+                    % Get data in which peaks should be found
+                    DataP2 = Data_RewP(:,TimeIdx_P2,:);
+                    DataRewP = Data_RewP(:,TimeIdx_RewP_P2P,:);
+                    
+                    % Get peaks
                     P2 = Peaks_Detection(mean(DataP2,3), "POS");
-                    FRN = Peaks_Detection(mean(Data,3), "NEG");
-                    ERP(:,i_Cond,1) = P2 - FRN;
-                    SME(:,i_Cond,1) = Peaks_to_Peak_SME(Data, "NEG", DataP2, "POS");
+                    FRN = Peaks_Detection(mean(DataRewP,3), "NEG");
+                    
+                    % Substract peaks
+                    ERP_RewP(:,i_Cond,1) = P2 - FRN;
+                    
+                    % Get SME
+                    SME_RewP(:,i_Cond,1) = Peaks_to_Peak_SME(DataRewP, "NEG", DataP2, "POS");
+                    
+                    % For P3 take only Peak
+                    [ERP_P3(:,i_Cond,1), ~] = Peaks_Detection(mean(Data_P3,3), "POS");
+                    SME_P3(:,i_Cond,1) = Peaks_SME(Data_P3, "POS");
                 end
-                if strcmp(ChoiceP3, "Mean")
-                    ERPP3(:,i_Cond,1) = mean(mean(DataP3,3),2);
-                    SMEP3(:,i_Cond,1) = Mean_SME(DataP3);
-                elseif strcmp(ChoiceP3, "Peak")
-                    [ERPP3(:,i_Cond,1), ~] = Peaks_Detection(mean(DataP3,3), "NEG");
-                    SMEP3(:,i_Cond,1) = Peaks_SME(DataP3, "NEG");
-                end
-                
             end
         end
         
         % ********************************************************************************************
-        % **** Prepare Output Table    ***************************************************************
+        % **** Loop also through Difference Waves!          ******************************************
         % ********************************************************************************************
+        % Create **** Difference Waves ****   on ERPs
+        for i_Diff = 1:NrConditionsDiff
+            i_Cond = i_Diff + 6;
+            if i_Diff < 4 % Diff Per Condition
+                Pos_RewP = ConditionData_RewP.(Condition_Names(i_Diff+3));
+                Neg_RewP =  ConditionData_RewP.(Condition_Names(i_Diff));
+                
+                Pos_P3 = ConditionData_P3.(Condition_Names(i_Diff+3));
+                Neg_P3 =  ConditionData_P3.(Condition_Names(i_Diff));
+                
+            else % Diff across all Magnitude Conditions
+                Pos_RewP = cat(3, ConditionData_RewP.(Condition_Names(1)), ...
+                    ConditionData_RewP.(Condition_Names(2)), ...
+                    ConditionData_RewP.(Condition_Names(3)));
+                Neg_RewP =  cat(3, ConditionData_RewP.(Condition_Names(4)), ...
+                    ConditionData_RewP.(Condition_Names(5)), ...
+                    ConditionData_RewP.(Condition_Names(6)));
+                
+                Pos_P3 = cat(3, ConditionData_P3.(Condition_Names(1)), ...
+                    ConditionData_P3.(Condition_Names(2)), ...
+                    ConditionData_P3.(Condition_Names(3)));
+                Neg_P3 =  cat(3, ConditionData_P3.(Condition_Names(4)), ...
+                    ConditionData_P3.(Condition_Names(5)), ...
+                    ConditionData_P3.(Condition_Names(6)));
+            end
+            
+            % Count Epochs
+            MinEpochs = min(min(size(Pos_RewP,3), size(Neg_RewP,3)));
+            EpochCount_RewP(:,i_Cond,:) = MinEpochs;
+            EpochCount_P3(:,i_Cond,:) = MinEpochs;
+            
+            if MinEpochs < str2double(INPUT.StepHistory.Trials_MinNumber)
+                ERP_RewP(:,i_Cond,:) = NaN;
+                SME_RewP(:,i_Cond,:) = NaN;
+                ERP_P3(:,i_Cond,:) = NaN;
+                SME_P3(:,i_Cond,:) = NaN;
+            else
+                
+                % Calculate if enough epochs there
+                if strcmp(Choice, "Mean")
+                    ERP_RewP(:,i_Cond,1) = mean(mean(Pos_RewP,3) - mean(Neg_RewP,3),2);
+                    SME_RewP(:,i_Cond,1) = DifferenceWave_SME(Pos_RewP, Neg_RewP, "MEAN");
+                    
+                    ERP_P3(:,i_Cond,1) = mean(mean(Pos_P3,3) - mean(Neg_P3,3), 2);
+                    SME_P3(:,i_Cond,1) = DifferenceWave_SME(Pos_P3, Neg_P3, "MEAN");
+                    
+                elseif strcmp(Choice, "Peak")
+                    ERP_RewP(:,i_Cond,1) = Peaks_Detection(mean(Pos_RewP,3) - mean(Neg_RewP,3), "POS");
+                    SME_RewP(:,i_Cond,1) = DifferenceWave_SME(Pos_RewP, Neg_RewP, "POS");
+                    
+                    ERP_P3(:,i_Cond,1) = Peaks_Detection(mean(Pos_P3,3) - mean(Neg_P3,3), "POS");
+                    SME_P3(:,i_Cond,1) = DifferenceWave_SME(Pos_P3, Neg_P3, "POS");
+                    
+                elseif strcmp(Choice, "Peak-to-Peak")
+                    % doesn't make sense in DIFF waves! NaN or just take peak?
+                    ERP_RewP(:,i_Cond,1) = NaN;
+                    SME_RewP(:,i_Cond,1) = NaN;
+                    
+                    ERP_P3(:,i_Cond,1) = Peaks_Detection(mean(Pos_P3,3) - mean(Neg_P3,3), "POS");
+                    SME_P3(:,i_Cond,1) = DifferenceWave_SME(Pos_P3, Neg_P3, "POS");
+                end
+            end
+        end
+    end
+    
+    
+    % ********************************************************************************************
+    % **** Prepare Output Table    ***************************************************************
+    % ********************************************************************************************
+    % Add ERP for Plotting
+    OUTPUT.data.ERP = ERP_forExport;
+    
+    if contains(INPUT.StepHistory.TimeWindow, "Relative_Group")
+        % Add Relative Data and Relative Info
+        OUTPUT.data.For_Relative = For_Relative;
+        
+    else
+        % Prepare Final Export with all Values
         % ****** Prepare Labels ******
-        % Subject is constant
-        if isfield(INPUT, "Subject"); INPUT.SubjectName = INPUT.Subject; end
-        Subject_L = repmat(INPUT.SubjectName, NrConditions*NrElectrodes,1 );
-        SubjectP3_L = repmat(INPUT.SubjectName, NrConditions*NrElectrodesP3,1 );
-
-        Lab_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodes,1 );
-        LabP3_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodesP3,1 );
-
-        Experimenter_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodes,1 );
-        ExperimenterP3_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodesP3,1 );
+        % important P3 and RewP do not always have same number of electrodes!
         
-        % Electrodes: if multiple electrodes, they simply alternate
-        Electrodes_L = repmat(Electrodes', NrConditions, 1);
-        ElectrodesP3_L = repmat(ElectrodesP3', NrConditions, 1);
+        % Subject, ComponentName, Lab, Experimenter is constant AAA
+        NrConditions = NrConditions + NrConditionsDiff;
         
-        % Conditions are blocked across electrodes, but alternate across time windows
-        Conditions_L = repelem(Condition_Names', NrElectrodes,1);
-        Conditions_L = repmat([Conditions_L(:)], 1);
-        ConditionsP3_L = repelem(Condition_Names', NrElectrodesP3,1);
-        ConditionsP3_L = repmat([ConditionsP3_L(:)], 1);
+        Subject_RewP_L = repmat(INPUT.Subject, NrConditions*NrElectrodes_RewP,1 );
+        Lab_RewP_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodes_RewP,1 );
+        Experimenter_RewP_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodes_RewP,1 );
+        Component_RewP_L = repmat("RewP", NrConditions*NrElectrodes_RewP,1 );
         
-        % Time Window are blocked across electrodes and conditions
-        TimeWindow_L = repmat(num2str(TimeWindow), NrConditions*NrElectrodes, 1);
-        TimeWindowP3_L = repmat(num2str(TimeWindowP3), NrConditions*NrElectrodesP3, 1);
+        Subject_P3_L = repmat(INPUT.Subject, NrConditions*NrElectrodes_P3,1 );
+        Lab_P3_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodes_P3,1 );
+        Experimenter_P3_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodes_P3,1 );
+        Component_P3_L = repmat("P3", NrConditions*NrElectrodes_P3,1 );
+        
+        % Electrodes: if multiple electrodes, they simply alternate ABABAB
+        Electrodes_RewP_L = repmat(Electrodes_RewP', NrConditions, 1);
+        Electrodes_P3_L = repmat(Electrodes_P3', NrConditions, 1);
+        
+        
+        % Conditions are blocked across electrodes, but alternate across
+        % time windows AABBAABB
+        Condition_Names = [Condition_Names, Condition_NamesDiff];
+        Conditions_RewP_L = repelem(Condition_Names', NrElectrodes_RewP,1);
+        Conditions_RewP_L = repmat(Conditions_RewP_L(:), 1);
+        Conditions_P3_L = repelem(Condition_Names', NrElectrodes_P3,1);
+        Conditions_P3_L = repmat(Conditions_P3_L(:), 1);
+        
+        % Time Window are blocked across electrodes and conditions AAAAABBBB
+        TimeWindow_RewP_L = repmat(num2str(TimeWindow_RewP), NrConditions*NrElectrodes_RewP, 1);
+        TimeWindow_P3_L = repmat(num2str(TimeWindow_P3), NrConditions*NrElectrodes_P3, 1);
         
         % ****** Prepare Table ******
-        Export = [cellstr([Subject_L, Lab_L, Experimenter_L, Conditions_L, Electrodes_L, TimeWindow_L]),...
-            num2cell([ERP(:), SME(:), EpochCount(:)]);
-            cellstr([SubjectP3_L, LabP3_L, ExperimenterP3_L, ConditionsP3_L, ElectrodesP3_L, TimeWindowP3_L]),...
-            num2cell([ERPP3(:), SMEP3(:), EpochCountP3(:)])];
+        OUTPUT.data.Export = [[cellstr([Subject_RewP_L, Lab_RewP_L, Experimenter_RewP_L, Conditions_RewP_L, Electrodes_RewP_L, TimeWindow_RewP_L]),...
+            num2cell([ERP_RewP(:), SME_RewP(:), EpochCount_RewP(:)]), cellstr(Component_RewP_L)]; ...
+            [cellstr([Subject_P3_L, Lab_P3_L, Experimenter_P3_L, Conditions_P3_L, Electrodes_P3_L, TimeWindow_P3_L]),...
+            num2cell([ERP_P3(:), SME_P3(:), EpochCount_P3(:)]), cellstr(Component_P3_L)]];
         
     end
-    OUTPUT.data = [];
-    OUTPUT.data.Export = Export;
-    OUTPUT.data.ERP = ERP_toExport;
+    
+    
     
     % ****** Error Management ******
 catch e
@@ -300,87 +401,3 @@ catch e
     OUTPUT.Error = ErrorMessage;
     
 end
-
-%% house built functions
-% Find Time Index (range)
-    function [TimeIndexRange] = findTimeIdx(times, Start, End)
-        [~, TimeIndexRange(1)]=min(abs(times - Start));
-        [~, TimeIndexRange(2)]=min(abs(times - End));
-        TimeIndexRange = TimeIndexRange(1):TimeIndexRange(2);
-    end
-
-% detect peaks (and latencies)
-    function [Peaks, Latency] = Peaks_Detection(Subset, PeakValence)
-        if PeakValence == "NEG"
-            % Find possible Peak
-            possiblePeaks = islocalmin(Subset,2);
-            Subset(~possiblePeaks) = NaN;
-            % Identify largest Peak
-            [Peaks, Latency]  = min(Subset,[],2);
-            
-        elseif PeakValence == "POS"
-            % Find Possible Peak
-            possiblePeaks = islocalmax(Subset,2);
-            Subset(~possiblePeaks) = NaN;
-            % Identify largest Peak
-            [Peaks, Latency]  = max(Subset,[],2);
-        end
-    end
-
-% SME of Mean Values
-    function SME = Mean_SME(Subset)
-        % Calculate Mean per Trial
-        Mean_perTrial = squeeze(mean(Subset,2));
-        % Take SD of these means
-        if size(Mean_perTrial,2) == 1
-            SME = std(Mean_perTrial,[],1)/sqrt(length(Mean_perTrial));
-        else
-            SME = std(Mean_perTrial,[],2)/sqrt(length(Mean_perTrial));
-        end
-    end
-
-% SME of Peaks
-    function SME = Peaks_SME(Subset, Component)
-        % similiar to ERPlab toolbox
-        % Initate some variables
-        n_boots = 10000;
-        replacement = 1;
-        trials = size(Subset,3);
-        electrodes = size(Subset,1);
-        Peak_perTrial = NaN(electrodes,trials);
-        % Bootstrap and create different ERPS, pick peaks
-        for i_bs = 1:n_boots
-            rng(i_bs, 'twister')
-            bs_trialidx = sort(randsample(1:trials,trials,replacement));
-            bs_ERP = squeeze(mean(Subset(:,:,bs_trialidx),3));
-            Peak_perTrial(:,i_bs) = Peaks_Detection(bs_ERP, Component);
-        end
-        % use sd of this distribution for SME
-        SME = std(Peak_perTrial, [], 2);
-    end
-
-
-% SME of PeakDifference
-    function SME = Peaks_to_Peak_SME(Subset, Component, Subset2, Component2)
-        % similiar to ERPlab toolbox
-        % Initate some variables
-        n_boots = 10000;
-        replacement = 1;
-        trials = size(Subset,3);
-        electrodes = size(Subset,1);
-        Peak_perTrial = NaN(electrodes,trials);
-        % Bootstrap and create different ERPS, pick peaks
-        for i_bs = 1:n_boots
-            rng(i_bs, 'twister')
-            bs_trialidx = sort(randsample(1:trials,trials,replacement));
-            bs_ERP = squeeze(mean(Subset(:,:,bs_trialidx),3));
-            bs_ERP2 = squeeze(mean(Subset2(:,:,bs_trialidx),3));
-            Peak_perTrial1 = Peaks_Detection(bs_ERP, Component);
-            Peak_perTrial2 = Peaks_Detection(bs_ERP2, Component2);
-            Peak_perTrial(:,i_bs)=Peak_perTrial1-Peak_perTrial2;
-        end
-        % use sd of this distribution for SME
-        SME = std(Peak_perTrial, [], 2);
-    end
-end
-

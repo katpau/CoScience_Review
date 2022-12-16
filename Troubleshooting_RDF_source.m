@@ -1,18 +1,3 @@
-%% File to test Forking Path Analysis for Review only
-% this is only for testing, since the analysis is done on HUMMEL (UHH
-% server) and SLURM (Job scheduler parallelizing across subjects)
-
-AnalysisName = "Alpha_Context"
-% choice from: 
-% * Alpha_Resting (Cassie)
-% * Alpha_Context (Kat)
-% * Error_MVPA (Elisa)
-% * Flanker_Conflict (Corinna)
-% * Gambling_RewP (Anja)
-% * Gambling_N300H (Erik)
-% * GoNoGo_Conflict (Andre)
-% * Ultimatum_Offer (Jojo)
-
 % Depending on analysis that should be tested, adjust inputs
 switch AnalysisName
     case "Alpha_Context" 
@@ -129,7 +114,37 @@ RetryError="0" ; % usually, if error ocurrs, stop step and all combinations that
 ParPools="3"; % how many parallel instances can be run
 PrintLocation = "0"; % some lines can be printed to console to make it easier to navigate errors (change to "1" if desired)
 
-parfor_Forks(IndexSubjectsSubset,      ListFile,  DesignFile, ForkingFile, OutputFolder, ...
-    RawFolder, MatlabAnalysisName, MaxStep,    RetryError, LogFolder, ParPools, PrintLocation)
+%% copied already from parfor_Forks
+% Load Design
+Import = load(DesignFile);
+DESIGN = Import.DESIGN;
+clearvars Import;
 
-% CS: comment for testing commits
+% Correct Design if Steps are not in correct order
+% Get all Steps and all Choices from the Design Structure (important for
+% indexing the Combination)
+Steps =fieldnames(DESIGN);
+Order = zeros(length(Steps),2);
+for iStep = 1:length(Steps)
+    Order(iStep,:) =[iStep, DESIGN.(Steps{iStep}).Order];
+end
+Order = sortrows(Order,2);
+Steps = Steps(Order(:,1));
+
+
+% Load OUTPUT File with List of Forks
+% Get Name of OUTPUT File that should be run
+OUTPUT_List = table2cell(readtable( ListFile, 'ReadVariableNames', false, 'Delimiter', ' '));  % read csv file with subject Ids to be run
+OUTPUT_File = OUTPUT_List{1};
+[~, OUTPUT_Name] = fileparts(OUTPUT_File);
+clearvars OUTPUT_List
+
+% Load OUTPUT File (= File with Forking List)
+Import = load(OUTPUT_File);
+OUTPUT = Import.OUTPUT;
+
+%%
+disp("*********************")
+disp("All Steps that can be tested (in order):")
+disp(fieldnames(DESIGN))
+disp("*********************")

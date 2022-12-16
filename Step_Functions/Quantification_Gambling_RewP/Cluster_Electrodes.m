@@ -1,4 +1,8 @@
 function  OUTPUT = Cluster_Electrodes(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Script only marks if electrode clusters shouls be clustered (averaged 
 % acroos), or not. 

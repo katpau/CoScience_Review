@@ -1,4 +1,8 @@
 function  OUTPUT = Quantification_Asymmetry(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Depending on the forking choice, it uses the choices from the previous
 % steps to quantify Alpha Asymmetry

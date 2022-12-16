@@ -4,6 +4,10 @@ Choices = c("pleasant_arousal_perSub", "pleasant_perSub", "pleasant_arousal_av")
 Order = 5
 output = input$data
 
+## Contributors
+# Last checked by KP 12/22
+# Planned/Completed Review by:
+
 # Handles all Choices listed above to add behavioral covariate to data
 # (1) Read and Restructure Data
 # (2) Extract Ratings and combine (either per Subject/Condition, Arousal or/and Valence, or Group Average by condition)
@@ -14,9 +18,8 @@ output = input$data
 # (1) Preparations 
 #########################################################
 # Read Behavioural Data
-#BehavFile = "/work/bay2875/BehaviouralData/task_StroopRating_beh.csv"
-BehavFile = paste0(input$stephistory["Root_Behavior"], "task_StroopRating_beh.csv")
-BehavData = read.csv(BehavFile, header = TRUE, sep = ";")
+BehavFile = paste0(input$stephistory[["Root_Behavior"]], "task_StroopRating_beh.csv")
+BehavData = read.csv(BehavFile, header = TRUE)
 
 
 # Restructure Data so that the Information from  "Condition" is split into relevant collumns
@@ -65,26 +68,17 @@ if (choice != "pleasant_arousal_av") {
     group_by(Condition, Dimension) %>%
     summarise_at(vars(Response), mean)
   
-  output =  merge(
+  Group_Mean = spread(Group_Mean, Dimension, Response)
+  colnames(Group_Mean) = c("Condition","Behav_Arousal", "Behav_Pleasure")
+
+  output = merge(
     output,
-    Group_Mean[Group_Mean$Dimension == "Arousal", ],
+    Group_Mean,
     by = c("Condition"),
     all.x = TRUE,
     all.y = FALSE
   )
-  colnames(output)[colnames(output) == "Response"] = "Behav_Arousal"
   
-  output =  merge(
-    output,
-    Group_Mean[Group_Mean$Dimension == "Valence", ],
-    by = c("Condition"),
-    all.x = TRUE,
-    all.y = FALSE
-  )
-  colnames(output)[colnames(output) == "Response"] = "Behav_Pleasure"
-  
-  # Drop dimension collumns
-  output= output[,-which(grepl("Dimension", names(output)))]
 }
 
 

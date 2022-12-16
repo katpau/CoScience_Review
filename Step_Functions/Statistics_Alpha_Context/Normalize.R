@@ -3,6 +3,10 @@ Normalize = function(input = NULL, choice = NULL) {
   Choices = c("Rankit", "Log", "None")
   Order = 11
   output = input$data
+
+  ## Contributors
+  # Last checked by KP 12/22
+  # Planned/Completed Review by:
   
   # Handles all Choices listed above 
   # Tests if Data should be normalized or not (is grouped for Analyses, Tasks, Condition, etc.)
@@ -37,7 +41,7 @@ Normalize = function(input = NULL, choice = NULL) {
       } else if (choice == "Log")  {
         # Add Constant to each collum to make all values > 0
         Min = min(data, na.rm = TRUE)
-        if (Min<0) { data = data + abs(Min) +1 }
+        if (Min<=0) { data = data + abs(Min) +1 }
         normal = log(data)
       } 
       return (normal)

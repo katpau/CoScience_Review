@@ -1,7 +1,11 @@
 function  OUTPUT = Quantification_ERP(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Based on information of previous steps, and depending on the forking
-% choice, ERPs are quantified based on Mean/Binned Means etc.
+% choice, ERPs are quantified based on Mean or ERPS.
 % Script also extracts Measurement error and reshapes Output to be easily
 % merged into a R-readable Dataframe for further analysis.
 %#####################################################################
@@ -33,70 +37,109 @@ Conditional = ["NaN", "~contains(TimeWindow, ""Relative"") "];
 SaveInterim = logical([1]);
 Order = [22];
 
+
 %%%%%%%%%%%%%%%% Updating the SubjectStructure. No changes should be made here.
 INPUT.StepHistory.Quantification_ERP = Choice;
 OUTPUT = INPUT;
+OUTPUT.data = [];
 % Some Error Handling
 try
     %%%%%%%%%%%%%%%% Routine for the analysis of this step
-    % This functions starts from using INPUT and returns OUTPUT
-    
-    
-    
-    % ********************************************************************************************
-    % **** Prepare Indexes of  Data to be exported ***********************************************
-    % ********************************************************************************************
-    
     EEG = INPUT.data.EEG;
     
-    % **** Get Info on Electrodes ******
+    % ********************************************************************************************
+    % **** Set Up Some Information 1 ***************************************************************
+    % ********************************************************************************************
+    % Get Info on ** Electrodes **
     if strcmp(INPUT.StepHistory.Electrodes, "Relative")
         Electrodes = upper(["AFz", "Fz", "Fcz", "Cz", "Cpz", "Pz", "Poz", "Oz", ...
             "AF3", "F1", "FC1", "C1", "CP1", "P1", "PO3", "O1", ...
             "AF4", "F2", "FC2", "C2", "CP2", "P2", "PO4", "O2"]);
     else
-        Electrodes = upper(strsplit(INPUT.StepHistory.Electrodes , ","));
+        Electrodes = strrep(upper(strsplit(INPUT.StepHistory.Electrodes , ",")), " ", "");
     end
     NrElectrodes = length(Electrodes);
+    ElectrodeIdx = findElectrodeIdx(EEG.chanlocs, Electrodes);
     
-    % Get Index on Electrodes ******
-    Electrodes = strrep(Electrodes, " ", "");
-    ElectrodeIdx = zeros(1, length(Electrodes));
-    for iel = 1:length(Electrodes)
-        [~, ElectrodeIdx(iel)] = ismember(Electrodes(iel), upper({EEG.chanlocs.labels})); % Do it in this loop to maintain matching/order of Name and Index!
+    % Info on ** Time Window ** handled later as it can be relative too
+    
+    % Info on ** Epochs **    
+    Condition_Triggers = {'101';  '102'; '201'; '202'}; % Target onset
+    Event_Window = [-0.300 1.000];
+    Condition_Triggers =  {'11', '12', '13', '14', '15', '16', '17', '18'; '21', '22', '23', '24', '25', '26', '27', '28'; ...
+        '31', '32', '33', '34', '35', '36', '37', '38';  '41', '42', '43', '44', '45', '46', '47', '48'; ...
+        '51', '52', '53', '54', '55', '56', '57', '58'; '61', '62', '63', '64', '65', '66', '67', '68';...
+        '71', '72', '73', '74', '75', '76', '77', '78'}; % Picture Onset
+    Condition_Names = ["Tree", "Erotic_Couple", "Erotic_Man", "Neutral_ManWoman", "Neutral_Couple", "Positive_ManWoman", "Erotic_Woman"];
+    NrConditions = length(Condition_Names);
+    
+    
+    % ********************************************************************************************
+    % **** Prepare ERP  ***************************************************************
+    % ********************************************************************************************
+    % For saving ERP, select only relevant channels
+    ElectrodesERP = {'CZ','CPZ','CP1','CP2','PZ'};
+    EEG_for_ERP = pop_select(EEG, 'channel',ElectrodesERP);
+    % For saving ERP, downsample!
+    EEG_for_ERP =  pop_resample(EEG_for_ERP, 100);
+    for i_Cond = 1:NrConditions
+        try
+            ERP = pop_epoch( EEG_for_ERP, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');
+            ERP_forExport.(Condition_Names(i_Cond)) = mean(ERP.data,3);
+        end
     end
-    % Update Nr on Electrodes for Final OutputTable
-    if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-        NrElectrodes = 1;
-        Electrodes = strcat('Cluster ', join(Electrodes));
+    % Add Info on Exported ERP
+    ERP_forExport.times = ERP.times;
+    ERP_forExport.chanlocs = ERP.chanlocs;
+    
+    
+    % ********************************************************************************************
+    % **** Prepare Relative Data   ***************************************************************
+    % ********************************************************************************************
+    % if Time window is Relative to Peak across all Subjects or within a
+    % subject, an ERP needs to be created across all Conditions.
+    if contains(INPUT.StepHistory.TimeWindow, "Relative") ||  strcmp(INPUT.StepHistory.Electrodes, "Relative")
+        % select all relevant epochs
+        EEG_for_Relative = pop_epoch( EEG, Condition_Triggers', Event_Window, 'epochinfo', 'yes');
+        if contains(INPUT.StepHistory.TimeWindow, "Relative_Group") ||  strcmp(INPUT.StepHistory.Electrodes, "Relative")
+            % Due to different recording setup, Biosemi needs to be resampled
+            EEG_for_Relative_Export =  pop_resample(EEG_for_Relative, fix(EEG_for_Relative.srate/100)*100);
+            % Get index of Data that should be exported (= used to find peaks)
+            TimeIdxRel = findTimeIdx(EEG_for_Relative_Export.times, 300, 1000);
+            % Get only relevant Data
+            For_Relative.ERP.AV = mean(EEG_for_Relative_Export.data(ElectrodeIdx,TimeIdxRel,:),3) ;
+            For_Relative.ERP.times = EEG_for_Relative_Export.times(TimeIdxRel);
+            For_Relative.ERP.chanlocs = EEG_for_Relative_Export.chanlocs(ElectrodeIdx);
+        end
     end
     
-    
+    % ********************************************************************************************
+    % **** Set Up Some Information 2 *************************************************************
+    % ********************************************************************************************
     % ****** Get Info on TimeWindow ******
     TimeWindow = INPUT.StepHistory.TimeWindow;
     if ~contains(TimeWindow, "Relative")
         TimeWindow = str2double(strsplit(TimeWindow, ","));
+        
     elseif strcmp(TimeWindow, "Relative_Subject")
-        % find subset to find Peak
-        [~, TimeIdx(1)]=min(abs(EEG.times - 300));
-        [~, TimeIdx(2)]=min(abs(EEG.times - 1000));
-        TimeIdx = TimeIdx(1):TimeIdx(2);
-        ERP = mean(mean(EEG.data(ElectrodeIdx,TimeIdx,:),1),3);
-        
+        % find subset to find Peak for LPP
+        TimeIdx = findTimeIdx(EEG_for_Relative.times, 300, 1000);
+        % Calculate Grand Average ERP
+        ERP = mean(EEG_for_Relative.data,3);
         % Find Peak in this Subset
-        [~, Latency] = Peaks_Detection(ERP, "POS");
-        
+        [~, Latency] = Peaks_Detection(mean(ERP(ElectrodeIdx, TimeIdx,:),1), "POS");
         % Define Time Window Based on this
-        TimeWindow = [EEG.times(Latency+(TimeIdx(1))) - 100, EEG.times(Latency+(TimeIdx(1))) + 100];
-    elseif strcmp(TimeWindow, "Relative_Group")
-        TimeWindow = [300 1000];
+        TimeWindow = [EEG_for_Relative.times(Latency+(TimeIdx(1))) - 100, EEG_for_Relative.times(Latency+(TimeIdx(1))) + 100];
+        
+    elseif contains(TimeWindow, "Relative_Group")
+        % Time window needs to be longer since peak could be at edge
+        % this part of the data will be exported later
+        TimeWindow = [200 1000];
     end
     
-    % Get Index of TimeWindow
-    [~, TimeIdx(1)]=min(abs(EEG.times - TimeWindow(1)));
-    [~, TimeIdx(2)]=min(abs(EEG.times - TimeWindow(2)));
-    TimeIdx = TimeIdx(1):TimeIdx(2);
-
+    % Get Index of TimeWindow LPP [in Sampling Points]
+    TimeIdx = findTimeIdx(EEG.times, TimeWindow(1), TimeWindow(2));
+    
     % If Window is binned into early and later, then Adjust here
     if strcmp(Choice, "Mean_Binned")
         HalfWindow = (TimeWindow(2)-TimeWindow(1))/2;
@@ -109,122 +152,109 @@ try
         NrTimeWindows = 1;
     end
     
-    
-    
-    
     % ********************************************************************************************
-    % **** Epoch Data into different Conditions **************************************************
+    % ****  Prepare Data *************************************************************************
     % ********************************************************************************************
-     % For saving ERP, select only relevant channels
-     EEG_for_ERP = EEG;
-     Electrodes_ERP = { 'FCZ', 'CZ', 'CPZ', 'PZ', 'POZ', 'C1', 'CP1', 'P1', 'PO3', 'C2', 'CP2', 'P2', 'PO4'};
-     EEG_for_ERP = pop_select(EEG_for_ERP, 'channel',Electrodes_ERP);
-     % For saving ERP, always downsample!
-      EEG_for_ERP =  pop_resample(EEG_for_ERP, 100);
-     
-     %Info on Epochs
-    Event_Window = [-0.300 1.000];
-    Condition_Triggers =  [ 11, 12, 13, 14, 15, 16, 17, 18; 21, 22, 23, 24, 25, 26, 27, 28; 31, 32, 33, 34, 35, 36, 37, 38; ...
-        41, 42, 43, 44, 45, 46, 47, 48; 51, 52, 53, 54, 55, 56, 57, 58; 61, 62, 63, 64, 65, 66, 67, 68; ...
-        71, 72, 73, 74, 75, 76, 77, 78]; % Picture Onset
-    Condition_Names = ["Tree", "Erotic_Couple", "Erotic_Man", "Neutral_ManWoman", "Neutral_Couple", "Positive_ManWoman", "Erotic_Woman"];
+    for i_Cond = 1:NrConditions
+        try
+            % * Epoch Data around predefined window and save each
+            EEGData = pop_epoch( EEG, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');
+            ConditionData.(Condition_Names(i_Cond)) = EEGData.data(ElectrodeIdx, TimeIdx,:);
+            
+            % Update Nr on Electrodes for Final OutputTable
+            if INPUT.StepHistory.Cluster_Electrodes == "cluster"
+                NrElectrodes = 1;
+                Electrodes = strcat('Cluster ', join(Electrodes));
+                ConditionData.(Condition_Names(i_Cond)) = mean(ConditionData.(Condition_Names(i_Cond)),1);
+            end
+        end
+    end
+    
+    % update Conditions based on on which epochs were found
+    Condition_Names = fieldnames(ConditionData);
     NrConditions = length(Condition_Names);
     
-
-     
-    for i_Cond = 1:NrConditions
-        % * Epoch Data around predefined window and save each
-        Interim = pop_epoch( EEG_for_ERP, num2cell(Condition_Triggers(i_Cond,:)), Event_Window, 'epochinfo', 'yes');
-        ForRelative = pop_epoch( EEG, num2cell(Condition_Triggers(i_Cond,:)), Event_Window, 'epochinfo', 'yes');
-        ConditionData.(Condition_Names(i_Cond)) = ForRelative.data;
-        % Calculate ERP
-        ERP_toExport.(Condition_Names(i_Cond)) = mean(Interim.data,3);
-    end
-    ERP_toExport.times = Interim.times;
-    ERP_toExport.chanlocs = Interim.chanlocs;
-    
-    
-    
     % ********************************************************************************************
-    % **** Loop Through each Condition and extract Data ******************************************
+    % **** Extract Data and prepare Output Table    **********************************************
     % ********************************************************************************************
-    % if depending on group, crop data and save data for now
-    if strcmp(INPUT.StepHistory.TimeWindow, "Relative_Group") || strcmp(INPUT.StepHistory.Electrodes, "Relative")
-        % for this ERP some montages do not have all channels
-        ElectrodeIdx = ElectrodeIdx(ElectrodeIdx>0);
-        Export.Data = EEG.data(ElectrodeIdx,TimeIdx,:);
-        Export.Times = EEG.times(TimeIdx);
-        Export.Electrodes = {EEG.chanlocs(ElectrodeIdx).labels};
-        Export.ACC = EEG.ACC;
+    if contains(INPUT.StepHistory.TimeWindow, "Relative_Group") ||  strcmp(INPUT.StepHistory.Electrodes, "Relative")
+        For_Relative.RecordingLab = EEG.Info_Lab.RecordingLab;
+        For_Relative.Experimenter = EEG.Info_Lab.Experimenter;
+        For_Relative.Data = ConditionData;
+        For_Relative.Times = EEGData.times(TimeIdx);
+        For_Relative.Electrodes = Electrodes;
         
     else
-        % if not dependent on group,
         % ****** Extract Amplitude, SME, Epoch Count ******
-        InitSize = [NrElectrodes,NrConditions, NrTimeWindows];
-        EpochCount = NaN(InitSize); ERP =NaN(InitSize); SME=NaN(InitSize);
-        Trials = NaN(NrConditions);
+        InitSize = [NrElectrodes*NrTimeWindows,NrConditions];
+        EpochCount = NaN(InitSize);
+        ERP =NaN(InitSize); SME=NaN(InitSize);
         
         for i_Cond = 1:NrConditions
-            % Select relevant Data
-            Data = ConditionData.(Condition_Names(i_Cond))(ElectrodeIdx,TimeIdx,:);
-            
-            % check if Electrodes should be averaged across, or kept
-            % separate
-            if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-                Data = mean(Data, 1); % first dimensions are Electrodes
-            end
+            Data = ConditionData.(Condition_Names{i_Cond});
             
             % Count Epochs
             EpochCount(:,i_Cond,:) = size(Data,3);
-            if Trials(i_Cond) < str2double(INPUT.StepHistory.Trials_MinNumber)
+            if size(Data,3) < str2double(INPUT.StepHistory.Trials_MinNumber)
                 ERP(:,i_Cond,:) = NaN;
                 SME(:,i_Cond,:) = NaN;
             else
                 % Calculate Mean if enough epochs there
                 if ~strcmp(Choice, "Mean_Binned")
-                    ERP(:,i_Cond,1) = mean(mean(Data,3),2);
-                    SME(:,i_Cond,1) = Mean_SME(Data);
+                    ERP(:,i_Cond) = mean(mean(Data,3),2);
+                    SME(:,i_Cond) = Mean_SME(Data);
                 else
-                    ERP(:,i_Cond,1) = mean(mean(Data(:, 1:HalfWindowIdx,:),3),2);
-                    SME(:,i_Cond,1) = Mean_SME(Data(:, 1:HalfWindowIdx,:));
-                    ERP(:,i_Cond,2) = mean(mean(Data(:, HalfWindowIdx+1:length(TimeIdx),:),3),2);
-                    SME(:,i_Cond,2) = Mean_SME(Data(:, HalfWindowIdx+1:length(TimeIdx),:));
+                    ERP(:,i_Cond) = [mean(mean(Data(:, 1:HalfWindowIdx,:),3),2); ...
+                        mean(mean(Data(:, HalfWindowIdx+1:length(TimeIdx),:),3),2)];
+                    SME(:,i_Cond) = [Mean_SME(Data(:, 1:HalfWindowIdx,:)); ...
+                        Mean_SME(Data(:, HalfWindowIdx+1:length(TimeIdx),:))];
                 end
+                
+                
             end
         end
-        
-        % ********************************************************************************************
-        % **** Prepare Output Table    ***************************************************************
-        % ********************************************************************************************     
-        % ****** Prepare Labels ****** 
-        % Subject, Lab and experimenter is constant
-        if isfield(INPUT, "Subject"); INPUT.SubjectName = INPUT.Subject; end
-        Subject_L = repmat(INPUT.SubjectName, NrConditions*NrElectrodes*NrTimeWindows,1 );
-        Lab_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodes*NrFreqWindow,1 );
-        Experimenter_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodes*NrFreqWindow,1 );
-        
-        % Electrodes: if multiple electrodes, they simply alternate
-        Electrodes_L = repmat(Electrodes', NrConditions*NrTimeWindows, 1);
-        % Conditions are blocked across electrodes, but alternate across time windows
-        Conditions_L = repelem(Condition_Names', NrElectrodes,1);
-        Conditions_L = repmat([Conditions_L(:)], NrTimeWindows,1);
-        % Time Window are blocked across electrodes and conditions
-        TimeWindow_L = repmat(convertCharsToStrings(num2str(TimeWindow(1,:))), NrConditions*NrElectrodes, 1);
-        if NrTimeWindows == 2
-            TimeWindow_L = [TimeWindow_L; repmat(convertCharsToStrings(num2str(TimeWindow(2,:))), NrConditions*NrElectrodes, 1) ];
-        end
-        
-        
-        % ****** Prepare Table ****** 
-        Export = [cellstr([Subject_L, Lab_L, Experimenter_L, Conditions_L, Electrodes_L, TimeWindow_L]),...
-            num2cell([ERP(:), SME(:), EpochCount(:)])];
-        
-        % Add ACC
-        Export = [Export, num2cell(repmat(EEG.ACC, size(Export,1), 1))]
     end
-    OUTPUT.data = [];
-    OUTPUT.data.Export = Export;
-    OUTPUT.data.ERP = ERP_toExport;
+    
+    
+    % ********************************************************************************************
+    % **** Prepare Output Table    ***************************************************************
+    % ********************************************************************************************
+    % Add ERP for Plotting
+    OUTPUT.data.ERP = ERP_forExport;
+    
+    if contains(INPUT.StepHistory.TimeWindow, "Relative_Group") ||  strcmp(INPUT.StepHistory.Electrodes, "Relative")
+        % Add Relative Data and Relative Info
+        OUTPUT.data.For_Relative = For_Relative;
+    else
+        % Prepare Final Export with all Values
+        % ****** Prepare Labels ******
+        % Subject, ComponentName, Lab, Experimenter is constant AAA
+        Subject_L = repmat(INPUT.Subject, NrConditions*NrElectrodes*NrTimeWindows,1 );
+        Lab_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodes*NrTimeWindows,1 );
+        Experimenter_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodes*NrTimeWindows,1 );
+        Component_L = repmat("LPP", NrConditions*NrElectrodes*NrTimeWindows,1 );
+        
+        % Electrodes: if multiple electrodes, they simply alternate ABABAB
+        Electrodes_L = repmat(Electrodes', NrConditions*NrTimeWindows, 1);
+        
+        % Conditions are blocked across electrodes and timewindows AABBAABB
+        Conditions_L = repelem(Condition_Names', NrElectrodes*NrTimeWindows,1);
+        
+        % Time Window are blocked across electrodes and conditions
+        if NrTimeWindows == 2
+            TimeWindow_L = [convertCharsToStrings(num2str(TimeWindow(1,:))); ...
+                convertCharsToStrings(num2str(TimeWindow(2,:)))]
+        else
+            TimeWindow_L = convertCharsToStrings(num2str(TimeWindow(1,:)));
+        end
+        TimeWindow_L = repmat(repelem(TimeWindow_L, NrElectrodes, 1),NrConditions,1) ;
+        
+        
+        % ****** Prepare Table ******
+        OUTPUT.data.Export = [cellstr([Subject_L, Lab_L, Experimenter_L, Conditions_L, Electrodes_L, TimeWindow_L]),...
+            num2cell([ERP(:), SME(:), EpochCount(:)]), cellstr(Component_L)];
+        
+    end
     
     % ****** Error Management ******
 catch e
@@ -239,37 +269,4 @@ catch e
     
     
 end
-
-%% house built functions to detect peaks (and bootstrap SME)
-    function [Peaks, Latency] = Peaks_Detection(Subset, PeakValence)
-        if PeakValence == "NEG"
-            % Find possible Peak
-            possiblePeaks = islocalmin(Subset,2);
-            Subset(~possiblePeaks) = NaN;
-            % Identify largest Peak
-            [Peaks, Latency]  = min(Subset,[],2);
-            
-        elseif PeakValence == "POS"
-            % Find Possible Peak
-            possiblePeaks = islocalmax(Subset,2);
-            Subset(~possiblePeaks) = NaN;
-            % Identify largest Peak
-            [Peaks, Latency]  = max(Subset,[],2);
-        end
-    end
-
-% SME of Mean Values
-    function SME = Mean_SME(Subset)
-        % Calculate Mean per Trial
-        Mean_perTrial = squeeze(mean(Subset,2));
-        % Take SD of these means
-        if size(Mean_perTrial,2) == 1
-            SME = std(Mean_perTrial,[],1)/sqrt(length(Mean_perTrial));
-        else
-            SME = std(Mean_perTrial,[],2)/sqrt(length(Mean_perTrial));
-        end
-    end
-
-
 end
-

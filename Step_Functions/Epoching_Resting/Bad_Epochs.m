@@ -1,6 +1,11 @@
 function  OUTPUT = Bad_Epochs(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
-% Data is already epoched, so epochs containing artefacts are removed.
+% Epochs data if not already epoched
+% removes epochs containing artefacts
 % It is able to handle all options from "Choices" below (see Summary).
 
 
@@ -31,13 +36,13 @@ StepName = "Bad_Epochs";
 Choices = ["FASTER", "Threshold_100", "Threshold_120", "Threshold_150", "Threshold_200", "Probability+Kurtosis+Frequency_3.29SD", "No_BadEpochs"];
 Conditional = ["NaN", "NaN", "NaN", "NaN", "NaN", "NaN", "OccularCorrection ~= ""No_OccularCorrection"" & Bad_Segments ~= ""No_BadSegments"" "]; % Choice "None" only allowed if some Artcor was done before
 SaveInterim = logical([0]);
-Order = [13];
+Order = [12.5];
 
 % ****** Updating the OUTPUT structure ******
 % No changes should be made here.
 INPUT.StepHistory.(StepName) = Choice;
 OUTPUT = INPUT;
-tic % for keeping track of time
+
 try % For Error Handling, all steps are positioned in a try loop to capture errors
     
     %#####################################################################
@@ -49,6 +54,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         % Get EEGlab EEG structure from the provided Input Structure
         EEG = INPUT.data.(Conditions{i_cond});
         
+        % Initate Clean Epoch Mask
         Clean_Epochs_Mask = ones(EEG.trials, 1);
         
         % ****** Remove EOG & Reference Channels ******
@@ -64,12 +70,17 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 
             elseif contains(Choice, "Threshold")
                 Threshold = strsplit(Choice, "_"); Threshold = str2double(Threshold{1,2});
+                % Demean Data otherwise Thresholding does not work
+                EEG_subset.data = EEG_subset.data - mean(EEG_subset.data,2);
                 [~, badEpochs, ~, ~] = eegthresh(EEG_subset.data, EEG_subset.pnts, [1:EEG_subset.nbchan], -Threshold, Threshold, [EEG_subset.xmin EEG_subset.xmax], EEG_subset.xmin, EEG_subset.xmax);
                 Clean_Epochs_Mask(badEpochs) = 0;
                 
             elseif strcmpi(Choice, "Probability+Kurtosis+Frequency_3.29SD")
                 threshold_DB = 90;
                 threshold_SD = 3.29;
+                % Demean Data otherwise Thresholding does not work
+                EEG_subset.data = EEG_subset.data - mean(EEG_subset.data,2);
+                
                 % Frequency Spectrum
                 [~, bad_Spectrum] = pop_rejspec(EEG_subset, 1, 'elecrange', [1:EEG_subset.nbchan], 'threshold', [-threshold_DB threshold_DB], 'freqlimits', [1 30]);
                 Clean_Epochs_Mask(bad_Spectrum) = 0;
@@ -85,10 +96,16 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 Clean_Epochs_Mask(bad_Probability) = 0;
                 
             end
-                       
+            
+            
             % ****** Remove bad Epochs ******
+            if  sum(Clean_Epochs_Mask) == 0
+                e.message = 'All Trials marked as bad (100%!!) .';
+                error(e.message);
+            end
             EEG = pop_select( EEG, 'trial',find(Clean_Epochs_Mask));
         end
+        
         
         %#####################################################################
         %### Wrapping up Preprocessing Routine                         #######
@@ -100,7 +117,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         OUTPUT.data.(Conditions{i_cond}) = EEG;
         OUTPUT.AC.(Conditions{i_cond}).Clean_Epochs_Mask = Clean_Epochs_Mask;
     end
-    OUTPUT.StepDuration = [OUTPUT.StepDuration; toc];
+    
     
     % ****** Error Management ******
 catch e
@@ -110,10 +127,10 @@ catch e
     for ierrors = 1:length(e.stack)
         ErrorMessage = strcat(ErrorMessage, "//", num2str(e.stack(ierrors).name), ", Line: ",  num2str(e.stack(ierrors).line));
     end
-    
-    if  exist('Clean_Epochs_Mask', 'var') && sum(Clean_Epochs_Mask)<1
-        ErrorMessage = strcat(ErrorMessage, "Note: All Epochs marked as bad") ;
+    if  exist('Clean_Epochs_Mask', 'var')
+        ErrorMessage = strcat(ErrorMessage,"extracted Epochs: ", num2str(length(Clean_Epochs_Mask)));
     end
+
     OUTPUT.Error = ErrorMessage;
 end
 end

@@ -1,4 +1,8 @@
 function  OUTPUT = Trials_MinNumber(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Script only marks the minimum number of trials necessary to calculate an 
 % ERP, however, nothing is done here as this will be used in a later 

@@ -1,4 +1,8 @@
 function  OUTPUT = LineNoise_Filter(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Depending on the forking choice, it applies a line noise filter as
 % implemented in the PREP pipeline, or not

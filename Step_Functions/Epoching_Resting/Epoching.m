@@ -1,7 +1,11 @@
 function  OUTPUT = Epoching(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
-% Depending onf the forking choice, data is epoched with different window
-% lengths and different overlaps.
+% Depending onf the forking choice, resting data is epoched with different 
+% window lengths and different overlaps.
 % It is able to handle all options from "Choices" below (see Summary).
 
 
@@ -40,7 +44,6 @@ Order = [12];
 % No changes should be made here.
 INPUT.StepHistory.(StepName) = Choice;
 OUTPUT = INPUT;
-tic % for keeping track of time
 try % For Error Handling, all steps are positioned in a try loop to capture errors
     
     %#####################################################################
@@ -91,7 +94,6 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         % the OUTPUT.data field, overwriting previous EEG information.
         OUTPUT.data.(Conditions{i_cond}) = EEG;
     end
-    OUTPUT.StepDuration = [OUTPUT.StepDuration; toc];
     
     
     % ****** Error Management ******

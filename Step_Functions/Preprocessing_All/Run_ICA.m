@@ -1,4 +1,8 @@
 function  OUTPUT = Run_ICA(INPUT, Choice)
+% Last Checked by KP 12/22
+% Planned Reviewer:
+% Reviewed by: 
+
 % This script does the following:
 % Depending on the forking choice, an ICA decomposition is calculated,
 % It is able to handle all options from "Choices" below (see Summary).

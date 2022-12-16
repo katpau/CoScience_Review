@@ -1,11 +1,16 @@
 Outliers_SME = function(input = NULL, choice = NULL) {
 StepName = "Outliers_SME"
 Choices = c("Applied", "None")
-Order = 6
+Order = 7
 output = input$data
 
+## Contributors
+# Last checked by KP 12/22
+# Planned/Completed Review by:
+
+
 # Handles if outliers based on SME should be identified or not
-# No Action here, will be carried out in function "Outliers_Threshold"
+# No Action here, will be carried out in function "Outliers_EEG"
 
 
 

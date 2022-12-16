@@ -168,7 +168,7 @@ if PrintLocation == 1; fprintf('Line 158\n'); end
 CountErrors = 0;
 CountPreviouslyCompleted = 0;
 CountCompleted = 0;
-RetryFork =  ones(length(OUTPUT_Choices), 1);
+RetryFork =  ones(size(OUTPUT_Choices,1), 1);
 
 % Prepare Matlabpool
 delete(gcp('nocreate')); % make sure that previous pooling is closed

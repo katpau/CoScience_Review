@@ -4,33 +4,82 @@
 
 
 
+# Adjust Input here (for shared test only this input works, since other files do not exist)
+AnalysisName="Alpha_Context"   # <<<<============================================
+# choose from
+# * Alpha_Resting (Cassie)
+# * Alpha_Context (Kat)
+# * GoNoGo_Conflict (Andre)
+# * Flanker_Conflict (Corinna)
+# * Gambling_RewP (Anja)
+# * Ultimatum_Offer (Jojo)
+# * Gambling_N300H (Erik)
+# * Error_MVPA (Elisa)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+######################################################################################################################
+# No Changes below!!
+
 # Load Relevant Libraries
-list.of.packages <- c("foreach", "dplyr", "tidyr", "stringr", "effectsize", "data.table", "doParallel", "rstudioapi")
+list.of.packages <- c("foreach", "dplyr", "tidyr", "stringr", "effectsize", "data.table", "doParallel", "rstudioapi", "lme4", "lmerTest")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages,  repos='http://cran.us.r-project.org')
 suppress = lapply(list.of.packages, require, character.only = TRUE)
 
-# Adjust Input here (for shared test only this input works, since other files do not exist)
-AnalysisName="Alpha_Context"
-ListOfStepFunctionFolders=c("Statistics_All", "Statistics_Alpha_Context")
+
+if (AnalysisName == "Alpha_Context") {
 collumnNamesEEGData=c("ID", "Condition", "Hemisphere", "Electrode", "Localisation", "FrequencyBand", "FrequencyRange", "EEG_Signal", "SME", "Epochs")
+} else if (AnalysisName == "Alpha_Resting") {
+collumnNamesEEGData=c("ID", "Task", "Hemisphere", "Electrode", "Localisation", "FrequencyBand", "FrequencyRange", "EEG_Signal", "SME", "Epochs", "Lab", "Experimenter")
+} else if (AnalysisName == "GoNoGo_Conflict") {
+collumnNamesEEGData=c("ID", "Lab", "Experimenter",  "Condition", "Electrode", "TimeWindow",  "EEG_Signal", "SME", "Epochs", "Component", "ACC")
+} else if (AnalysisName == "Flanker_Conflict") {
+  collumnNamesEEGData=c("ID", "Lab", "Experimenter",  "Congruency", "Electrode", "TimeWindow",  "EEG_Signal", "SME", "Epochs", "Component", "ACC")
+} else if (AnalysisName == "Ultimatum_Offer") {
+  collumnNamesEEGData=c("ID", "Lab", "Experimenter",  "Offer", "Electrode", "TimeWindow",  "EEG_Signal", "SME", "Epochs", "Component")
+} else if (AnalysisName == "Gambling_RewP") {
+  collumnNamesEEGData=c("ID", "Lab", "Experimenter",  "Condition", "Electrode", "TimeWindow",  "EEG_Signal", "SME", "Epochs", "Component")
+} else if (AnalysisName == "Gambling_N300H") {
+  collumnNamesEEGData=c("ID", "Lab", "Experimenter",  "Condition", "Electrode", "TimeWindow",  "TimeWindowECG", "EEG_Signal", "SME", "Epochs", "Bin", "Component")
+} else if (AnalysisName == "Error_MVPA") {
+  collumnNamesEEGData=c("ID", "Lab", "Experimenter",  "Condition", "Task", "EEG_Signal", "SME",  "Component", "Epochs", "ACC")
+} 
+
 
 # Path of current project
 Root = dirname(getSourceEditorContext()$path)
-FORKS_File= paste0(Root, "/Only_ForGit_To_TestRun/ForkingFiles/Alpha_Context/StatFORKS.txt") # Usually there are more files and there is a loop here
 
 
-# Set up Variables based  on Input
-RootPath = paste0(Root, "/Only_ForGit_To_TestRun/", AnalysisName , "/")
+FORKS_File= paste0(Root, "/Only_ForGit_To_TestRun/ForkingFiles/", AnalysisName, "/StatFORKS.txt") # Usually there are more files and there is a loop here
+
+RootPath = paste0(Root, "/Only_ForGit_To_TestRun/Preproc_forked/", AnalysisName , "/")
 LogDir = paste0(Root, "/Only_ForGit_To_TestRun/Logs/", AnalysisName , "/Statistics/")
-dir.create(LogDir)
+if (!dir.exists(LogDir)) {dir.create(LogDir)}
 LogFile= paste0(LogDir , "Logs_", FORKS_File)
 Path_to_Merged_Files = paste0(RootPath,"Group_Data/" )
 Path_to_Export = paste0(RootPath,"Stats_Results/" )
 if (!dir.exists(Path_to_Export)) {dir.create(Path_to_Export)}
 
 # Add StepFunctions (these include the functions for each step to handle the forking)
-ListOfStepFunctionFolders=c("Statistics_All", "Statistics_Alpha_Context")
+ListOfStepFunctionFolders=c("Statistics_All", paste0("Statistics_", AnalysisName))
 StepFunctionFolder = paste0(Root, "/Step_Functions/")
 ListOfStepFunctionFolders = paste0(StepFunctionFolder, ListOfStepFunctionFolders, "/")
 
@@ -41,7 +90,11 @@ for (iFolder in ListOfStepFunctionFolders) {
   }
 }
 
-
+# Add Function For Testing Hypotheses
+StepFunctions = list.files(paste0(Root, "/Analysis_Functions/Forking_FunctionsR/"), pattern = ".R", full.names=TRUE)
+for (iFile in StepFunctions) {
+  source(iFile)
+}
 
 # Read Forking List
 FORKS = read.table(FORKS_File,  sep = ";", header = TRUE)
@@ -51,7 +104,7 @@ FORKS = read.table(FORKS_File,  sep = ";", header = TRUE)
 run_Steps_parallel = function (i_Fork, FORKS, Path_to_Merged_Files, Path_to_Export, Root){
   
   # Added here again so that it can be done in parallel on windows.... -.-
-  ListOfStepFunctionFolders=c("Statistics_All", "Statistics_Alpha_Context")
+  ListOfStepFunctionFolders=c("Statistics_All", paste0("Statistics_", AnalysisName))
   StepFunctionFolder = paste0(Root, "/Step_Functions/")
   ListOfStepFunctionFolders = paste0(StepFunctionFolder, ListOfStepFunctionFolders, "/")
   
@@ -62,6 +115,10 @@ run_Steps_parallel = function (i_Fork, FORKS, Path_to_Merged_Files, Path_to_Expo
     }
   }
   
+  StepFunctions = list.files(paste0(Root, "/Analysis_Functions/Forking_FunctionsR/"), pattern = ".R", full.names=TRUE)
+  for (iFile in StepFunctions) {
+    source(iFile)
+  }
   
   # Paste Filenames to check if already existing
   filename_input = paste0(Path_to_Merged_Files, "/", FORKS[i_Fork, 1])
@@ -85,7 +142,7 @@ run_Steps_parallel = function (i_Fork, FORKS, Path_to_Merged_Files, Path_to_Expo
     input$stephistory["Final_File_Name"] = filename_FORKS
     input$data = read.table(filename_input,  sep = ",", header = FALSE)
     input$stephistory["Root_Behavior"] = paste0(Root, "/Only_ForGit_To_TestRun/BehaviouralData/")
-    input$stephistory["Root_Personality"] =  paste0(Root, "/Only_ForGit_To_TestRun/QuestionnaireData/")
+    input$stephistory["Root_Personality"] =  paste0(Root, "/Only_ForGit_To_TestRun/QuestionnaireData/", AnalysisName, "/")
     colnames(input$data) = collumnNamesEEGData 
     
     # Run in Try Catch to parse Error Messages to Parloop
@@ -131,7 +188,7 @@ Protocol = invisible(foreach(i_Fork = 1:nrow(FORKS),
                              .errorhandling = 'pass',
                              .packages = list.of.packages,
                              .combine = 'c') 
-                     %dopar% run_Steps_parallel(i_Fork, FORKS, Path_to_Merged_Files,  Path_to_Export, Root))
+                     %do% run_Steps_parallel(i_Fork, FORKS, Path_to_Merged_Files,  Path_to_Export, Root))
 on.exit(stopCluster(myCluster))
 
 
@@ -142,8 +199,6 @@ Text_toWrite <- ""
 Text_toWrite[1] = "Inputs to Run Forks on Statistic"
 Text_toWrite[length(Text_toWrite) + 1] = sprintf('RootPath: %s', RootPath)
 Text_toWrite[length(Text_toWrite) + 1] = sprintf('Forking File: %s', FORKS_File)
-Text_toWrite[length(Text_toWrite) + 1] = sprintf('RootPath: %s', RootPath)
-Text_toWrite[length(Text_toWrite) + 1] = sprintf('Calculation took : %s ', time_needed_forParallel)
 Text_toWrite[length(Text_toWrite) + 1] = ""
 
 # Summary
@@ -175,6 +230,7 @@ file.create(file_name)
 con <- file(file_name, "w")
 writeLines(Text_toWrite, con)
 close(con)
+print(Text_toWrite)
 
 
 

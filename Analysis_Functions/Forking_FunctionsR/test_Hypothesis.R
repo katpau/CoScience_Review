@@ -76,6 +76,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       if ((EntriesPerSub)>1) {
         noRandomFactor = 0
         lm_formula = paste(lm_formula, "+ (1|ID)")  
+        lm_formula_noAdd_Random = lm_formula
         
         # check how many levels per predictor 
         if (length(Predictors)>1) {
@@ -91,8 +92,6 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
      
       
       if (length(AddPredictors)>0) { 
-        noRandomFactor = 0
-        lm_formula = paste(lm_formula, "+ (1|ID)")  
           for  (iPredictor in AddPredictors) {
             lm_formula = paste0(lm_formula, "+ (1|", iPredictor, ":ID)")
           }
@@ -100,24 +99,48 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       
       #####################################################################################
       # Calculate LM Model
-      
-      Model_Result = tryCatch({
-        if (noRandomFactor == 0) {
-          Model_Result = lmer(as.formula(lm_formula), 
-                              Subset) 
-          
-        }   else {
+      if (noRandomFactor == 1) {
+        Model_Result = tryCatch({
           Model_Result = lm(as.formula(lm_formula), 
                             Subset)
+          Model_Result = 3
+          
+        }, error = function(e) {
+          print("Error with Model")
+          Model_Result = "Error_when_computing_Model"
+          return(Model_Result)
+        })
+        
+        
+      } else {
+        Model_Result = tryCatch({
+          Model_Result = lmer(as.formula(lm_formula), 
+                              Subset) 
+          Model_Result
+        }, error = function(e) {
+          print("Error in Model")
+          Model_Result = "Error_when_computing_Model"
+          return(Model_Result)
+        })
+      
+        if (is.character(Model_Result) &&  grepl( "Error", Model_Result)) {
+          # Try again with less random predictors
+          Model_Result = tryCatch({
+            Model_Result = lmer(as.formula(lm_formula_noAdd_Random), 
+                                Subset) 
+            print("Error in Model fixed by dropping random predictors")
+            Model_Result
+          }, error = function(e) {
+            print("Error in Model even after dropping random predictors")
+            Model_Result = "Error_when_computing_Model"
+            return(Model_Result)
+          })
+          
+          
         }
-        Model_Result
-      }, error = function(e) {
-        print("Error with Model")
-        Model_Result = "Error_when_computing_Model"
-        return(Model_Result)
-      })
-      
-      
+        
+        
+        }
       
       # If Model is provided, get it here
     }} else {  
@@ -125,17 +148,19 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       Model_Result = ModelProvided }
   
   
-  
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # if only model is exported, stop here
   if (SaveUseModel == "exportModel")  {
+    print("only Export Model")
     return(Model_Result)
     break
     # prepare export of parameters
   } else { 
+    print("Prepare Estimates")
     # Check if Model was calculated successfully
     #  If there were Problems with the Model, extract NAs
     if (is.character(Model_Result) &&  grepl( "Error", Model_Result)) {
+      print("no Estimates since Error with Model ")
       Estimates = cbind.data.frame(Name_Test, Model_Result, NA, NA, NA, NA, NA, length(unique(as.character(Subset$ID))),NA, NA, NA)
       
     } else {
