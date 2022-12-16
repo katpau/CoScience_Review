@@ -12,20 +12,23 @@ run **TEST_RDF.m** for the preprocessing
 
 run **TEST_RDF_Stats.R** for the statistical analyses
 
+!! You do not need to run the Preprocessing before the Statistics. Example Files are added.
 
 
 ***Change the Analysis Name to what analysis you want to test***
  * Alpha_Resting (Cassie)
  * Alpha_Context (Kat)
- * Error_MVPA (Elisa)
- * Flanker_Conflict (Corinna)
- * Gambling_RewP (Anja)
- * Gambling_N300H (Erik)
- * GoNoGo_Conflict (Andre)
- * Ultimatum_Offer (Jojo)
+ * Error_MVPA (Elisa, Jutta)
+ * Flanker_Conflict (Corinna, Christoph, Alex)
+ * Gambling_RewP (Anja, Hannes, Kai)
+ * Gambling_N300H (Erik, Phillip)
+ * GoNoGo_Conflict (Andre, Vera)
+ * Ultimatum_Offer (Jojo, Johannes)
 
 ## Can I run the code line by line if I suspect something is wrong?
 Yes, please use the **Troubleshooting_RDF_** scripts for this. It is explained there how to use it.
+
+!! You do not need to run the Preprocessing before the Statistics. Example Files are added.
 
 
 
