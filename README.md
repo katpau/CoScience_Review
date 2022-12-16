@@ -2,15 +2,54 @@
 
 This Repository contains all Preprocessing and Analytical functions used in in the CoScience Project
 
-######################################################### 
 
-***To Run the Test, open and run TEST_RDF.m (or any of the other TEST Files)***
 
-#########################################################
+## How to run the test?
+
+***To Run the Test, across all forking options:***
+
+run **TEST_RDF.m** for the preprocessing
+
+run **TEST_RDF_Stats.R** for the statistical analyses
+
+
+
+***Change the Analysis Name to what analysis you want to test***
+ * Alpha_Resting (Cassie)
+ * Alpha_Context (Kat)
+ * Error_MVPA (Elisa)
+ * Flanker_Conflict (Corinna)
+ * Gambling_RewP (Anja)
+ * Gambling_N300H (Erik)
+ * GoNoGo_Conflict (Andre)
+ * Ultimatum_Offer (Jojo)
+
+## Can I run the code line by line if I suspect something is wrong?
+Yes, please use the **Troubleshooting_RDF_** scripts for this. It is explained there how to use it.
+
+
+
+## Before You Get Started
+
+Before Starting, please familiarize yourself a bit with github. 
+
+Christoph has prepared this excellent introduction:
+[GitHub_tutorial.pdf](https://github.com/katpau/CoScience_Review/files/10229627/GitHub_tutorial.pdf)
+
+
+And a bit of practical information on how to deal with this code here is collected here:
+[GitHub_Welcome.pdf](https://github.com/katpau/CoScience_Review/files/10229647/GitHub_Welcome.pdf)
+
+
+
+
+
+
+## More Details
 
 
 In detail, the folders contain
-* **Analysis_Functions** - contain all EEGLAB functions, including plugins, functions to export in BIDS format etc. and custom made functions to handle the forking
+* **Analysis_Functions** - contain all EEGLAB functions, including plugins, functions to export in BIDS format etc. and custom made functions to handle the forking or functions for easier peak detection etc.
 
 * **Step_Functions** - for the different analyses and preprocessing the corresponding step functions. Each step function lists all choices (and conditions for these choices). These functions are called in the parfor_Forks scripts. These are the scripts you should focus on when reviewing the analysis.
 
@@ -25,10 +64,11 @@ All of these files above are compiled, depending on the analysis (e.g. for Alpha
 
 
 * **Only_ForGit_To_TestRun** - includes some files that are only included to test the Scripts. The test scripts are adjusted to mirror the behaviour of the job scheduler on the high performance cluster. If the scripts are run, the data will be calculated here. The folders are:
-                        
-    * **RawData**  - contains the eeg + behavioral data from three subjects from the resting and stroop task in the BIDS format
+
+    * **BehaviouralData** - contains Behavioural Data of Tasks where relevant
     
-    * **ForkingFiles** - contains the files that inform about the forking combinations, contains the following for each analysis (Alpha_Context, Stroop_LPP)
+    
+    * **ForkingFiles** - contains the files that inform about the forking combinations, contains the following for each analysis (Alpha_Context, Flanker_Conflict ...)
         * *DESIGN.mat* - overview of all Steps, their order, choices, and conditions (e.g. look for bad IC components only when ICA was calculated). Also contains information if intermediate Step should be saved. [For now Data is only saved after Line Noise Filter and the later Low Pass Filter, and the final quantification] This information has been read out of the headers of the Step_Function Files, thats why they should not be changed
         * *FORKS.mat* - list of randomly drawn Forking combinations. For this test these are only 75 very different combinations. Ultimately these will be over 1000
                       and distributed across two to six files. The forks are listed in terms of theire choices (for each step), separated by %
@@ -47,21 +87,25 @@ All of these files above are compiled, depending on the analysis (e.g. for Alpha
                                 file) is saved as txt
          * *Statistics* - a Logfile from R running the stats  is saved as txt
                                                          
-     * **Alpha_Context** - Folder for each Analysis, with the "task-" subfolders. These contain the intermediate and final Forking Steps of the 
+     * **Preproc_forked** - contains a folder for each Analysis, with the "task-" subfolders. These contain the intermediate and final Forking Steps of the 
                     Preprocessing. Generates a Folder for each task 
-         * **task-Resting /Stroop** ..., each of them contains a lot of folders. The forks are coded by number (not name as it would exceed max file names). The folders then contain
+         * **task-Resting ** ..., each of them contains a lot of folders. The forks are coded by number (not name as it would exceed max file names). The folders then contain
             * *.mat* for the Subject, including the preprocessed data, information on the lab and previous steps etc.
             * *error.mat* if there was an error with this step, these files are used to terminate the processing of a fork with a similiar stephistory
             * *running.mat* if step is going to be saved and is currently in progress, this interim file is created and deleted as soon as the file is   saved
-          * **Group_Data** - contains two example files where all information from all single subjects of one fork are merged across all tasks [only 50 subjects for testing, otherwise it takes too long]
+         
+         * **Group_Data** - contains two example files where all information from all single subjects of one fork are merged across all tasks [50 subjects with fake data!]
                   
     
-    * **QuestionnaireData/Alpha_Context** contains 4 txt files where the relevant Personality Scores have been extracted, they differ if they are "filtered" (attention 
+    * **QuestionnaireData** contains folder for each analysis. Each folder contains...
+            * 4 csv files where the relevant Personality Scores have been extracted, they differ if they are "filtered" (attention 
                         checks and RT cutoffs applied or not) and if "outliers were removed" (based on mahalanobis)
+            * 4 csv files describing the factor analysis
     
-    * **BehaviouralData** - contains taks_StroopRating_beh.txt which lists the Ratings (Valence/Arousal) of the pictures for each subject 
-      
+     * **Questionnaire_Prep** - contains R scripts to extract relevant questionnaire data (includes the Factor analysis!)
      
+     * **RawData**  - contains the eeg + behavioral data from three subjects from the task in the BIDS format
+
          
                      
                       

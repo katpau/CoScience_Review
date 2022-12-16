@@ -1,11 +1,8 @@
 # ignore the following file types
 .DS_Store
+
 # ignore folder with precomputed data to not upload similar calculations:
 **/Only_ForGit_To_TestRun/Logs/*
-**/Only_ForGit_To_TestRun/Alpha_Context/task*
-**/Only_ForGit_To_TestRun/Alpha_Context/Stats_Results/*
-**/Only_ForGit_To_TestRun/LPP_Stroop/task*
-**/Only_ForGit_To_TestRun/LPP_Stroop/Stats_Results/*
 **/Only_ForGit_To_TestRun/Preproc_forked/GoNoGo_Conflict/task*
 **/Only_ForGit_To_TestRun/Preproc_forked/GoNoGo_Conflict/Stats*
 **/Only_ForGit_To_TestRun/Preproc_forked/Alpha_Context/task*
@@ -26,6 +23,7 @@
 **/Only_ForGit_To_TestRun/Preproc_forked/Ultimatum_Offer/task*
 **/Only_ForGit_To_TestRun/Preproc_forked/Ultimatum_Offer/Stats*
 **/Only_ForGit_To_TestRun/Preparing_PersonalityData/Test*
+
 # Also ignore incomplete/untested scripts
 **/Only_ForGit_To_TestRun/ForkingFiles/Flanker_Error*
 **/Only_ForGit_To_TestRun/ForkingFiles/Flanker_Error*
@@ -34,3 +32,10 @@
 **/Step_Functions/Quantification_Gambling_RewP_Relative/*
 **/Step_Functions/Quantification_Error_Perfectionism/*
 **/Step_Functions/Statistics_Error_Perfectionism/*
+
+# other files
+**/Only_ForGit_To_TestRun/Logs/*
+**/Step_Functions/Quantification_Flanker_ERN/*
+
+
+
