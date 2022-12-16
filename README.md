@@ -54,7 +54,7 @@ And a bit of practical information on how to deal with this code here is collect
 In detail, the folders contain
 * **Analysis_Functions** - contain all EEGLAB functions, including plugins, functions to export in BIDS format etc. and custom made functions to handle the forking or functions for easier peak detection etc.
 
-* **Step_Functions** - for the different analyses and preprocessing the corresponding step functions. Each step function lists all choices (and conditions for these choices). These functions are called in the parfor_Forks scripts. These are the scripts you should focus on when reviewing the analysis.
+* **Step_Functions** - ***for the different analyses and preprocessing the corresponding step functions. Each step function lists all choices (and conditions for these choices). These functions are called in the parfor_Forks scripts. These are the scripts you should focus on when reviewing the analysis.***
 
 * **Parfor_Functions** - functions to run the forking (for one subject) in parallel, checking which path should be calculated.
                     They include 2 important functions: parfor_Forks and parfor_Forks_Other. The first one is for the primary analysis carried out
