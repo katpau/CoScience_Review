@@ -12,20 +12,23 @@ run **TEST_RDF.m** for the preprocessing
 
 run **TEST_RDF_Stats.R** for the statistical analyses
 
+!! You do not need to run the Preprocessing before the Statistics. Example Files are added.
 
 
 ***Change the Analysis Name to what analysis you want to test***
  * Alpha_Resting (Cassie)
  * Alpha_Context (Kat)
- * Error_MVPA (Elisa)
- * Flanker_Conflict (Corinna)
- * Gambling_RewP (Anja)
- * Gambling_N300H (Erik)
- * GoNoGo_Conflict (Andre)
- * Ultimatum_Offer (Jojo)
+ * Error_MVPA (Elisa, Jutta)
+ * Flanker_Conflict (Corinna, Christoph, Alex)
+ * Gambling_RewP (Anja, Hannes, Kai)
+ * Gambling_N300H (Erik, Phillip)
+ * GoNoGo_Conflict (Andre, Vera)
+ * Ultimatum_Offer (Jojo, Johannes)
 
 ## Can I run the code line by line if I suspect something is wrong?
 Yes, please use the **Troubleshooting_RDF_** scripts for this. It is explained there how to use it.
+
+!! You do not need to run the Preprocessing before the Statistics. Example Files are added.
 
 
 
@@ -51,7 +54,7 @@ And a bit of practical information on how to deal with this code here is collect
 In detail, the folders contain
 * **Analysis_Functions** - contain all EEGLAB functions, including plugins, functions to export in BIDS format etc. and custom made functions to handle the forking or functions for easier peak detection etc.
 
-* **Step_Functions** - for the different analyses and preprocessing the corresponding step functions. Each step function lists all choices (and conditions for these choices). These functions are called in the parfor_Forks scripts. These are the scripts you should focus on when reviewing the analysis.
+* **Step_Functions** - ***for the different analyses and preprocessing the corresponding step functions. Each step function lists all choices (and conditions for these choices). These functions are called in the parfor_Forks scripts. These are the scripts you should focus on when reviewing the analysis.***
 
 * **Parfor_Functions** - functions to run the forking (for one subject) in parallel, checking which path should be calculated.
                     They include 2 important functions: parfor_Forks and parfor_Forks_Other. The first one is for the primary analysis carried out
