@@ -7,7 +7,8 @@ Center = function(input = NULL, choice = NULL) {
   ## Contributors
   # Last checked by KP 12/22
   # Planned/Completed Review by:
-
+  # CS 01/23
+  
   # Handles all Choices listed above 
   # Normalizes the predictors (e.g. behavioral and personality) data within all conditions
   # (1) Center Personality Variables
