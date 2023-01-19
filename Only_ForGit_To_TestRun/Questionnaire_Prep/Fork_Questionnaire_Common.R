@@ -1,6 +1,8 @@
 
-###################################################################################################
-## Prepare Files
+################################################################################
+
+# 0. Prepare Files #############################################################
+
 FolderQuestData = paste0(Root, "/Raw/")
 OutputFolder = paste0(Root,"/Test-",
                       TaskName, "/")
@@ -11,9 +13,7 @@ Helperfile = paste0(Root, "/Raw/Fragebogen_OutputÜbersicht.csv")
 
 
 
-##########################################################
-### Get Information on Item Level (for Reliability!)
-##########################################################
+# 1. Get Information on Item Level (for Reliability!) ##########################
 
 # Load HelperFile
 Helperfile = read.csv(Helperfile, header = TRUE, sep = ";")
@@ -40,9 +40,7 @@ weight_Items = lengths(Idx_Scales[Allrelevant_Subscales])
 
 
 
-##########################################################
-### Adjust Raw Data (reverse coding, outliers)
-##########################################################
+# 2. Adjust Raw Data (reverse coding, outliers) ################################
 
 # Depending on Combination (Attention Checks + Outliers based on RT), load the different 
 # files with the Scores (for each subscale)
@@ -76,9 +74,8 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     Items_Data = Items_Data[,c("ID", unlist(Names_Items))]
     
    
-    ###################################################
-    # Check for Outliers in Personality Data based on Mahalanobis Distance
-    ###################################################
+    ## 2.1. Check for Outliers in Personality Data based on Mahalanobis Distance ####
+
     if (Outliers_Applied == 1){
       # Determine Outliers based on all (possibly) relevant Subscales
       ToTestforOutliers = Score_Data[,Maha_Subscales]
@@ -104,9 +101,10 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
 
  
     if (Do_ZScores == 1) {
-    ##########################################################
-    ### Calculate Cronbach Alpha for each Subscale
-    ##########################################################
+
+      
+    ## 2.2 Calculate Cronbach Alpha for each Subscale ##########################
+
     z_ScoreCollumns = unique(c(unlist(Z_Scores_Average), unlist(Z_Scores_Sum)))
     weight_Reliability = weight_Items
     for (iSubscale in 1:length(z_ScoreCollumns)) {
@@ -114,9 +112,9 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
       weight_Reliability[iSubscale] = Test_Alpha$total$raw_alpha
     }
     
-    ##########################################################
-    ### Calculate Z Scores of Personality Variable
-    ##########################################################
+
+    ## 2.3. Calculate Z Scores of Personality Variable #########################
+
     Z_Score_Data = data.frame( Score_Data$ID)
     colnames(Z_Score_Data) = "ID"
    
@@ -153,9 +151,10 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
  
     }
     if (Do_PCA == 1) {
-    ##########################################################
-    ### Calculate PCA across Subscales
-    ##########################################################
+
+      
+    ## 2.4 Calculate PCA across Subscales ######################################
+
     PCA_Subset = na.omit(Score_Data[,c("ID", PCA_Subscales)])
     
     PCA_FirstFactor = prcomp(PCA_Subset[,2:ncol(PCA_Subset)])$x[, 1] # scale = TRUE???
@@ -163,9 +162,9 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     colnames(PCA_FirstFactor) = c("ID", "Personality_PCA")
     
     
-    ##########################################################
-    ### Calculate Factor Analysis across Subscales
-    ##########################################################
+
+    ## 2. 5 Calculate Factor Analysis across Subscales #########################
+
     ## An oblique rotation and analysis of all factors from a factor analysis (including all relevant subscales).
     # The factor analysis is estimated using a PCA, a promax rotation (with Kappa=4) is applied.
     # Parallel Analysis is used as a method for the number of factors to extract. Component scores are computed
@@ -208,10 +207,8 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     
     
     
-   
-    ##########################################################
-    # Second PCA/Factor Analysis
-    ##########################################################
+    ## 2.6. Second PCA/Factor Analysis #########################################
+
     
     ### If second PCA should be run (only selected Analysis)
     if (TaskName == "Alpha_Resting") {
@@ -264,9 +261,9 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     }}
 
     
-    ##########################################################
-    ### Get Scores for the Personality Variable
-    ##########################################################  
+
+    ## 2.7. Get Scores for the Personality Variable ############################
+
     # Scores from Subscales
     if (length(Scored_Subscales) > 0) {
       Score_Subscales = Score_Data[, Scored_Subscales]
@@ -275,9 +272,9 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     }
 
     
-    ##########################################################
-    ### Get Scores for the Covariates
-    ##########################################################  
+
+    ## 2.8. Get Scores for the Covariates ######################################
+
     # Scores from Subscales
     if (length(Covariates_Subscales) > 0) {
       Covariates = Score_Data[, Covariates_Subscales]
@@ -285,17 +282,17 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
       Covariates = NULL
     }
     
-    ##########################################################
-    # Some Special Concepts
-    ##########################################################
+
+    ## 2.9. Some Special Concepts ##############################################
+
     
    if (TaskName == "Ultimatum_Offer") {
      Score_Subscales$AVBIS = rowMeans(Score_Data[,c("BISBAS_BIS", "RSTPQ_BIS")])
    }
     
-    ##########################################################
-    ### Merge and export Data
-    ##########################################################  
+
+    ## 2.10. Merge and export Data #############################################
+
     ## Merge Data
     colnames(Score_Subscales) = paste0("Personality_", colnames(Score_Subscales))
     colnames(Covariates) = paste0("Covariate_", colnames(Covariates))
@@ -352,4 +349,6 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     }
 
   
-}}
+  }}
+
+################################################################################
