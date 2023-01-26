@@ -129,7 +129,17 @@ RetryError="0" ; % usually, if error ocurrs, stop step and all combinations that
 ParPools="3"; % how many parallel instances can be run
 PrintLocation = "0"; % some lines can be printed to console to make it easier to navigate errors (change to "1" if desired)
 
+
 parfor_Forks(IndexSubjectsSubset,      ListFile,  DesignFile, ForkingFile, OutputFolder, ...
     RawFolder, MatlabAnalysisName, MaxStep,    RetryError, LogFolder, ParPools, PrintLocation)
+
+
+% if only Main Path needs to be run comment out call parfor_Forks above and
+% use this instead
+
+%SubjectListFile=strcat(RootFolder, "Only_ForGit_To_TestRun/ForkingFiles/", AnalysisName, "/List_Subjects-Main.csv");
+%parfor_MainPath(IndexSubjectsSubset, SubjectListFile, DesignFile, ForkingFile, OutputFolder, ...
+%    RawFolder, MatlabAnalysisName, "10", RetryError, LogFolder, ParPools, PrintLocation)
+
 
 % CS: comment for testing commits
