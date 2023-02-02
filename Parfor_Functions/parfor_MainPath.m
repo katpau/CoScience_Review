@@ -60,7 +60,12 @@ Steps = Steps(Order(:,1));
 
 
 %% Load OUTPUT File with List of Forks
-OUTPUT_Name = OUTPUT;
+
+% [elisa] COMMENTED to solve dir issue line 200
+%OUTPUT_Name = OUTPUT;
+
+% [elisa] ADDED to solve dir issue line 200
+[~, OUTPUT_Name] = fileparts(OUTPUT);
 if isstring(OUTPUT) || ischar(OUTPUT)
     RetryLoad = 0; SuccessfulLoad = 0;
     while RetryLoad <200 & SuccessfulLoad == 0% Parfor sometimes has problems with loading
@@ -83,7 +88,7 @@ OutputFolder = fullfile(OutputFolder);
 if ~exist(OutputFolder, 'dir'); mkdir(OutputFolder); end
 ErrorFolder = strcat(LogFolder, "ErrorMessages/");
 if ~exist(ErrorFolder, 'dir'); mkdir(ErrorFolder); end
-CompletionFolder =strcat(LogFolder, "/CompletionStatus/");
+CompletionFolder =strcat(LogFolder, "CompletionStatus/"); % [elisa] REMOVED Slash before CompletionStatus to solve dir issue line 200
 if ~exist(CompletionFolder, 'dir'); mkdir(CompletionFolder); end
 
 
@@ -227,7 +232,7 @@ CountPreviouslyCompletedOUT = zeros(size(RetryForkOUT));
 
 % Loop through all Forking Combinations
 % change to for (instead of parfor if checking manualy)
-parfor iSubject = 1:length(Subjects)
+for iSubject = 1:length(Subjects) % [elisa] CHANGED parfor to for to test mainpath
     try
         Subject = Subjects{iSubject};
         iPath = 1;
