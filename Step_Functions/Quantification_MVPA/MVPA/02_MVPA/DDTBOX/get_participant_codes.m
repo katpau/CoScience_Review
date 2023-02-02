@@ -1,4 +1,4 @@
-function [participant_codes] = get_participant_codes(bdir, input_dir)
+function [participant_codes] = get_participant_codes(input_dir)
 
 % this function gets participant codes from the file where the data is
 % stored

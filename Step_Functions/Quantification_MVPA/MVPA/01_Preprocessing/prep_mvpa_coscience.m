@@ -37,7 +37,7 @@ chan_dir = [bdir 'Step_Functions\Quantification_MVPA\MVPA\02_MVPA\locations\']; 
 
 %% extract participant code
 
-participant_codes = get_participant_codes(bdir, input_dir);
+participant_codes = get_participant_codes(input_dir);
 part_code = participant_codes(part) %Informing in the command window about which participant is being processed. 
 filename = [input_dir, char(part_code), '.mat'];
 EEG_data = load(filename);
@@ -48,7 +48,7 @@ events = struct2table(EEG_data.Data.data.EEG.event);
 events_response = events(strcmp(events.Event, 'Response'),:);
 
 if AnalysisName == "Flanker_MVPA"
-    for i = 1:(height(events_response));
+    for i = 1:(height(events_response))
         if events_response.ACC(i) == 1
            events_response.responsetype(i) = 1;
         elseif events_response.ACC(i) == 0
@@ -58,7 +58,7 @@ if AnalysisName == "Flanker_MVPA"
         end
     end
 elseif AnalysisName == "GoNoGo_MVPA" 
-    for i = 1:(height(events_response));
+    for i = 1:(height(events_response))
         if strcmp(events_response.Type(i), 'Go') && events_response.ACC(i) == 1
         events_response.responsetype(i) = 1;
         elseif strcmp(events_response.Type(i), 'NoGo') && events_response.ACC(i) == 0
@@ -103,7 +103,8 @@ for i = 1:length(EEG_data.Data.data.EEG.data_correct(1,1,:))
  for i = 1:length(EEG_data.Data.data.EEG.data_error(1,1,:))
      if EEG_data.Data.data.EEG.data_error(:,:,i) == 0
         empty_rows_error(i) = 1;
-     else empty_rows_error(i) = 0;
+     else 
+         empty_rows_error(i) = 0;
      end
  end
  all_empty_correct = sum(empty_rows_correct);
