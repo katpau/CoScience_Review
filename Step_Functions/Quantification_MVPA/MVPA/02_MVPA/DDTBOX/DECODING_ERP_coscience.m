@@ -276,6 +276,16 @@ if STUDY.equal_n == 1
     
     % Find the smallest trial number
     n_trials_min = min(n_trials);
+    % [elisa] ADDED to stop analyses when trials < 10
+    if n_trials_min < 10
+        fprintf('The minimum trial number is %d. At least 10 trials are needed. Ending analyses.', n_trials_min);
+%         ErrorMessage = "Not enough trials.";
+%         for ierrors = 1:length(e.stack)
+%         ErrorMessage = strcat(ErrorMessage, "//", num2str(e.stack(ierrors).name), ", Line: ",  num2str(e.stack(ierrors).line));
+%         end
+%         OUTPUT.Error = ErrorMessage;
+        return
+    end
     eeg_sorted_cond_new = eeg_sorted_cond;
     
     % Randomly pick n_min trials for each condition
