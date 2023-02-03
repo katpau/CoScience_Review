@@ -127,7 +127,8 @@ if max(IndexSubjects) > length(Subjects)
     IndexSubjects = IndexSubjects(ismember(IndexSubjects, 1:length(Subjects)));
 end
 
-if length(IndexSubjects) == 0
+%[elisa] CHANGED length == 0 to isempty for faster processing
+if isempty(IndexSubjects)
     fprintf('Index for Subset %d does not contain any subjects.\n', IndexSubjects);
     return
 end
