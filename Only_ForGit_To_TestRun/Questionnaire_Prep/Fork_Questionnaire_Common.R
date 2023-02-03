@@ -17,6 +17,7 @@ Helperfile = paste0(Root, "/Raw/Fragebogen_OutputÜbersicht.csv")
 
 # Load HelperFile
 Helperfile = read.csv(Helperfile, header = TRUE, sep = ";")
+
 # Restructrue Helperfile so that it is long format
 Add = Helperfile[Helperfile$Subskala2 != "", ]
 Add$Subskala1 = Add$Subskala2
@@ -25,7 +26,6 @@ Add = Helperfile[Helperfile$Subskala3 != "", ]
 Add$Subskala1 = Add$Subskala3
 Helperfile = rbind(Helperfile, Add)
 Helperfile$Fragebogenkürzel = as.character(Helperfile$Fragebogenkürzel)
-
 
 # Determine Items of all Scales
 Idx_Scales = sapply(Allrelevant_Subscales, grep, as.character(Helperfile$Subskala1))
@@ -74,7 +74,7 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     Items_Data = Items_Data[,c("ID", unlist(Names_Items))]
     
    
-    ## 2.1. Check for Outliers in Personality Data based on Mahalanobis Distance ####
+    ## 2.1 Check for Outliers in Personality Data based on Mahalanobis Distance ####
 
     if (Outliers_Applied == 1){
       # Determine Outliers based on all (possibly) relevant Subscales
@@ -113,7 +113,7 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     }
     
 
-    ## 2.3. Calculate Z Scores of Personality Variable #########################
+    ## 2.3 Calculate Z Scores of Personality Variable ##########################
 
     Z_Score_Data = data.frame( Score_Data$ID)
     colnames(Z_Score_Data) = "ID"
@@ -163,7 +163,7 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     
     
 
-    ## 2. 5 Calculate Factor Analysis across Subscales #########################
+    ### 2.4.1 Calculate Factor Analysis across Subscales #######################
 
     ## An oblique rotation and analysis of all factors from a factor analysis (including all relevant subscales).
     # The factor analysis is estimated using a PCA, a promax rotation (with Kappa=4) is applied.
@@ -207,7 +207,7 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     
     
     
-    ## 2.6. Second PCA/Factor Analysis #########################################
+    ### 2.4.2 Second PCA/Factor Analysis #######################################
 
     
     ### If second PCA should be run (only selected Analysis)
@@ -261,8 +261,11 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     }}
 
     
+    ## 2.5 Calculate CFA for Cognitive Effort Investment #######################
+    
+    
 
-    ## 2.7. Get Scores for the Personality Variable ############################
+    ## 2.6 Get Scores for the Personality Variable #############################
 
     # Scores from Subscales
     if (length(Scored_Subscales) > 0) {
@@ -273,7 +276,7 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
 
     
 
-    ## 2.8. Get Scores for the Covariates ######################################
+    ## 2.7 Get Scores for the Covariates #######################################
 
     # Scores from Subscales
     if (length(Covariates_Subscales) > 0) {
@@ -283,7 +286,7 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
     }
     
 
-    ## 2.9. Some Special Concepts ##############################################
+    ## 2.8 Some Special Concepts ###############################################
 
     
    if (TaskName == "Ultimatum_Offer") {
@@ -291,7 +294,7 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
    }
     
 
-    ## 2.10. Merge and export Data #############################################
+## 3. Merge and export Data ####################################################
 
     ## Merge Data
     colnames(Score_Subscales) = paste0("Personality_", colnames(Score_Subscales))
