@@ -54,22 +54,19 @@ try
         Condition_Triggers = [211; 220 ]; %Responses Speed/Acc emphasis
         Condition_Names = ["GoNoGo_Correct", "GoNoGo_Error"];
     end
+    
     % [elisa] CHANGED time window from -0.500 0.800 to -0.300 0.300
     Event_Window = [-0.300 0.300]; % Epoch length in seconds
     NrConditions = length(Condition_Names);
-    
-    
+   
     % Get Info on Electrodes for LRP
     Electrodes = upper(strsplit(INPUT.StepHistory.Electrodes , ","));
-    Electrodes = strrep(Electrodes, " ", "");
-    
-    
+    Electrodes = strrep(Electrodes, " ", "");    
     
     % Loop Through the conditions like this?
     for i_Cond = 1:NrConditions
         (Condition_Names(i_Cond))
-        pop_epoch( EEG, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');
-        
+        pop_epoch(EEG, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');
         
         
         % ********************************************************************************************
@@ -78,13 +75,9 @@ try
         
         % Remove interpolated channels => INPUT.AC.EEG.Bad_Channel_Names
         
-        
-        % ********************************************************************************************
-        % **** Prepare MVPA            ***************************************************************
-        % ********************************************************************************************
-        
         % also: count epochs, prepare some kind of SME
         
+
     end
     
     % Export should have format like this:
