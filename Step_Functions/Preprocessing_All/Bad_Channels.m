@@ -114,8 +114,10 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 e.message = 'All Channels marked as bad (100%!!) .';
                 error(e.message);
             end
-            EEG = pop_interp(EEG, find(~Clean_Channel_Mask), 'spherical');
-            EEG = eeg_checkset( EEG );
+            if ~contains(INPUT.AnalysisName, "MVPA")
+                EEG = pop_interp(EEG, find(~Clean_Channel_Mask), 'spherical');
+                EEG = eeg_checkset( EEG );
+            end
         end
         
     end
