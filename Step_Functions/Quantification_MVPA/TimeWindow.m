@@ -60,8 +60,7 @@ try
     NrConditions = length(Condition_Names);
    
     % Get Info on Electrodes for LRP
-    Electrodes = upper(strsplit(INPUT.StepHistory.Electrodes , ","));
-    Electrodes = strrep(Electrodes, " ", "");    
+    Electrodes = upper(strsplit(EEG_data.Data.StepHistory.Electrodes, ", ")); %[elisa] changed how electrodes are stored to use strcmp in prep_lrp
     
     % Loop Through the conditions like this?
     for i_Cond = 1:NrConditions
