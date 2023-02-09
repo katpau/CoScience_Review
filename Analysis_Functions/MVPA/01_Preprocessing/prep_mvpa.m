@@ -1,6 +1,6 @@
 function prep_mvpa(part)
 
-%% This function preprocessed the EEG and behavioural data and sorts them into the following conditions:
+%% This function preprocesses the EEG and behavioural data and sorts them into the following conditions:
 
 % flanker task:
 % correct
@@ -20,24 +20,34 @@ window_end = 300;
 window_length = window_end - window_start;
 dppt = window_length/2;
 
+global AnalysisName;
+global bdir;
+
 %% Specifications
-AnalysisName = "Flanker_MVPA";
-
-bdir = 'C:\Users\elisa\Documents\GitHub\CoScience_Review\'; % Base directory
-
 if AnalysisName == "Flanker_MVPA"
-    input_dir = [bdir 'Only_ForGit_To_TestRun\Preproc_forked\Error_MVPA\task-Flanker\1.1_2.1_3.1_4.1_5.1_6.1_7.1_8.1_9.1_10.1_11.1_12.1_13.1_14.1_15.1/'];   %Folder containing the raw data
-    output_dir = [bdir 'Analysis_Functions\MVPA\01_Preprocessing\PreprocessedData\flanker\'];      %Folder where the preprocessed data is to be stored 
+    input_dir = [bdir '\Only_ForGit_To_TestRun\Preproc_forked\Error_MVPA\task-Flanker\1.1_2.1_3.1_4.1_5.1_6.1_7.1_8.1_9.1_10.1_11.1_12.1_13.1_14.1_15.1/'];   %Folder containing the raw data
+    output_dir = [bdir '\Analysis_Functions\MVPA\01_Preprocessing\PreprocessedData\flanker\'];      %Folder where the preprocessed data is to be stored 
  elseif AnalysisName == "GoNoGo_MVPA" 
-    input_dir = [bdir 'Only_ForGit_To_TestRun\Preproc_forked\Error_MVPA\task-GoNoGo\1.1_2.1_3.1_4.1_5.1_6.1_7.1_8.1_9.1_10.1_11.1_12.1_13.1_14.1_15.1/'];   %Folder containing the raw data
-    output_dir = [bdir 'Analysis_Functions\MVPA\01_Preprocessing\PreprocessedData\go_nogo\'];      %Folder where the preprocessed data is to be stored Preprocessed Data
+    input_dir = [bdir '\Only_ForGit_To_TestRun\Preproc_forked\Error_MVPA\task-GoNoGo\1.1_2.1_3.1_4.1_5.1_6.1_7.1_8.1_9.1_10.1_11.1_12.1_13.1_14.1_15.1/'];   %Folder containing the raw data
+    output_dir = [bdir '\Analysis_Functions\MVPA\01_Preprocessing\PreprocessedData\go_nogo\'];      %Folder where the preprocessed data is to be stored Preprocessed Data
 end
 
-chan_dir = [bdir 'Analysis_Functions\MVPA\02_MVPA\locations\']; %Folder where channel locations are to be stored
+chan_dir = [bdir '\Analysis_Functions\MVPA\02_MVPA\locations\']; %Folder where channel locations are to be stored
 
 %% extract participant code
 
-participant_codes = get_participant_codes(input_dir);
+files = struct2table(dir(fullfile(input_dir,'*.mat')));
+participant_filenames = files.name;
+participant_codes = cell(size(participant_filenames));
+
+for i = 1:length(participant_filenames)
+    
+    id = participant_filenames{i};
+    participant_codes{i} = id(1:(length(id)-4));
+    
+end
+
+
 part_code = participant_codes(part) %Informing in the command window about which participant is being processed. 
 filename = [input_dir, char(part_code), '.mat'];
 EEG_data = load(filename);
