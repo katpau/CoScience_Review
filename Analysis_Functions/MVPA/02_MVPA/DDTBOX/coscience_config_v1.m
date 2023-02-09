@@ -21,7 +21,8 @@ function coscience_config_v1
 global SLIST;
 global SBJTODO;
 global CALL_MODE;
-
+global AnalysisName;
+global bdir;
 
 %% ABOUT THIS SCRIPT
 %Normal classification
@@ -32,16 +33,14 @@ global CALL_MODE;
 % Decide whether to save the SLIST structure and EEG data in a .mat file
 savemode = 0; % 1 = Save the SLIST as a mat file; 0 = Don't save the SLIST
 
-bdir = 'C:\Users\elisa\Documents\GitHub\CoScience_Review\Analysis_Functions\MVPA\'; % Base directory
-AnalysisName = "Flanker_MVPA";
 if AnalysisName == "Flanker_MVPA"
-    input_dir = [bdir '01_Preprocessing\PreprocessedData\flanker\']; % Directory in which the decoding results will be saved
-    output_dir = [bdir '02_MVPA\DECODING_RESULTS\level_1\flanker\']; % Directory in which the decoding results will be saved
-    output_dir_group = [bdir '02_MVPA\DECODING_RESULTS\level_2\flanker\']; % Directory in which the group level results will be saved
-elseif AnalysisName == "GoNoGo_MVPA" 
-    input_dir = [bdir '01_Preprocessing\PreprocessedData\go_nogo\']; % Directory in which the decoding results will be saved
-    output_dir = [bdir '02_MVPA\DECODING_RESULTS\level_1\go_nogo\']; % Directory in which the decoding results will be saved
-    output_dir_group = [bdir '02_MVPA\DECODING_RESULTS\level_2\go_nogo\']; % Directory in which the group level results will be saved
+    input_dir = [bdir '\Analysis_Functions\MVPA\01_Preprocessing\PreprocessedData\flanker\']; % Directory in which the decoding results will be saved
+    output_dir = [bdir '\Analysis_Functions\MVPA\02_MVPA\DECODING_RESULTS\level_1\flanker\']; % Directory in which the decoding results will be saved
+    output_dir_group = [bdir '\Analysis_Functions\MVPA\02_MVPA\DECODING_RESULTS\level_2\flanker\']; % Directory in which the group level results will be saved
+elseif STUDY.AnalysisName == "GoNoGo_MVPA" 
+    input_dir = [bdir '\Analysis_Functions\MVPA\01_Preprocessing\PreprocessedData\go_nogo\']; % Directory in which the decoding results will be saved
+    output_dir = [bdir '\Analysis_Functions\MVPA\02_MVPA\DECODING_RESULTS\level_1\go_nogo\']; % Directory in which the decoding results will be saved
+    output_dir_group = [bdir '\Analysis_Functions\MVPA\02_MVPA\DECODING_RESULTS\level_2\go_nogo\']; % Directory in which the group level results will be saved
 end
 
 sbj_code = get_participant_codes(input_dir);
@@ -65,7 +64,7 @@ sn = SBJTODO;
     SLIST.nchannels = 61; % Number of channels in the dataset
     SLIST.channels = 'ChannelLabels'; 
     SLIST.channel_names_file = 'channel_inf.mat'; % Name of the .mat file containing channel information
-    SLIST.channellocs = [bdir '02_MVPA\locations\']; % Directory of the .mat file containing channel information
+    SLIST.channellocs = [bdir '\Analysis_Functions\MVPA\02_MVPA\locations\']; % Directory of the .mat file containing channel information
     SLIST.eyes = []; % Channel indices of ocular electrodes
     SLIST.extra = []; % Channel indices of electrodes to exclude from the classification analyses
     
