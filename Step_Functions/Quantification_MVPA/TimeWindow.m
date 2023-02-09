@@ -58,25 +58,11 @@ try
     % [elisa] CHANGED time window from -0.500 0.800 to -0.300 0.300
     Event_Window = [-0.300 0.300]; % Epoch length in seconds
     NrConditions = length(Condition_Names);
-   
-    % Get Info on Electrodes for LRP
-    Electrodes = upper(strsplit(EEG_data.Data.StepHistory.Electrodes, ", ")); %[elisa] changed how electrodes are stored to use strcmp in prep_lrp
     
     % Loop Through the conditions like this?
     for i_Cond = 1:NrConditions
         (Condition_Names(i_Cond))
-        pop_epoch(EEG, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');
-        
-        
-        % ********************************************************************************************
-        % **** Prepare LRP jack knife   **************************************************************
-        % ********************************************************************************************
-        
-        % Remove interpolated channels => INPUT.AC.EEG.Bad_Channel_Names
-        
-        % also: count epochs, prepare some kind of SME
-        
-
+        pop_epoch(EEG, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');     
     end
     
     % Export should have format like this:
