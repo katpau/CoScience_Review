@@ -1,17 +1,9 @@
-Steps for running MVPA
+Running MVPA
 
-(1) Preprocessing
-
-- Open prep_mvpa
-  - Under Specifications, change directories and AnalysisName
-- Run prep_mvpa_all(first_part, last_part)
-  - Input arguments: first_part = index of first id to run (e.g. 1), last_part = index of last id to run (e.g. 720)
-
-(2) MVPA
-
-- Open coscience_config_v1
-  - Under General Study Parameters, change directory bdir and AnalysisName
-- Open runall
-  - Under Specifications insert index of participants to run
-- Run runall for first-level analyses
-- Run ANALYSE_DECODING_ERP('coscience',1,0,'all',1) for second-level analyses
+(1) Open script run_mvpa
+(2) Make specifications: 
+    first_part = index of first participant in folder Preproc_forked/... to analyse
+    last_part = index of last participant in folder  Preproc_forked/... to analyse 
+    participants = index of participants in PreprocessedData to analyse
+    AnalysisName = "Flanker_MVPA" or "GoNoGo_MVPA" 
+(3) run script
