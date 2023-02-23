@@ -1,4 +1,4 @@
-   %% This scripts runs all mvpa analyses
+ %% This scripts runs all mvpa analyses
 
 %% Specifications
 %Preprocessing
