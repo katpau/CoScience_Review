@@ -1,20 +1,15 @@
 %% This script computes the LRP
 
-%% Specifications
-AnalysisName = "Flanker_MVPA";
-
-%% Add relevant paths
-bdir = pwd; % Base directory
-addpath(genpath(strcat(bdir, "/Only_ForGit_to_TestRun/")))
-addpath(genpath(strcat(bdir, "/Analysis_Functions/LRP/")))
+global AnalysisName;
+global bdir;
 
 %% directories
 if AnalysisName == "Flanker_MVPA"
     input_dir = [bdir '\Only_ForGit_To_TestRun\Preproc_forked\Error_MVPA\task-Flanker\1.1_2.1_3.1_4.1_5.1_6.1_7.1_8.1_9.1_10.1_11.1_12.1_13.1_14.1_15.1/'];   %Folder containing the raw data
-    output_dir = [bdir '\Analysis_Functions\LRP\01_Preprocessing\PreprocessedData\flanker\'];      %Folder where the preprocessed data is to be stored 
+    output_dir = [bdir '\Analysis_Functions\LRP\preprocessed_data\flanker\'];      %Folder where the preprocessed data is to be stored 
  elseif AnalysisName == "GoNoGo_MVPA" 
     input_dir = [bdir '\Only_ForGit_To_TestRun\Preproc_forked\Error_MVPA\task-GoNoGo\1.1_2.1_3.1_4.1_5.1_6.1_7.1_8.1_9.1_10.1_11.1_12.1_13.1_14.1_15.1/'];   %Folder containing the raw data
-    output_dir = [bdir '\Analysis_Functions\LRP\01_Preprocessing\PreprocessedData\go_nogo\'];      %Folder where the preprocessed data is to be stored Preprocessed Data
+    output_dir = [bdir '\Analysis_Functions\LRP\preprocessed_data\go_nogo\'];      %Folder where the preprocessed data is to be stored Preprocessed Data
 end
 
 %% extract participant code
@@ -30,6 +25,7 @@ for i = 1:length(participant_filenames)
 end
 
 clear files participant_filenames
+
 %% loop through participants
 for part = 1:length(participant_codes)
     part_code = participant_codes(part) %Informing in the command window about which participant is being processed. 
@@ -121,7 +117,25 @@ for part = 1:length(participant_codes)
         %add vector with ms
         ms_start = EEG_data.Data.data.EEG.xmin*1000; %start of epoch 
         ms_end = EEG_data.Data.data.EEG.xmax*1000;  %end of epoch
-        ms= [ms_start:2:ms_end]'; %create ms vector with time steps of 2 ms
+
+        % add code for sampling rate 512 Hz here, something like
+        % if sampling == 512
+            % ms_down = [ms_start:1.95:ms_end]'; 
+            % ms_base =  [ms_start:2:ms_end]';
+            % ms_base = [ms_base, zeroes(length(ms_down)-length(ms_base))]';
+            % ms = [ms_down, ms_base];
+            % ms.diff = ms.down-ms.base;
+            % for i = 1:length(ms.down)
+            % if ms.diff(i) > 1
+                % ms.down(i)=[];
+                % ms.diff = ms.down-ms.base;
+            % end
+            %end
+            %else 
+            %...
+            %end
+
+        ms = [ms_start:2:ms_end]'; %create ms vector with time steps of 2 ms
         
         EEG_data.Data.data.EEG.data_lrp_correct_aver(:,2)=ms;
         EEG_data.Data.data.EEG.data_lrp_error_aver(:,2)=ms;
@@ -137,7 +151,7 @@ for part = 1:length(participant_codes)
         clear id
     
         %add column names
-        colNames={'amplitude', 'dp', 'id'};
+        colNames={'amplitude', 'ms', 'id'};
         EEG_data.Data.data.EEG.data_lrp_correct_aver.Properties.VariableNames = colNames;
         EEG_data.Data.data.EEG.data_lrp_error_aver.Properties.VariableNames = colNames;
     
