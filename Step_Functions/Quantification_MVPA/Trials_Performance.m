@@ -55,7 +55,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             EEG = INPUT.data.(Conditions{i_cond});
             
             % Mark Trials with RTs faster than 0.1 and slower than 0.8s
-            IdxKeep = cellfun(@(x)~isempty(x) && ismember(x, 1), {EEG.event.ACC});
+            IdxKeep = cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {EEG.event.RT});
 
             
             Epochs_to_Keep = {EEG.event.epoch};
