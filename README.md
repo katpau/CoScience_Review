@@ -16,6 +16,22 @@ run **TEST_Stats_xxx.R** for the statistical analyses
 !! You do not need to run the Preprocessing before the Statistics. Example Files are added.
 
 
+
+
+## Before You Get Started
+
+Before Starting, please familiarize yourself a bit with github. 
+
+Christoph has prepared this excellent introduction:
+[GitHub_tutorial.pdf](https://github.com/katpau/CoScience_Review/files/10229627/GitHub_tutorial.pdf)
+
+
+And a bit of practical information on how to deal with this code here is collected here:
+[GitHub_Welcome.pdf](https://github.com/katpau/CoScience_Review/files/10229647/GitHub_Welcome.pdf)
+
+
+
+
 ## How to run the test across all forking options?
 
 ***To Run the Test, across all forking options:***
@@ -38,26 +54,6 @@ run **TEST_RDF_Stats.R** for the statistical analyses
  * Gambling_N300H (Erik, Phillip)
  * GoNoGo_Conflict (Andre, Vera)
  * Ultimatum_Offer (Jojo, Johannes)
-
-
-
-
-
-## Before You Get Started
-
-Before Starting, please familiarize yourself a bit with github. 
-
-Christoph has prepared this excellent introduction:
-[GitHub_tutorial.pdf](https://github.com/katpau/CoScience_Review/files/10229627/GitHub_tutorial.pdf)
-
-
-And a bit of practical information on how to deal with this code here is collected here:
-[GitHub_Welcome.pdf](https://github.com/katpau/CoScience_Review/files/10229647/GitHub_Welcome.pdf)
-
-
-
-
-
 
 ## More Details
 
