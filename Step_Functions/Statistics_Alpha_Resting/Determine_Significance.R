@@ -30,9 +30,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   # Get column Names for Personality Data (to to be used in the model formula)
   Personality_collumns = names(output)[names(output) %like% "Personality_"]
-  BAS_Scales = paste("Personality_", c("BISBAS_BAS","RSTPQ_BAS","Z_sum_MPQ","Z_sum_BFI","Z_AV_notweighted_BAS","Z_AV_ItemNr_BAS","Z_AV_Reliability_BAS","PCA_BAS","FactorAnalysis_BAS"))
-  BIS_Scales = paste("Personality_", c("BISBAS_BIS", "RSTPQ_BIS", "PSWQ_Concerns", "BFI_Anxiety", "Z_AV_notweighted_BIS", "Z_AV_ItemNr_BIS", "Z_AV_Reliability_BIS", "PCA_BIS", "FactorAnalysis_BIS"))
-  
+
   Personality_Name_BAS = paste0("Personality_", unlist(input$stephistory["Personality_Variable"]))
   Personality_Name_BIS = paste0("Personality_", unlist(input$stephistory["Personality_Variable_BIS"]))
   Personality_Formula_BAS = paste("* ", Personality_Name_BAS)
@@ -57,7 +55,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
       Covariate_Formula = paste( "*", Covariate_Name)
     }
   }
-  }
+  
   
   
   # Get possible additional factors to be included in the GLM (depends on the forking
@@ -102,7 +100,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     
     # Create Subset
-    Subset = Data[, names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", collumns_to_keep)]
+    Subset = Data[, names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", "Lab", collumns_to_keep)]
     
     # Run Test
     ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)
@@ -145,12 +143,21 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                                 "previousModel", H1_Model)
   
   
+  Effect_of_Interest = c(Personality_Name_BAS, "Behav_Attractiveness")
+  Name_Test = c("BAS_AttractivenesssRating")
+  DirectionEffect = list("Effect" = "correlation",
+                         "Personality" = Personality_Name_BAS)
+  
+  
+  H1_12b = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                              DirectionEffect, collumns_to_keep,
+                              "previousModel", H1_Model)
+  
   Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BAS, "Behav_Attractiveness")
-  Name_Test = c("BAS_ExperimenterAttractiveness")
+  Name_Test = c("BAS_AttractivenesssRating_ExperimenterSex")
   DirectionEffect = list("Effect" = "interaction_correlation",
                          "Larger" = c("Experimenter_Sex", "Opposite"),
                          "Smaller" = c("Experimenter_Sex", "Same"),
-                         "Interaction" = c("Participant_Sex", "Female", "Male"),
                          "Personality" = Personality_Name_BAS)
   
   
@@ -236,7 +243,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                                   "exportModel")
   
   Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BIS)
-  Name_Test = c("BAS_ExperimenterSex")
+  Name_Test = c("BIS_ExperimenterSex")
   DirectionEffect = list("Effect" = "interaction_correlation",
                          "Larger" = c("Experimenter_Sex", "Opposite"),
                          "Smaller" = c("Experimenter_Sex", "Same"),
@@ -248,7 +255,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BIS, "Behav_Attractiveness")
-  Name_Test = c("BAS_ExperimenterSex_Attractiveness")
+  Name_Test = c("BIS_ExperimenterSex_Attractiveness")
   DirectionEffect = list("Effect" = "interaction_correlation",
                          "Larger" = c("Experimenter_Sex", "Opposite"),
                          "Smaller" = c("Experimenter_Sex", "Same"),
@@ -345,10 +352,10 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # (8) Correct for Multiple Comparisons for Hypothesis 1
   #########################################################
   
-  Estimates_to_Correct = as.data.frame(rbind(H1_1, H1_2, H3_1, H3_2)) # add other estimates here
+  Estimates_to_Correct = as.data.frame(rbind(H1_1, H1_2, H1_12b, H3_1, H3_2)) # add other estimates here
   comparisons = sum(!is.na(Estimates_to_Correct$p_Value))
   
-  if (choice == "Holmes"){
+  if (choice == "Holm"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "holm", n = comparisons)
   }  else if (choice == "Bonferroni"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "bonferroni", n = comparisons)

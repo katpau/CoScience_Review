@@ -103,6 +103,7 @@ Normalize = function(input = NULL, choice = NULL) {
     # (4) Normalize RTs
     #########################################################
     RTs = output[,c("ID", "Behav_RT", "Congruency" )]
+    RTs = RTs[!is.na(RTs$Behav_RT),]
     RTs = RTs[!duplicated(RTs),]
     # Remove from output file
     output = output[,-which(names(output) %in% "Behav_RT")]

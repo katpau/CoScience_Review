@@ -20,7 +20,7 @@ Attractiveness = function(input = NULL, choice = NULL) {
   #########################################################
   # Read Behavioural Data
   BehavFile = paste0(input$stephistory["Root_Behavior"], "task_Ratings_beh.csv")
-  BehavData = read.csv(BehavFile, header = TRUE, sep = ";")
+  BehavData = read.csv(BehavFile, header = TRUE, sep = ",")
   
   # keep only Ratings of Experimenter
   BehavData = BehavData[BehavData$Rated_Person == "Experimenter",]

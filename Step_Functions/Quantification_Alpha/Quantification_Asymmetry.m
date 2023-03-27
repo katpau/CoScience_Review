@@ -1,7 +1,8 @@
 function  OUTPUT = Quantification_Asymmetry(INPUT, Choice)
 % Last Checked by KP 12/22
 % Planned Reviewer:
-% Reviewed by: 
+% Reviewed by: KP 10/03 take 2 times the absolute from power, to capture
+% positive&negative
 
 % This script does the following:
 % Depending on the forking choice, it uses the choices from the previous
@@ -129,9 +130,9 @@ try
             if contains(Conditions{icond}, "Resting")
                 MinData = [MinData, 120 * INPUT.data.Resting.pnts/INPUT.data.Resting.srate];
             elseif  contains(Conditions{icond}, "Gambling_Anticipation")
-                MinData = [MinData, 40]; 
+                MinData = [MinData, 20]; 
             elseif  contains(Conditions{icond}, "Gambling_Consumption")
-                MinData = [MinData, 20];
+                MinData = [MinData, 14];
             elseif  contains(Conditions{icond}, "Stroop_Anticipation")
                 MinData = [MinData, 28];
             elseif  contains(Conditions{icond}, "Stroop_Consumption")
@@ -291,7 +292,7 @@ try
                 % Array of Electrodes : Frequencies : Trials
             end
         end
-        power_AllConditions(:,1:NrFreqs, 1:Trials(i_cond), i_cond) = abs(FreqData(:, 1:NrFreqs, :)); % take only frequencies of Nyquist plus DC
+        power_AllConditions(:,1:NrFreqs, 1:Trials(i_cond), i_cond) = 2*abs(FreqData(:, 1:NrFreqs, :)); % take only frequencies of Nyquist plus DC
     end
     
     

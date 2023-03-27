@@ -90,7 +90,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     
     # Create Subset
-    Subset = Data[Data$Component %in% Component, names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", collumns_to_keep)]
+    Subset = Data[, names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", "Lab", collumns_to_keep)]
+    if (!is.na(Component)) { Data = Data[Data$Component %in% Component,]}
     
     # Run Test
     ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)
@@ -106,14 +107,15 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   #########################################################
-  # (4) Test Hypothesis set 1 for Behaviour
+  # (4) Test Hypothesis set for Behaviour
   #########################################################
   Estimates = data.frame()
   for (DV in c("Behav_RT", "ACC")) {
     print(paste("Test Effect on ", DV))
-    lm_formula =   paste( DV,  " ~ (( Congruency * Personality_CEI) ) ", Covariate_Formula)
-    collumns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, DV) 
-    
+    BehavData = output[,c("ID", "Congruency", "Lab", "ACC", "Behav_RT",
+                        "Personality_NFC_NeedForCognition", "Personality_LE_Positiv", "Personality_CEI", "IST", Covariate_Name)]
+    BehavData = BehavData[!duplicated(BehavData),]
+   
     Effect_of_Interest = c("Personality_CEI")
     Effect_of_Interest_IA = c("Personality_CEI", "Congruency")
     DirectionEffect = list("Effect" = "correlation",
@@ -125,30 +127,55 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                               "Personality" = "Personality_CEI",
                               "DV" = DV)
     
-    
-    H_1_Model = wrap_test_Hypothesis("",lm_formula, output,
+    lm_formula =   paste( DV,  " ~ (( Congruency * Personality_CEI) ) ", Covariate_Formula)
+    collumns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, DV) 
+    H_1_Model = wrap_test_Hypothesis("",lm_formula, BehavData,
                                      "",  "", 
-                                     collumns_to_keep, "RT",
+                                     collumns_to_keep, NA,
+                                     "exportModel")
+
+    lm_formula =   paste( DV,  " ~ ((Congruency * Personality_CEI) + ( Congruency * IST) ) ", Covariate_Formula)
+    collumns_to_keep = c("Congruency", "Personality_CEI", "IST", Covariate_Name, DV) 
+    H_1_IST_Model = wrap_test_Hypothesis("",lm_formula, BehavData,
+                                     "",  "", 
+                                     collumns_to_keep, NA,
                                      "exportModel")
     # Test main Effect of CEI  
     Name_Test = paste0(DV, "_CEI")
-    Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                                                      DirectionEffect, collumns_to_keep, "RT",
+    Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, BehavData, Effect_of_Interest,
+                                                      DirectionEffect, collumns_to_keep, NA,
                                                       "previousModel", H_1_Model))
     
     # Test IA with CEI and Demand Level
     Name_Test = paste0(DV, "_CEI_Congruency")
     Estimates = rbind(Estimates,wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest_IA,
-                                                     DirectionEffect_IA, collumns_to_keep, "RT",
+                                                     DirectionEffect_IA, collumns_to_keep, NA,
                                                      "previousModel", H_1_Model)  )
+    
+    
+    # Test main Effect of CEI   controlled for IST
+    Name_Test = paste0(DV, "_CEI_IST_controlled")
+    Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, BehavData, Effect_of_Interest,
+                                                      DirectionEffect, collumns_to_keep, NA,
+                                                      "previousModel", H_1_IST_Model))
+    
+    # Test IA with CEI and Demand Level controlled for IST
+    Name_Test = paste0(DV, "_CEI_Congruency_IST_controlled")
+    Estimates = rbind(Estimates,wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest_IA,
+                                                     DirectionEffect_IA, collumns_to_keep, NA,
+                                                     "previousModel", H_1_IST_Model)  )
+    
   }
   
   #########################################################
-  # (4) Test Hypothesis set 1 for EEG
+  # (4) Test Hypothesis set for EEG
   #########################################################
   lm_formula =   paste( "EEG_Signal ~ (( Congruency * Personality_CEI) ", 
                         additional_Factor_Formula, ")", Covariate_Formula)
-  collumns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, additional_Factors_Name) 
+  lm_formula_IST =   paste( "EEG_Signal ~ ((( Congruency * Personality_CEI) + ( Congruency * IST) ) ", 
+                        additional_Factor_Formula, ")", Covariate_Formula)
+  
+  collumns_to_keep = c("Congruency", "Personality_CEI", "IST", Covariate_Name, additional_Factors_Name) 
   
   DirectionEffect = list("Effect" = "correlation",
                          "Personality" = "Personality_CEI")
@@ -163,7 +190,10 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                                      "",  "", 
                                      collumns_to_keep, DV,
                                      "exportModel")
-    
+    H_4_IST_Model = wrap_test_Hypothesis("",lm_formula_IST, output,
+                                     "",  "", 
+                                     collumns_to_keep, DV,
+                                     "exportModel")   
     
     # Test main Effect of CEI  
     Name_Test = paste0(DV, "_CEI")
@@ -176,17 +206,33 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest_IA,
                                                       DirectionEffect_IA, collumns_to_keep, "N2",
                                                       "previousModel", H_4_Model)  )
+    
+    # Test main Effect of CEI  
+    Name_Test = paste0(DV, "_CEI_IST_controlled")
+    Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula_IST, output, Effect_of_Interest,
+                                                      DirectionEffect, collumns_to_keep, "N2",
+                                                      "previousModel", H_4_IST_Model))
+    
+    # Test IA with CEI and Demand Level
+    Name_Test = paste0(DV, "_CEI_Congruency_IST_controlled")
+    Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula_IST, output, Effect_of_Interest_IA,
+                                                      DirectionEffect_IA, collumns_to_keep, "N2",
+                                                      "previousModel", H_4_IST_Model)  )
+    
+    #######################
+    #  and Hypothesis 3 
+    # reaction times, error rates, FM?? power, N2 and P3 amplitude (x.1. - x.5.) are
+    # predicted in a hierarchical regression. First, (1) Demand levels, (2) CEI, (3) Electrode is included, then
+    # (4) fluid intelligence.
+    # Hypotheses 3 is tested when the main effect and interaction of CEI remains significant when fluid
+    # intelligence is entered.
+    
+    
+    
   }
   
   
-  #######################
-  #  and Hypothesis 3 
-  # reaction times, error rates, FM?? power, N2 and P3 amplitude (x.1. - x.5.) are
-  # predicted in a hierarchical regression. First, (1) Demand levels, (2) CEI, (3) Electrode is included, then
-  # (4) fluid intelligence.
-  # Hypotheses 3 is tested when the main effect and interaction of CEI remains significant when fluid
-  # intelligence is entered.
-  
+
   
   ############################
   # Hypthesis 4: Correlations
@@ -207,17 +253,43 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # (5) Correct for Multiple Comparisons for Hypothesis 1
   #########################################################
   
-  Estimates_to_Correct = as.data.frame(rbind(H1_4, H1_5)) # redo also for Behavioral, add FMT - make a loop? since many blocked!
-  comparisons = sum(!is.na(Estimates_to_Correct$p_Value))
-  
-  if (choice == "Holmes"){
-    Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "holm", n = comparisons)
+  if (choice == "Holm"){
+    methodcall = "holm"
   }  else if (choice == "Bonferroni"){
-    Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "bonferroni", n = comparisons)
+    methodcall = "bonferroni"
   }
   
-  Estimates = rbind(Estimates_to_Correct,
-                    H1_1  ) # Add other estimates here
+  # Correct Hypothesis 1
+  idx = which(Estimates$Effect_of_Interest %in% c("Behav_RT_CEI", "ACC_CEI"))
+  Estimates$p_Value[idx] = p.adjust(Estimates$p_Value[idx], method = methodcall, n = length(idx))
+  
+  idx = which(Estimates$Effect_of_Interest %in% c("N2_CEI", "PR_CEI", "FMT_CEI"))
+  Estimates$p_Value[idx] = p.adjust(Estimates$p_Value[idx], method = methodcall, n = length(idx))
+  
+  # Correct Hypothesis 2
+  idx = which(Estimates$Effect_of_Interest %in% c("Behav_RT_CEI_Congruency", "ACC_CEI_Congruency"))
+  Estimates$p_Value[idx] = p.adjust(Estimates$p_Value[idx], method = methodcall, n = length(idx))
+  
+  idx = which(Estimates$Effect_of_Interest %in% c("N2_CEI_Congruency", "P3_CEI_Congruency", "FMT_CEI_Congruency"))
+  Estimates$p_Value[idx] = p.adjust(Estimates$p_Value[idx], method = methodcall, n = length(idx))
+  
+  # Correct Hypothesis 3
+  idx = which(Estimates$Effect_of_Interest %in% c("Behav_RT_CEI_IST_controlled", "ACC_CEI_IST_controlled"))
+  Estimates$p_Value[idx] = p.adjust(Estimates$p_Value[idx], method = methodcall, n = length(idx))
+  
+  idx = which(Estimates$Effect_of_Interest %in% c("N2_CEI_IST_controlled", "P3_CEI_IST_controlled", "FMT_CEI_IST_controlled"))
+  Estimates$p_Value[idx] = p.adjust(Estimates$p_Value[idx], method = methodcall, n = length(idx))
+  
+  idx = which(Estimates$Effect_of_Interest %in% c("Behav_RT_CEI_Congruency_IST_controlled", "ACC_CEI_Congruency_IST_controlled"))
+  Estimates$p_Value[idx] = p.adjust(Estimates$p_Value[idx], method = methodcall, n = length(idx))
+  
+  idx = which(Estimates$Effect_of_Interest %in% c("N2_CEI_Congruency_IST_controlled", "PR_CEI_Congruency_IST_controlled", "FMT_CEI_Congruency_IST_controlled"))
+  Estimates$p_Value[idx] = p.adjust(Estimates$p_Value[idx], method = methodcall, n = length(idx))
+  
+  # Correct Hypothesis 4
+  idx = which(Estimates$Effect_of_Interest %in% c("Correlation_LE_NFC", "Correlation_LE_CEI", "Correlation_CEI_NFC"))
+  Estimates$p_Value[idx] = p.adjust(Estimates$p_Value[idx], method = methodcall, n = length(idx))
+  
   
   
   #########################################################

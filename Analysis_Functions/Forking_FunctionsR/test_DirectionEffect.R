@@ -8,6 +8,7 @@ test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResu
   # Subset is dataframe including all Data (Personality, EEG_Signal, Conditions)
   # ModelResult are the Estimates exported from test_Hypothesis
   
+  if (any(!(DirectionEffect == "notdirected"))) {
   if ("DV" %in% names(DirectionEffect) ) {
     DV = DirectionEffect$DV
   } else {DV = "EEG_Signal"}
@@ -74,6 +75,6 @@ test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResu
    ModelResult$value_EffectSize = ModelResult$value_EffectSize * -1
    ModelResult$CI_low = ModelResult$CI_low * -1
    ModelResult$CI90_high = ModelResult$CI90_high * -1
- } 
+ } }
   return(ModelResult)
 }

@@ -70,7 +70,7 @@ Normalize = function(input = NULL, choice = NULL) {
     # Apply Normalization
     if (length(Not_Normal_CollumnNames)>1) {
       Personality[,Not_Normal_CollumnNames] = lapply(Personality[,Not_Normal_CollumnNames], function(col) normalize_data(col, choice))
-    } else {
+    } else if (length(Not_Normal_CollumnNames)>0) {
       Personality[,Not_Normal_CollumnNames] = normalize_data(Personality[,Not_Normal_CollumnNames], choice)
     }
     
@@ -107,9 +107,10 @@ Normalize = function(input = NULL, choice = NULL) {
     Not_Normal_CollumnNames = Relevant_Collumns[Not_Normal]
     
     # Apply Normalization
-    if (length(Relevant_Collumns)>1) {
+    
+    if (length(Not_Normal_CollumnNames)>1) {
       output[,Not_Normal_CollumnNames] = lapply(output[,Not_Normal_CollumnNames], function(col) normalize_data(col, choice))
-    } else {
+    } else if (length(Not_Normal_CollumnNames)>0) {
       output[,Not_Normal_CollumnNames] = normalize_data(output[,Not_Normal_CollumnNames], choice)
     }
     

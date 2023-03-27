@@ -63,22 +63,27 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
     % on the individual Tasks!)
     
     % Resting has several Runs! make sure the correct one is loaded
-    if INPUT.AnalysisName == "Resting_Context_Alpha"
+if contains(INPUT.AnalysisName, "Resting")
+	if contains(INPUT.AnalysisName, "Context")
         % Context Alpha Resting takes second repetition!
         File_to_Import = strrep(File_to_Import, 'Resting_run-1_eeg', ...
             'Resting_run-2_eeg');
         File_to_Import = strrep(File_to_Import, 'Resting_run-3_eeg', ...
             'Resting_run-2_eeg');
-    elseif INPUT.AnalysisName == "Alpha_Resting"
-        % Context Alpha Resting takes second repetition!
+	else
         File_to_Import = strrep(File_to_Import, 'Resting_run-2_eeg', ...
             'Resting_run-1_eeg');
         File_to_Import = strrep(File_to_Import, 'Resting_run-3_eeg', ...
             'Resting_run-1_eeg');
-    end
+	end
+end
     
     % load the EEG File
-    EEG = pop_loadset('filename',char(File_to_Import), 'filepath', char(FilePath_to_Import));
+    if isfield(INPUT, 'data')
+     EEG = INPUT.data.EEG;
+    else
+     EEG = pop_loadset('filename',char(File_to_Import), 'filepath', char(FilePath_to_Import));
+    end
     
     % ****** Trim Channels ******
     % The imported files include many more channels, that we do not need 

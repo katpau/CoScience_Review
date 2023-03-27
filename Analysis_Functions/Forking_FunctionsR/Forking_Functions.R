@@ -58,7 +58,7 @@ source_Design = function (ListOfStepFunctionFolders) {
       imported =  readLines(StepFunctions[ifile])
       eval(parse(text = imported[grep("Order = ", imported)]))
       eval(parse(text = imported[grep("Choices = ", imported)]))
-      FunctionName = gsub("\\.R", "", StepFunctions_Short[ifile])
+      FunctionName = gsub(".R", "", StepFunctions_Short[ifile])
       FunctionOrder = c(FunctionOrder, Order)
       eval(parse(text = paste0(FunctionName, "= Choices")))
       FunctionNames = c(FunctionNames, FunctionName)
@@ -85,7 +85,6 @@ combine_Choices = function(design, PreviousStep) {
   highest_outlier = max(which(grepl("Outliers_", names(design))))
   
   Forking_List1 = do.call(expand.grid, design[1:highest_outlier])
-  
   
   # Drop outlier combinations that cannot be
   # Get Indexes of Nones
@@ -204,7 +203,8 @@ create_ForkingLists = function(CombinedForks,
                              sample(1:nrow(CombinedForks$Forks_Table), Remainder))
   
   # Shuffle again (in case it was multiplied this is important)
-  TotalCombinationsIndex = sample(TotalCombinationsIndex)
+  if (length(TotalCombinationsIndex)> 0) {
+  TotalCombinationsIndex = sample(TotalCombinationsIndex) }
   
   # How many Files will be created
   nr_Files = ceiling(NrCombinations_PreProc / sizeSubsets)
@@ -225,6 +225,31 @@ create_ForkingLists = function(CombinedForks,
                    CombinedForks$Forks_Nr[Subset],
                    CombinedForks$Forks_Table[Subset, ])
     names(OUTPUT)[1:2] = c("InputNumber", "CombinationNumber")
+    
+    # Important! Add Main Path 
+    if (iSubset == nr_Files) {
+      MainPath_PP = which.max(str_count(Combinations_Preproc, ".1"))
+      MainPath_St = which.max(str_count(CombinedForks$Forks_Nr, ".1"))
+      MainPath = cbind(Combinations_Preproc[MainPath_PP],
+                       CombinedForks$Forks_Nr[MainPath_St],
+                       CombinedForks$Forks_Table[MainPath_St, ])
+      names(MainPath)[1:2] = c("InputNumber", "CombinationNumber")
+      
+      OUTPUT = rbind(MainPath, OUTPUT)
+
+    # Write MainPath
+    filename = paste0(Path_To_Export, "/OUTPUT_MAIN.txt")
+    write.table(
+      MainPath,
+      filename,
+      sep = ";",
+      row.names = FALSE,
+      col.names = TRUE
+    )
+
+    }
+
+   # Write all Output
     filename = paste0(Path_To_Export, "/OUTPUT_", as.character(iSubset), ".txt")
     write.table(
       OUTPUT,
@@ -241,6 +266,9 @@ create_ForkingLists = function(CombinedForks,
 
 
 
+
+
+#####################################################################################
 ## Run Steps
 run_Steps = function( OUTPUT_File,
                       RootPath, 
@@ -257,50 +285,7 @@ run_Steps = function( OUTPUT_File,
   OUTPUT = read.table(OUTPUT_File,  sep = ";", header = TRUE)
   
   # Initate for summary
-  # Create Function to run in Parallel
-  run_Steps_parallel = function (i_Fork, OUTPUT, Path_to_Merged_Files, Path_to_Export, Root){
-
-    
-    # Paste Filenames to check if already existing
-    filename_input = paste0(Path_to_Merged_Files, "/", OUTPUT[i_Fork, 1])
-    filename_output = paste0(Path_to_Export,
-                             gsub(".txt", "", OUTPUT[i_Fork, 1]),
-                             OUTPUT[i_Fork, 2],
-                             ".txt")
-    
-    # Only Run if not already Run before
-    if (file.exists(filename_output)) {
-      return("Previously Completed") # added to Protocol, ParList, Logging 
-    } else {
-      # Initiate Data to be parsed to function
-      input <- vector(mode = "list", length = 0)
-      Step_Names = colnames(OUTPUT)[3:ncol(OUTPUT)]
-      input$stephistory <- sapply(Step_Names, function(x) NULL)
-      input$stephistory["Inputfile"] = filename_input
-      input$stephistory["Final_File_Name"] = filename_output
-      input$data = read.table(filename_input,  sep = ",", header = FALSE)
-      input$Root_Behavior = paste0(RootPath, "/BehaviouralData/")
-      input$Root_Personality =  paste0(RootPath, "/QuestionnaireData/")
-      colnames(input$data) = collumnNamesEEGData 
-      
-      # Run in Try Catch to parse Error Messages to Parloop
-      Error_Subjects = tryCatch({
-        
-        for (iStep in Step_Names) {
-          input = do.call(iStep, list(input, OUTPUT[i_Fork, iStep]))
-        }
-        
-        # Save completion status to ParList = Protocol
-        return("Newly Completed")
-        
-      },  # if error ocurrs, save error to Parlist = Protocol
-      error = function(e) {
-        
-        return(paste("Error with Step:", iStep, "and Choice:", OUTPUT[i_Fork, iStep], ". The error message was: ", e))
-          })
-      
-    } 
-  }  
+  
   # Loop Through list in parallel way
   Protocol = NA
   start_time <- Sys.time() 
@@ -329,7 +314,6 @@ run_Steps = function( OUTPUT_File,
   Text_toWrite[length(Text_toWrite) + 1] = "Summary Achievements"
   Text_toWrite[length(Text_toWrite) + 1] = sprintf('Number of Combinations to Run: %d', nrow(OUTPUT))
   Text_toWrite[length(Text_toWrite) + 1] = sprintf('Newly Completed : %d', sum(grepl("Newly Completed", Protocol)))
-  Text_toWrite[length(Text_toWrite) + 1] = sprintf('Previously Completed: %d', sum(grepl("Previously Completed", Protocol)))
   Text_toWrite[length(Text_toWrite) + 1] = sprintf('Encountered Errors: %d',sum(grepl("Error", Protocol)))
   Text_toWrite[length(Text_toWrite) + 1] = ""
   Text_toWrite[length(Text_toWrite) + 1] = ""
@@ -346,3 +330,51 @@ run_Steps = function( OUTPUT_File,
   
   print(Text_toWrite, row.names = FALSE)
 }
+
+###############################
+# Create Function to run in Parallel
+run_Steps_parallel = function (i_Fork, OUTPUT, Path_to_Merged_Files, Path_to_Export, Root){
+  
+  
+  # Paste Filenames to check if already existing
+  filename_input = paste0(Path_to_Merged_Files, OUTPUT[i_Fork, 1])
+  filename_output = paste0(Path_to_Export,
+                           gsub(".txt", "", OUTPUT[i_Fork, 1]),
+                           OUTPUT[i_Fork, 2],
+                           ".txt")
+  
+  print(paste("filename_input", filename_input))
+  print(paste("filename_output", filename_output))
+  
+  # Only Run if not already Run before
+  if (file.exists(filename_output)) {
+    print("Previously Completed")
+    return("Previously Completed") # added to Protocol, ParList, Logging 
+  } else {
+    # Initiate Data to be parsed to function
+    input <- vector(mode = "list", length = 0)
+    Step_Names = colnames(OUTPUT)[3:ncol(OUTPUT)]
+    input$stephistory <- sapply(Step_Names, function(x) NULL)
+    input$stephistory["Inputfile"] = filename_input
+    input$stephistory["Final_File_Name"] = filename_output
+    input$data = read.table(filename_input,  sep = ",", header = FALSE)
+    input$stephistory["Root_Behavior"] = paste0(Root, "/BehaviouralData/")
+    input$stephistory["Root_Personality"] =  paste0(Root, "/QuestionnaireData/", AnalysisName, "/")
+    colnames(input$data) = collumnNamesEEGData 
+    
+    # Run in Try Catch to parse Error Messages to Parloop
+    Error_Subjects = tryCatch({
+      for (iStep in Step_Names) {
+        input = do.call(iStep, list(input, OUTPUT[i_Fork, iStep]))
+      }
+      
+      
+      
+    },  # if error ocurrs, save error to Parlist = Protocol
+    error = function(e) {
+      print(e)
+      return(paste("Error with Step:", iStep, "and Choice:", OUTPUT[i_Fork, iStep], ". The error message was: ", e))
+    })
+    
+  } 
+}  

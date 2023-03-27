@@ -95,7 +95,7 @@ Outliers_EEG = function(input = NULL, choice = NULL) {
       output$EEG_Signal[ExceedMax] =   output$Max[ExceedMax]
       
       # Exclude Value
-    } else {
+    } else if (Treatment == "Exclude" & EEG_Outlier == "Applied") {
       output$EEG_Signal[as.logical(output$Outliers_EEG)] = NA  }
     
     

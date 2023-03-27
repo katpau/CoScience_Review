@@ -105,7 +105,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     # Create Subset
     Subset = Data[Data$Condition_Type %in% Condition_Type &
                     Data$Component %in% Component ,
-                  names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", collumns_to_keep)]
+                  names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", "Lab", collumns_to_keep)]
     
     # Run Test
     ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)
@@ -274,7 +274,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   Estimates_to_Correct = as.data.frame(rbind(H3_2, H3_3, H3_4)) # add estimates from manipulation check
   comparisons = sum(!is.na(Estimates_to_Correct$p_Value))
   
-  if (choice == "Holmes"){
+  if (choice == "Holm"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "holm", n = comparisons)
   }  else if (choice == "Bonferroni"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "bonferroni", n = comparisons)

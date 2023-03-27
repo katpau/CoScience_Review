@@ -1,0 +1,7 @@
+Gender => 1 = Female, 2 = Male, 3 = Divers
+Contraceptives => 1 = Yes, 2 = No
+Ethnicity => 1 = European, 2 = Arabic, 3 = African, 4 = Asian, 5 = Hisp, 6 other
+Marital Status => 1 = Single, 2 = relationship, 3 = legal partnership, 4 = divorced, 5 = widowed
+Employement => 1 = working, 2 = Student, 3 = unemployed
+education => 1= hauptschule, 2 realschuule, 3 abitur, 4 hochschulabschluss, 5 promotion
+income => 1 = <500, 2 = 500-1000, 3 = 1000-2000, 4= 2000-3000, 5 = >3000, 6 = no info

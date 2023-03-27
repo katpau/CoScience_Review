@@ -34,7 +34,7 @@ function  OUTPUT = Electrodes(INPUT, Choice)
 % Order determines when it should be run.
 StepName = "Electrodes";
 Choices = ["Fz,Fcz,Cz", "Fcz,Cz", "Fcz", "Cz", "Fz"];
-Conditional = ["NaN", "NaN", "Cluster_Electrodes == ""no_cluster"" ", "Cluster_Electrodes == ""no_cluster"" ", "Cluster_Electrodes == ""no_cluster"" ";
+Conditional = ["NaN", "NaN", "Cluster_Electrodes == ""no_cluster"" ", "Cluster_Electrodes == ""no_cluster"" ", "Cluster_Electrodes == ""no_cluster"" "];
 SaveInterim = logical([0]);
 Order = [20];
 

@@ -75,19 +75,19 @@ RT = function(input = NULL, choice = NULL) {
   RT_Data$Congruency[RT_Data$Congruency == 0.33] = "Cong_033"
   RT_Data$Congruency[RT_Data$Congruency == 0.66] = "Cong_066"
   RT_Data$Congruency[RT_Data$Congruency == 1] = "Cong_100"
-  RT_Data$Component = "RT"
   
-  Data_to_ADD = output[,c("ID", "Congruency", "Lab", "Experimenter", "ACC", colnames(output)[grepl("Covariate_|Personality_", colnames(output))])]
-  RT_Data = merge(
+  #Data_to_ADD = output[,c("ID", "Congruency", "Lab", "Experimenter", "ACC", colnames(output)[grepl("Covariate_|Personality_", colnames(output))])]
+  #Data_to_ADD = Data_to_ADD[!duplicated(Data_to_ADD),]
+  output = merge(
+    output,
     RT_Data, 
-    Data_to_ADD[!duplicated(Data_to_ADD),],
     by =  c("ID", "Congruency"),
-    all.x = FALSE,
+    all.x = TRUE,
     all.y = FALSE
   )
   
   # Merge with data
-  output = bind_rows(output, RT_Data)
+  #output = bind_rows(output, RT_Data)
  
   
   
