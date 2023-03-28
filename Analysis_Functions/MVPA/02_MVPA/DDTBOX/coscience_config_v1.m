@@ -33,11 +33,11 @@ global bdir;
 % Decide whether to save the SLIST structure and EEG data in a .mat file
 savemode = 0; % 1 = Save the SLIST as a mat file; 0 = Don't save the SLIST
 
-if AnalysisName == "Flanker_MVPA"
+if strcmp(AnalysisName, "Flanker_MVPA")
     input_dir = [bdir '\Analysis_Functions\MVPA\01_Preprocessing\PreprocessedData\flanker\']; % Directory in which the decoding results will be saved
     output_dir = [bdir '\Analysis_Functions\MVPA\02_MVPA\DECODING_RESULTS\level_1\flanker\']; % Directory in which the decoding results will be saved
     output_dir_group = [bdir '\Analysis_Functions\MVPA\02_MVPA\DECODING_RESULTS\level_2\flanker\']; % Directory in which the group level results will be saved
-elseif STUDY.AnalysisName == "GoNoGo_MVPA" 
+elseif strcmp(AnalysisName, "GoNoGo_MVPA") 
     input_dir = [bdir '\Analysis_Functions\MVPA\01_Preprocessing\PreprocessedData\go_nogo\']; % Directory in which the decoding results will be saved
     output_dir = [bdir '\Analysis_Functions\MVPA\02_MVPA\DECODING_RESULTS\level_1\go_nogo\']; % Directory in which the decoding results will be saved
     output_dir_group = [bdir '\Analysis_Functions\MVPA\02_MVPA\DECODING_RESULTS\level_2\go_nogo\']; % Directory in which the group level results will be saved
@@ -69,8 +69,7 @@ sn = SBJTODO;
     SLIST.extra = []; % Channel indices of electrodes to exclude from the classification analyses
     
     % sampling rate and baseline
-    % [elisa] need to adjust this to sampling rates of other labs
-    SLIST.sampling_rate = 500; % Sampling rate (Hz)
+    % [elisa ]for sampling rate see lines 103-112 
     SLIST.pointzero = 300; % Corresponds to time zero, for example stimulus onset (in ms, from the beginning of the epoch)
      
         
@@ -100,7 +99,16 @@ sn = SBJTODO;
     
     SLIST.data_open_name = [input_dir (sbj_code{sn}) '.mat'];
     SLIST.data_save_name = [input_dir (sbj_code{sn}) '_data.mat'];
-    
+
+    % [elisa] read files to extract sampling rate from info
+    open_file = (SLIST.data_open_name);
+    load(open_file);
+    if info.sampling_rate == 500
+        SLIST.sampling_rate = 500; % Sampling rate (Hz)
+    elseif info.sampling_rate == 512
+        SLIST.sampling_rate = 512; % Sampling rate (Hz)
+    end
+    clear eeg_sorted_cond info    
 %% SAVE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %__________________________________________________________________________
 
