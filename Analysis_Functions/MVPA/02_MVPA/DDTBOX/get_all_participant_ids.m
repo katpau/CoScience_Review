@@ -26,7 +26,8 @@ pattern = [(SLIST.output_dir) study_name '_SBJ*_win' num2str(ANALYSIS.window_wid
 % List all the available files
 % listing = struct2dataset(dir(pattern));
 listing = dir(pattern);
-files = listing.name;
+lisitng_tab = struct2table(listing);
+files = lisitng_tab.name;
 
 % How many characters are there before and after the participant number 
 % (in the data file name)? This is needed to extract the participant id as a
@@ -39,10 +40,8 @@ nchar_after = length(after);
 
 % Loop through the file names and extract the participant number as a
 % numeric variable.
-% for i = 1:length(files)
-for i = 1:length(files(:,1))
-%     file = files{i};
-    file = files(i,:);
+for i = 1:length(files)
+    file = files{i};
     number = file((nchar_before+1):(length(file)-nchar_after));
     numbers(i) = str2num(number);
 end
