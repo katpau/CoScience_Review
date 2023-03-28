@@ -138,6 +138,7 @@ info.participant = part_code;
 info.n_trial_dp = dppt;
 info.pre_event_baseline = abs(window_start);
 info.ConditionLables = {'1 = correct'; '2 = error'};
+info.sampling_rate = EEG_data.Data.data.EEG.srate;
 info.n_correct = length(EEG_data.Data.data.EEG.data_correct(1,1,:)); 
 info.n_error = length(EEG_data.Data.data.EEG.data_error(1,1,:)); 
 info.n_total = sum([length(EEG_data.Data.data.EEG.data_correct(1,1,:)),length(EEG_data.Data.data.EEG.data_error(1,1,:))]);
