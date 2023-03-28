@@ -63,7 +63,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                     228, 238, 109, 119, 129, 139, 209, 219, 229, 239  ]; %Responses
                 
             elseif INPUT.AnalysisName == "Flanker_MVPA"
-                Event_Window = [-0.500 0.800]; % Epoch length in seconds
+                Event_Window = [-0.300 0.300]; % Epoch length in seconds %[elisa] CHANGED from -0.500 0.800 for MVPA
                 Relevant_Triggers = [ 106, 116, 126,  136, ...
                     107, 117, 127, 137, 108, 118, 128, 138, ...
                     109, 119, 129, 139  ]; %Responses Experimenter Absent
