@@ -6,7 +6,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: Cassie (CAS) 4/23
 
   # Handles all Choices listed above 
   # Runs the statistical Test, corrects for multiple comparisons and 
@@ -126,6 +126,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   print("Test Effect of Experimenter Sex and attractiveness for BAS")
   lm_formula =   paste( "EEG_Signal ~ ((Experimenter_Sex * Behav_Attractiveness * Participant_Sex )", 
                         Personality_Formula_BAS, additional_Factor_Formula, ")", Covariate_Formula)
+ # is it correct that we're not including the main effects in the model, only the interaction term? (For experimenter sex, attractiveness, participant sex?)
+ # I don't see trait-BAS included within the interaction term.
   collumns_to_keep = c("Experimenter_Sex", "Behav_Attractiveness",  "Participant_Sex", Personality_Name_BAS, Covariate_Name, additional_Factors_Name) 
   H1_Model = wrap_test_Hypothesis("",lm_formula, output, "", "", 
                                     collumns_to_keep, 
@@ -340,6 +342,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # whether experimenters' and participants' sex moderate this effect. If an effect of experimenter attractiveness
   # (and/or participant/experimenter sex) on mood is observed, we will further explore whether this mediates the
   # moderating effects listed under (1) and (3).
+  # During peer-review of the introduction section, we agreed not to test hypothesis 5
   
   # Better to look at Main Effect and then decide which effect should be explored?
   lm_formula =    "Behav_Mood ~ ((Experimenter_Sex * Median_Attractiveness)"
@@ -365,7 +368,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                     H2_1A, H2_1B,H2_2A, H2_2B, 
                     H4_1A, H4_1B,H4_2A, H4_2B ) # Add other estimates here
   
-  
+  # We also preregistered false discovery rate
   #########################################################
   # (9) Export as CSV file
   #########################################################
