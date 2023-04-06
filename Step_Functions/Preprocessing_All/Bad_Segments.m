@@ -1,7 +1,7 @@
 function  OUTPUT = Bad_Segments(INPUT, Choice)
 % Last Checked by KP 12/22
 % Planned Reviewer:
-% Reviewed by: 
+% Reviewed by: Cassie (CAS) 4/23
 
 % This script does the following:
 % Depending on the forking choice, very bad data segments are removed.
@@ -81,6 +81,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             if strcmpi(Choice,"ASR")
                 % ASR only works on filtered data. Create copy of data, and
                 % highpassfilter it with 1 Hz
+                % not clear to me where the 1 Hz 'hicutoff' is set. Possibly in another file? Just want to mention it to double check.
                 % Needs to be filtered first
                 EEG_fil = pop_eegfiltnew(EEG_subset, 'locutoff', 1, 'hicutoff', []);
                 EEG_cleaned = pop_clean_rawdata(EEG_fil, 'FlatlineCriterion','off',...
