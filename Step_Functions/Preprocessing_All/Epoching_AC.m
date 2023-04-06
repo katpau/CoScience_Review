@@ -1,7 +1,7 @@
 function  OUTPUT = Epoching_AC(INPUT, Choice)
 % Last Checked by KP 12/22
 % Planned Reviewer:
-% Reviewed by: 
+% Reviewed by: Cassie (CAS) 04/23
 
 % This script does the following:
 % Depending on the forking choice, it epochs the data for preprocessing, or
