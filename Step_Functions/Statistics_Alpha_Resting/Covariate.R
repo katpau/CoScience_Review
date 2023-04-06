@@ -6,7 +6,7 @@ Covariate = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: Cassie (CAS) 4/23
 
   # Handles all Choices listed above as well as choices from previous Steps 
   # (Attention Checks Personality, Outliers_Personality, Personality_Variable)
@@ -177,6 +177,7 @@ Covariate = function(input = NULL, choice = NULL) {
   
   # Unclear and still needs to be checked: Sometimes SME and EEG_Signal is Inf
   # Unclear why, but some EEG_Signal scores are -Inf
+  # I don't see that this is due to the script. I think it is an issue with the data input.
   output$EEG_Signal[abs(output$EEG_Signal)==Inf] = NA
   output$SME[abs(output$SME)==Inf] = NA
   
@@ -190,7 +191,7 @@ Covariate = function(input = NULL, choice = NULL) {
   Levels_L = length(unlist(unique(output$Localisation)))
   Levels_E = length(unlist(unique(output$Electrode)))
   Levles_F = length(unlist(unique(output$FrequencyBand)))
-  
+  # Levles_F rather than Levels_F but this is consistent in the script. Thought I'd mention it though in case you'd prefer to amend it.
   additional_Factors_Name = vector()
   additional_Factor_Formula = vector()
   if (Levels_H == 2) {
