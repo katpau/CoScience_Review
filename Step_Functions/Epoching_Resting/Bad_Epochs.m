@@ -1,7 +1,7 @@
 function  OUTPUT = Bad_Epochs(INPUT, Choice)
 % Last Checked by KP 12/22
 % Planned Reviewer:
-% Reviewed by: 
+% Reviewed by: Cassie (CAS) 4/23
 
 % This script does the following:
 % Epochs data if not already epoched
@@ -91,6 +91,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 Clean_Epochs_Mask(bad_Kurtosis) = 0;
                 
                 % Probability open pop_jointprob
+                % I don't see the frequency range set to 1-30 Hz - perhaps this is defined elsewhere but just want to check.
                 bad_Probability = pop_jointprob(EEG_subset, 1, [1:EEG_subset.nbchan],  threshold_SD, threshold_SD,0,0,0);
                 bad_Probability = find(bad_Probability.reject.rejjp);
                 Clean_Epochs_Mask(bad_Probability) = 0;
