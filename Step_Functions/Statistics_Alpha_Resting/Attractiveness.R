@@ -6,7 +6,7 @@ Attractiveness = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: Cassie (CAS) 4/23
 
   # Handles how Attractiveness Score is defined
   # (1) Preparations: loading File and selecting Data
@@ -31,6 +31,7 @@ Attractiveness = function(input = NULL, choice = NULL) {
   #########################################################
   # In Any case, median split is performed for hypothesis 5 (keep as seperate collumn)
   #Rating of experimenter attractiveness, median across subjects
+  # When reviewing the intro of the manuscript, we agreed not to test hypothesis 5
   MedianSplit = BehavData %>% 
     group_by(ExperimenterID) %>%
     summarise(Median_Attractiveness = median(attractiveness))
