@@ -3,6 +3,7 @@ function  OUTPUT = Quantification_Asymmetry(INPUT, Choice)
 % Planned Reviewer:
 % Reviewed by: KP 10/03 take 2 times the absolute from power, to capture
 % positive&negative
+% Cassie (CAS) 4/23
 
 % This script does the following:
 % Depending on the forking choice, it uses the choices from the previous
@@ -211,7 +212,7 @@ try
                     Localisation = repmat("Frontal",1,length(Electrodes));
                     AlphaType = repmat(["left", "right"],1,length(Electrodes)/2);
                 end
-                
+   % is it correct that left and right are clustered together into one electrode name?             
                 
             case "F3,F4,P3,P4"
                 ElectrodeNames = ["F34","F34","P34","P34"];
@@ -406,6 +407,7 @@ try
     end
     
     % Unclear why, but rarely the exported Value is -Inf
+    % I don't see a reason for this in the scripts. I think it must come from the input data.
     SME_Export(abs(Alpha_Export) == Inf) = NaN;
     Alpha_Export(abs(Alpha_Export) == Inf) = NaN;
     

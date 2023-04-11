@@ -6,13 +6,14 @@ output = input$data
 
 ## Contributors
 # Last checked by KP 12/22
-# Planned/Completed Review by:
+# Planned/Completed Review by: Cassie (CAS) 4/23
 
 # Handles how Personality Data is defined (different Scores calculated outside)
 # No Action here, will be carried out in function "Covariate"
 
 # Just assign Variable for BIS here too, given that they are Not considered in same model, they
 # do not need to be forked independently (maybe even better if not)
+# could not find where Z_sum_BFI is defined, to check that it comprises assertiveness and energy level
 
 if (choice == "BISBAS_BAS") {
   choiceBIS = "BISBAS_BIS" 

@@ -1,7 +1,7 @@
 function  OUTPUT = Bad_Channels(INPUT, Choice)
 % Last Checked by KP 12/22
 % Planned Reviewer:
-% Reviewed by: 
+% Reviewed by: Cassie (CAS) 4/23
 
 % This script does the following:
 % It identifies bad channels based on forking criteria, and it interpolates
@@ -37,6 +37,7 @@ Choices = ["EPOS", "Makoto", "HAPPE", "PREP", "FASTER", "APPLE", "CTAP", "No_Bad
 Conditional = ["NaN", "NaN", "NaN", "NaN", "NaN", "NaN", "NaN", "NaN"];
 SaveInterim = logical([0]);
 Order = [3];
+% "No bad channels" was not a preregistered option
 
 % ****** Updating the OUTPUT structure ******
 % No changes should be made here.

@@ -1,7 +1,7 @@
 function  OUTPUT = Electrodes(INPUT, Choice);
 % Last Checked by KP 12/22
 % Planned Reviewer:
-% Reviewed by:
+% Reviewed by: Cassie (CAS) 4/23
  
 
 % This script does the following:
@@ -36,6 +36,7 @@ function  OUTPUT = Electrodes(INPUT, Choice);
 StepName = "Electrodes";
 Choices = ["F3,F4", "F3,F4,F5,F6,AF3,AF4", "F3,F4,P3,P4", "F3,F4,F5,F6,AF3,AF4,P3,P4,P5,P6,PO3,PO4"]; 
 Conditional = ["Cluster_Electrodes == ""no_cluster"" ", "NaN", "Cluster_Electrodes == ""no_cluster"" ", "NaN"]; 
+% Is it correct that "F3,F4,P3,P4" is "no cluster"? As it could be clustered as F3P3 and F4P4.
 SaveInterim = logical([0]); 
 Order = [19]; 
  

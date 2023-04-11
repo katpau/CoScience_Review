@@ -2,6 +2,8 @@
 % (1) prepares and adds all necessary files - no changes here
 % (2) allows to run each step separately - check steps there!!
 
+% Reviewed by Cassie (CAS) 4/23
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (1) Preparation to run preprocessing Steps - No Changes Here (only
 % possible change is line 17, different subject)
@@ -83,6 +85,7 @@ INPUT = Run_ICA(INPUT, "ICA"); %  "ICA"    "No_ICA"
 INPUT = OccularCorrection(INPUT, "ICLabel"); % "ICLabel"    "EPOS"    "ADJUST"    "MARA"    "FASTER"    "APPLE"    "Gratton_Coles"    "No_OccularCorrect…"
 INPUT = LP_Filter_Later(INPUT, "30"); %  "30"    "40"    "60"    "No_LP_Later"
 INPUT = Epoching(INPUT, "2_s_50_overlap");  % "2_s_50_overlap", "2_s_90_overlap", "1_s_50_overlap", "1_s_90_overlap"
+% We amended the preregistration to remove the 90% overlaps, so options "2_s_90_overlap" and "1_s_90_overlap" should be removed. 
 INPUT = Bad_Epochs(INPUT, "FASTER"); %  "FASTER", "Threshold_100", "Threshold_120", "Threshold_150", "Threshold_200", "Probability+Kurtosis+Frequency_3.29SD", "No_BadEpochs"
 
 INPUT = Reference(INPUT, "CSD"); %  "CSD"    "CAV"    "Mastoids"

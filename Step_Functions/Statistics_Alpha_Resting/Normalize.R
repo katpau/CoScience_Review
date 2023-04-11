@@ -6,7 +6,7 @@ Normalize = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: Cassie (CAS) 4/23
 
   # Handles all Choices listed above 
   # Tests if Data should be normalized or not (is grouped for Analyses, Tasks, Condition, etc.)

@@ -1,7 +1,7 @@
 function  OUTPUT = Resampling(INPUT, Choice, SubjectName, FilePath_to_Import, File_to_Import)
 % Last Checked by KP 12/22
 % Planned Reviewer:
-% Reviewed by: 
+% Reviewed by: Cassie (CAS) 4/23
 
 % This script does the following: 
 % It first determines and loads the EEGLAB data file.
@@ -40,6 +40,8 @@ function  OUTPUT = Resampling(INPUT, Choice, SubjectName, FilePath_to_Import, Fi
 % Order determines when it should be run.
 StepName = "Resampling";
 Choices = ["500", "250", "125"];
+% the preregistration states that data is downsampled by factors, so would differ depending on amplifier
+% so would be 512/500, 256/250, 128/125 Hz
 Conditional = ["NaN", "NaN", "NaN"];
 SaveInterim = logical([0]);
 Order = [1];

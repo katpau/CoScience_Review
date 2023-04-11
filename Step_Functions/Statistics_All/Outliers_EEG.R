@@ -6,7 +6,7 @@ Outliers_EEG = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: Cassie (CAS) 4/23
 
   # Handles if outliers based on EEG should be identified or not
   # Handles all Choices listed above as well as for Outliers in terms of EEG & SME 

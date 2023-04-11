@@ -6,7 +6,7 @@ output = input$data
 
 ## Contributors
 # Last checked by KP 12/22
-# Planned/Completed Review by:
+# Planned/Completed Review by: Cassie (CAS) 4/23
 
 # Handles all Choices listed above 
 # Normalizes the predictors (e.g. behavioral and personality) data within all conditions
