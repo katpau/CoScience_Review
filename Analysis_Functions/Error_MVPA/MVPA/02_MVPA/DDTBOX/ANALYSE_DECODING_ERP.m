@@ -351,7 +351,7 @@ for s = 1:ANALYSIS.nsbj
             
     end
     %______________________________________________________________________
-    
+
     % Extract feature weights
     if ~isempty(RESULTS.feature_weights)
         ANALYSIS.RES.feature_weights{s} = RESULTS.feature_weights{1};

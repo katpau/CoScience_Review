@@ -26,13 +26,13 @@ global bdir;
 %% Specifications
 if AnalysisName == "Flanker_MVPA"
     input_dir = [bdir '\Only_ForGit_To_TestRun\Preproc_forked\Error_MVPA\task-Flanker\1.1_2.1_3.1_4.1_5.1_6.1_7.1_8.1_9.1_10.1_11.1_12.1_13.1_14.1_15.1/'];   %Folder containing the raw data
-    output_dir = [bdir '\Analysis_Functions\MVPA\01_Preprocessing\PreprocessedData\flanker\'];      %Folder where the preprocessed data is to be stored 
+    output_dir = [bdir '\Analysis_Functions\Error_MVPA\MVPA\01_Preprocessing\PreprocessedData\flanker\'];      %Folder where the preprocessed data is to be stored 
  elseif AnalysisName == "GoNoGo_MVPA" 
     input_dir = [bdir '\Only_ForGit_To_TestRun\Preproc_forked\Error_MVPA\task-GoNoGo\1.1_2.1_3.1_4.1_5.1_6.1_7.1_8.1_9.1_10.1_11.1_12.1_13.1_14.1_15.1/'];   %Folder containing the raw data
-    output_dir = [bdir '\Analysis_Functions\MVPA\01_Preprocessing\PreprocessedData\go_nogo\'];      %Folder where the preprocessed data is to be stored Preprocessed Data
+    output_dir = [bdir '\Analysis_Functions\Error_MVPA\MVPA\01_Preprocessing\PreprocessedData\go_nogo\'];      %Folder where the preprocessed data is to be stored Preprocessed Data
 end
 
-chan_dir = [bdir '\Analysis_Functions\MVPA\02_MVPA\locations\']; %Folder where channel locations are to be stored
+chan_dir = [bdir '\Analysis_Functions\Error_MVPA\MVPA\02_MVPA\locations\']; %Folder where channel locations are to be stored
 
 %% extract participant code
 

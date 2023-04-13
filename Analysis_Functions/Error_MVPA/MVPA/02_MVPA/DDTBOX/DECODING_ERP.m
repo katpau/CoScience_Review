@@ -90,6 +90,8 @@ if input_mode == 0 % Hard-coded input
     STUDY.equal_n = 1; % Should the same number of trials be analysed for each contrast? 0 = no / 1 = yes (added by André on April 18th, 2019)
     STUDY.equal_n_conditions = [1 2]; % Which conditions should be considered when looking for the minimum trial number? (added by André on August 19th, 2019)
     STUDY.analyse_n = 0; %How many trials should be analysed? 0 = analyse all trials (added by André on April 18th, 2019)
+    STUDY.part_code = SLIST.sbj_code; %[elisa] include info about participant code to store with subj_acc later
+
 
 elseif input_mode == 1 % Prompt user for input
 
@@ -748,6 +750,28 @@ end
 save(savename,'STUDY','RESULTS'); % Save STUDY and RESULTS structures into a .mat file
 
 fprintf('Results are saved for participant %d in directory: %s. \n',STUDY.sbj,(SLIST.output_dir));
+
+%[elisa] save otuput file for all participants with part_code and decoding
+%accuracies to jackknife decoding onset later
+part_accuracies = zeros(length(RESULTS.subj_acc),2);
+part_accuracies(:,1) = RESULTS.subj_acc;
+part_accuracies(:,2) = RESULTS.subj_perm_acc;
+id = repmat(info.participant,length(part_accuracies),1);
+timestep = [-300:10:290]';
+part_accuracies = [cell2table(id), array2table(timestep), array2table(part_accuracies)];
+colNames={'id', 'timestep', 'subj_acc', 'subj_perm_acc'};
+part_accuracies.Properties.VariableNames = colNames;
+
+if ~isfile([SLIST.output_dir 'all_part_acc.mat'])
+         all_part_accuracies = part_accuracies; 
+else 
+    load([SLIST.output_dir 'all_part_acc.mat']);
+    if ~any(strcmp(id, all_part_accuracies.id)) %only append when current part has not been appended 
+         all_part_accuracies = vertcat(all_part_accuracies, part_accuracies); 
+     end
+end
+
+save([SLIST.output_dir 'all_part_acc.mat'], 'all_part_accuracies'); % Save into a .mat file
 
 %% SECTION 11: DISPLAY INDIVIDUAL RESULTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Displays decoding results for each individual subject dataset.
