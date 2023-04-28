@@ -482,7 +482,7 @@ for (CutOff_Applied in 0) { # Cut loop here for testing
       
       
       ## extract factor scores from cfa
-      fac.scores <- data.frame(lavPredict(f1, type = "lv"))
+      CEI.fac.scores <- data.frame(lavPredict(f1, type = "lv"))
       
       # TODO @Kat save within export data frame (each variable or by cbind) & add to "merge and export data"
       df.pq$ESC <- fac.scores$ESC
