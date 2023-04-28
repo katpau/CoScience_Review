@@ -36,6 +36,60 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
   make_Factor = names(classes_df[classes_df == "character"])
   Subset[make_Factor] = lapply(Subset[make_Factor], as.factor)
   
+  # CK: necessary data format is long, and trial-by-trial 
+  
+  # ID  CEI trial demand  electrode RT  correct FMT N2  P3
+  # 1   1   1     1       1         x1  x1 [0,1]x1  x1  x1
+  # 1   1   1     1       2         x1  x1      x2  x2  x2
+  # 1   1   1     1       ...       ... ...     ... ... ...  
+  # 1   1   2     2       1         x2  x2      x1  x1  x1    
+  # 1   1   2     2       2         x2  x2      x2  x2  x2
+  # 1   1   2     2       ...       ... ...     ... ... ...
+  # 1   1   ...   ...     ...       ... ...     ... ... ...
+  # 2   2   1     1       1         x1  x1      x1  x1  x1
+  # ... ... ...   ...     ...       ... ...     ... ... ...
+  # n   x   n     4       x         x   x       x   x   x
+  
+  # *error trials are needed for accuracy analysis/ error rate
+  # ID and electrode as factor
+  
+  ## 1. change global coding in order to get meaningful results
+  # to orthogonal sum-to-zero contrast 
+  options(contrasts = c("contr.sum", "contr.poly"))
+  
+  ## 2. get subset for each criterion
+  # TODO @ Kat adjust variable naming
+  sub.rt <- droplevels(subset(df.rt[c("ID", "RT", "demand", "CEI", "COM", "ESC",
+                                       fluidIntelligence, electrode)],  # include all necessary variables, like covariates
+                              subset = !is.na(RT)))    # remove missing data rows
+  
+    # TODO MINIMUM OF INCLUDED DATA: Condition values will be marked as outlier if 
+    # after artefact correction, subjects have less than
+    # (1) 20 trials (per condition).
+  
+  ## 3. center predictors
+  # level 1 predictors: centering within cluster (CWC) = group mean centering
+  # demand
+  sub.rt$demand.cwc <- sub.rt$demand - ave(sub.rt$demand, sub.rt$ID, 
+                                           FUN = function(x) mean(x, na.rm = T))
+  # same for electrode
+  # TODO
+  
+  
+  # level 2 predictor: centering at the grand mean (CGM) 
+  # CEI, COM, ESC
+  sub.rt$CEI.cgm <- scale(sub.rt$CEI, scale = F)
+  sub.rt$COM.cgm <- scale(sub.rt$COM, scale = F)
+  sub.rt$ESC.cgm <- scale(sub.rt$ESC, scale = F)
+  # fluid Intelligence
+  # TODO
+  
+  ## 4. calculate models
+  # use lmerTest 
+  library(lmerTest)         # version  3.1.3            for LMM
+
+  
+  
   
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Prepare and Calculate LMer Model
@@ -147,6 +201,16 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       print("Using existing LMER")
       Model_Result = ModelProvided }
   
+  #----
+  # CK: there are several outcomes when estimating the models
+  # if there is a warning message - it can mostly be ignored (after checking covariance matrix: summary(model)$varcor)
+  # the optimization algorithm can be adjusted in order to prevent fitting error / singular fit or any other difficulty
+  m1 <- lmer(criterion ~ demand.cwc * CEI.cgm + electrode 
+             + (demand.cwc | ID), data = sub.df,
+             control = lmerControl(optimizer = "bobyqa")) # in most cases this optimizer works
+  # there is also a time consuming method to try all optimizers 
+  
+  
   
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # if only model is exported, stop here
@@ -224,6 +288,19 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       # Get Standardized effects
       #effectsize::standardize_parameters(Model_Result)
       
+      #-----
+      # CK: 
+      # TODO @ Kat adjust variable names
+      ## for the whole model
+      rt.r2_total <- r.squaredGLMM(m1.rt.final, pj2014 = T)
+      #            R2m       R2c
+      # [1,] 0.1526714 0.3793343
+
+
+      # semi-partial (marginal) R squared for fixed effects
+      rt.r2_fixef <- r2beta(m1.rt.final, method = "nsj")
+      #----
+      
 
       # get subject nr
       if (noRandomFactor == 0) { 
@@ -243,6 +320,26 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       
       
       # is there a way to test the direction simply?
+      # CK: the direction is expressed in the positive or negative value of the estimate
+      # however, if interactions are significant, we might want to explore this interaction effect
+      # that would be possible with a simple slope analysis
+      # plot interactions
+      library(interactions)
+      # produce a plot
+      rt_ia.plot <- interact_plot(model, pred = demand.cwc, modx = CEI.cgm, centered = "none", 
+                                  x.label = "Demand", y.label = "Reaction Time in ms",
+                                  legend.main = "Cognitive \nEffort \nInvestment",
+                                  interval = F,
+                                  colors = c("black", "black", "black", "black")) + ylim(335, 650) + theme_apa(legend.use.title = T) 
+      
+      # perform simple slopes analysis
+      rt.ss.d <- sim_slopes(model, pred = demand.cwc, modx = CEI.cgm, centered = "none",
+                            cond.int = T,                   # print conditional intercepts
+                            johnson_neyman = T,             # calculate Johnson Neyman intervals,
+                            jnplot = T, control.fdr = T,    # create plot, adjust false discovery rate
+                            confint = T)                    # get confidence intervals
+      
+      
       # is there a way to extract estimates when more than 2 levels?
       # effectsize::standardize_parameters(Model_Result)
     } 
