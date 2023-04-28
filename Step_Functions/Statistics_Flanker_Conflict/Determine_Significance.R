@@ -6,15 +6,15 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: CK 4/23
   
   # Handles all Choices listed above 
   # Runs the statistical Test, corrects for multiple comparisons and 
   # Prepares Output Table
   
-  # (1) Get Names and Formulas of variable Predictors
+  # (1) Get Names and Formulas of Variable Predictors
   # (2) Initiate Functions for Hypothesis Testing
-  # (3) Prepare Averages across Condition1s and Correlations
+  # (3) Prepare Averages across Conditions and Correlations
   # (4) Test State Hypothesis (H1)
   # (5) Correct for Multiple Comparisons for Hypothesis 1 and Combine all Estimates
   # (6) Export as CSV file
@@ -23,11 +23,11 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   #########################################################
-  # (1) Get Names and Formulas of variable Predictors
+  # (1) Get Names and Formulas of Variable Predictors  ####
   #########################################################
   # Names are used to select relevant columns
   # Formula (parts) are used to be put together and parsed to the lm() function,
-  # thats why they have to be added by a * or +
+  # that's why they have to be added by a * or +
   
   # Get column Names and Formula for Covariates
   if (input$stephistory["Covariate"] == "None") { 
@@ -57,27 +57,28 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   #########################################################
-  # (2) Initiate Functions for Hypothesis Testing
+  # (2) Initiate Functions for Hypothesis Testing      ####
   #########################################################
   wrap_test_Hypothesis = function (Name_Test,lm_formula,  Data, Effect_of_Interest, DirectionEffect,
-                                   collumns_to_keep, Component, SaveUseModel, ModelProvided) {
+                                   columns_to_keep, Component, SaveUseModel, ModelProvided) {
     # wrapping function to parse specific Information to the test_Hypothesis Function
-    # Does three things: (1) Select Subset depending on Conditions and Tasks ans Analysis Phase
-    # (2) Test the Hypothesis/Calculate Model and 
+    # Does three things: 
+    # (1) Selects Subset depending on Conditions and Tasks and Analysis Phase
+    # (2) Tests the Hypothesis/Calculate Model and 
     # (3) Checks the direction of the effects
     # Inputs:
-    # Name_Test is the Name that will be added as first collumn, to identify tests across forks, str (next to the actual interaction term)
+    # Name_Test is the Name that will be added as first column, to identify tests across forks, str (next to the actual interaction term)
     # lm_formula contains the formula that should be given to the lm, str
     # Data contains data (that will be filtered), df
     # Effect_of_Interest is used to identify which estimate should be exported, array of str.
     #             the effect is extended by any potential additional factors (hemisphere, electrode...)
     # DirectionEffect is a list with the following named elements:
     #               Effect - char to determine what kind of test, either main, interaction, correlation, interaction_correlation, interaction2_correlation
-    #               Personality - char name of personality collumn
-    #               Larger - array of 2 chars: first name of collumn coding condition, second name of factor with larger effect
-    #               Smaller - array of 2 chars: first name of collumn coding condition, second name of factor with smaller effect
-    #               Interaction - array of 3 chars: first name of collumn coding condition additional to Larger/Smaller, second name of factor with smaller effect, third with larger effect
-    # collumns_to_keep lists all collumns that should be checked for completeness, array of str
+    #               Personality - char name of personality column
+    #               Larger - array of 2 chars: first name of column coding condition, second name of factor with larger effect
+    #               Smaller - array of 2 chars: first name of column coding condition, second name of factor with smaller effect
+    #               Interaction - array of 3 chars: first name of column coding condition additional to Larger/Smaller, second name of factor with smaller effect, third with larger effect
+    # columns_to_keep lists all columns that should be checked for completeness, array of str
     # Component lists the Component included in this test, array of str
     # SaveUseModel, can be added or left out, options are 
     #           "default" (Model is calculated), 
@@ -90,7 +91,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     
     # Create Subset
-    Subset = Data[Data$Component %in% Component, names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", collumns_to_keep)]
+    Subset = Data[Data$Component %in% Component, names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", columns_to_keep)]
     
     # Run Test
     ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)
@@ -106,13 +107,13 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   #########################################################
-  # (4) Test Hypothesis set 1 for Behaviour
+  # (4) Test Hypothesis set 1 for Behavior             ####
   #########################################################
   Estimates = data.frame()
   for (DV in c("Behav_RT", "ACC")) {
     print(paste("Test Effect on ", DV))
     lm_formula =   paste( DV,  " ~ (( Congruency * Personality_CEI) ) ", Covariate_Formula)
-    collumns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, DV) 
+    columns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, DV) 
     
     Effect_of_Interest = c("Personality_CEI")
     Effect_of_Interest_IA = c("Personality_CEI", "Congruency")
@@ -128,27 +129,60 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     H_1_Model = wrap_test_Hypothesis("",lm_formula, output,
                                      "",  "", 
-                                     collumns_to_keep, "RT",
+                                     columns_to_keep, "RT",
                                      "exportModel")
     # Test main Effect of CEI  
     Name_Test = paste0(DV, "_CEI")
     Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                                                      DirectionEffect, collumns_to_keep, "RT",
+                                                      DirectionEffect, columns_to_keep, "RT",
                                                       "previousModel", H_1_Model))
     
     # Test IA with CEI and Demand Level
     Name_Test = paste0(DV, "_CEI_Congruency")
     Estimates = rbind(Estimates,wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest_IA,
-                                                     DirectionEffect_IA, collumns_to_keep, "RT",
+                                                     DirectionEffect_IA, columns_to_keep, "RT",
                                                      "previousModel", H_1_Model)  )
   }
+  
+  # FIXME @Kat CK: added LMM and GLM
+  
+  ## 1 Null model to calculate intra-class correlation
+  m0 <- lmer(criterion ~ 1 + (1 | ID), data = sub.df)  
+    # criterion = RT, FMT, N2, P3 
+    # data = data frame for each criterion containing the respective trial by trial data (cf. test_Hypothesis.R) as subset of main data frame
+  
+  # intraclass correlation (ICC) = random intercept variance / (random intercept variance + residual variance)
+  var_m0 <- as.data.frame(VarCorr(m0))
+  var_m0$vcov[1] / (var_m0$vcov[1] + var_m0$vcov[2])
+  
+  
+  ## 2 set up LMM (Hypothesis 1+2)
+  m1 <- lmer(criterion ~ demand.cwc * CEI.cgm + electrode # TODO CK: centering methods
+             + (demand.cwc | ID), data = sub.df)
+    # predictors need to be centered (cf. test_Hypothesis.R)
+  
+  
+  ## 3 set up LMM, additional predictor: fluid intelligence (Hypothesis 3)
+  m2 <- lmer(criterion ~ demand.cwc * CEI.cgm + electrode + fluidIntelligence # TODO CK: centering methods
+             + (demand.cwc | ID), data = sub.df)
+  
+  ## 4 set up GLMM for error rate / accuracy as is has a binomial distribution (Hypothesis 1+2)
+  m1.ac <- glmer(correct ~ demand.cwc * CEI.cgm + electrode
+                 + (demand.cwc | ID), data = sub.ac,
+                 family = binomial(link = "logit"))
+  
+  ## 5 set up GLMM for error rate / accuracy as is has a binomial distribution, additional predictor: fluid intelligence (Hypothesis 3)
+  m2.ac <- glmer(correct ~ demand.cwc * CEI.cgm + electrode + fluidIntelligence
+                 + (demand.cwc | ID), data = sub.ac,
+                 family = binomial(link = "logit"))
+  
   
   #########################################################
   # (4) Test Hypothesis set 1 for EEG
   #########################################################
   lm_formula =   paste( "EEG_Signal ~ (( Congruency * Personality_CEI) ", 
                         additional_Factor_Formula, ")", Covariate_Formula)
-  collumns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, additional_Factors_Name) 
+  columns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, additional_Factors_Name) 
   
   DirectionEffect = list("Effect" = "correlation",
                          "Personality" = "Personality_CEI")
@@ -161,20 +195,20 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     print(paste("Test Effect on ", DV))
     H_4_Model = wrap_test_Hypothesis("",lm_formula, output,
                                      "",  "", 
-                                     collumns_to_keep, DV,
+                                     columns_to_keep, DV,
                                      "exportModel")
     
     
     # Test main Effect of CEI  
     Name_Test = paste0(DV, "_CEI")
     Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                                                      DirectionEffect, collumns_to_keep, "N2",
+                                                      DirectionEffect, columns_to_keep, "N2",
                                                       "previousModel", H_4_Model))
     
     # Test IA with CEI and Demand Level
     Name_Test = paste0(DV, "_CEI_Congruency")
     Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest_IA,
-                                                      DirectionEffect_IA, collumns_to_keep, "N2",
+                                                      DirectionEffect_IA, columns_to_keep, "N2",
                                                       "previousModel", H_4_Model)  )
   }
   
@@ -187,6 +221,14 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # Hypotheses 3 is tested when the main effect and interaction of CEI remains significant when fluid
   # intelligence is entered.
   
+  # CK: additionally both models can be compared by criterions like (R², AIC)
+  # or by model comparison with test for deviances via ANOVA
+  anova(m1., m2)
+    # m1 = model of Hypothesis 1+2
+    # m2 = model with fluid intelligence as additional predictor Hypothesis 3
+  # the smaller the deviance the better fits the model
+  # significance examination  
+  
   
   ############################
   # Hypthesis 4: Correlations
@@ -196,6 +238,11 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   C1 = cor.test(Subset$Personality_LE_Positiv, Subset$Personality_NFC_NeedForCognition, method = "pearson")
   C2 = cor.test(Subset$Personality_LE_Positiv, Subset$Personality_CEI, method = "pearson")
   C3 = cor.test(Subset$Personality_CEI, Subset$Personality_NFC_NeedForCognition, method = "pearson")
+  # CK: why just do one correlation test (correlations would be automatically adjusted - but maybe that's the problem?)
+    # psych::corr.test(x, y = NULL, use = "pairwise",method="pearson",adjust="holm", alpha=.05,ci=TRUE,minlength=5,normal=TRUE)
+  C  = corr.test(c(Subset$Personality_LE_Positiv, Subset$Personality_NFC_NeedForCognition, Subset$Personality_CEI))
+    # save correlation matrix: round(C$r, 2)
+    # save p-values: round(C$p, 4)       
   
   Estimates = rbind(Estimates,
                     c("Correlation_LE_NFC", "pearsonR", "r", C1$estimate, C1$conf.int[1], C1$conf.int[2], C1$p.value, nrow(Subset),NA, NA, NA ),
@@ -204,7 +251,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   #########################################################
-  # (5) Correct for Multiple Comparisons for Hypothesis 1
+  # (5) Correct for Multiple Comparisons for Hypothesis 1 #### # CK: 1,2,3
   #########################################################
   
   Estimates_to_Correct = as.data.frame(rbind(H1_4, H1_5)) # redo also for Behavioral, add FMT - make a loop? since many blocked!
