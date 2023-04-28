@@ -1,6 +1,6 @@
 test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided) {
   # this function is used to export the relevant estimates from the tested model or the model (determined by SaveUseModel)
-  # Name_Test is the Name that will be added as first collumn, to identify tests across forks, str (next to the actual interaction term)
+  # Name_Test is the Name that will be added as first column, to identify tests across forks, str (next to the actual interaction term)
   # lm_formula contains the formula that should be given to the lm, str
   # output contains (subset) of the data, df
   # Effect_of_Interest is used to identify which estimate should be exported, array of str.
@@ -17,20 +17,20 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
   StopModel = 0
   
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # GetName of all relevant collumns
-  keptcollumns = colnames(Subset)
+  # GetName of all relevant columns
+  keptcolumns = colnames(Subset)
   # Drop Localisation and Electrode if both of them are given (only Relevant for Alpha Asymmetry)
-  if (any(grepl("Localisation ", keptcollumns)) & any(grepl("Electrode", keptcollumns)) ) {
-    keptcollumns = keptcollumns[!keptcollumns == "Localisation"]  }
+  if (any(grepl("Localisation ", keptcolumns)) & any(grepl("Electrode", keptcolumns)) ) {
+    keptcolumns = keptcolumns[!keptcolumns == "Localisation"]  }
   
   # Select relevant data and make sure its complete
   colNames_all = names(Subset)
   # Get DV
   DV = gsub(" ", "", str_split(lm_formula, "~")[[1]][1])
   # Second select columns based
-  relevant_collumns = c(DV, colNames_all[grepl("Personality_", colNames_all)],  colNames_all[grepl("Covariate_", colNames_all)])
+  relevant_columns = c(DV, colNames_all[grepl("Personality_", colNames_all)],  colNames_all[grepl("Covariate_", colNames_all)])
   # Third make sure cases are complete
-  Subset = Subset[complete.cases(Subset[,colnames(Subset) %in% relevant_collumns]), ]
+  Subset = Subset[complete.cases(Subset[,colnames(Subset) %in% relevant_columns]), ]
   
   classes_df = lapply(Subset[names(Subset)], class)
   make_Factor = names(classes_df[classes_df == "character"])
@@ -48,7 +48,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       
       print("Calculating LMER")
       #?? Update Formula if levels singular?
-      for (iCol in keptcollumns) {
+      for (iCol in keptcolumns) {
         if(length(unique(as.character((as.data.frame(Subset)[,iCol]))))<2) {
           if (grepl(iCol, lm_formula)) {
             print("Dropped Factor")
@@ -181,12 +181,12 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       
       
       # Expand Effect of Interest by additional factors
-      if ("Hemisphere" %in% keptcollumns) {
+      if ("Hemisphere" %in% keptcolumns) {
         Effect_of_Interest = c(Effect_of_Interest, "Hemisphere")  }
-      if ("Localisation" %in% keptcollumns) {
+      if ("Localisation" %in% keptcolumns) {
         Effect_of_Interest = c(Effect_of_Interest, "Localisation")  }
       # Add Electrode to effect of interest only if frontal/paripartial_Etal
-      if ("Electrode" %in% keptcollumns) {
+      if ("Electrode" %in% keptcolumns) {
         if (length(unlist(unique(Subset$Electrode))) == 6) {
           Effect_of_Interest = c(Effect_of_Interest, "Electrode")  }}
       
