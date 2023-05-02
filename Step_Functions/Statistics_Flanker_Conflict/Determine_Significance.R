@@ -157,24 +157,30 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   ## 2 set up LMM (Hypothesis 1+2)
-  m1 <- lmer(criterion ~ demand.cwc * CEI.cgm + electrode # TODO CK: centering methods
+  m1 <- lmer(criterion ~ demand.cwc * CEI.cgm + electrode.cwc 
              + (demand.cwc | ID), data = sub.df)
     # predictors need to be centered (cf. test_Hypothesis.R)
   
   
   ## 3 set up LMM, additional predictor: fluid intelligence (Hypothesis 3)
-  m2 <- lmer(criterion ~ demand.cwc * CEI.cgm + electrode + fluidIntelligence # TODO CK: centering methods
+  m2 <- lmer(criterion ~ demand.cwc * CEI.cgm + electrode.cwc + fluidIntelligence.cgm 
              + (demand.cwc | ID), data = sub.df)
   
   ## 4 set up GLMM for error rate / accuracy as is has a binomial distribution (Hypothesis 1+2)
-  m1.ac <- glmer(correct ~ demand.cwc * CEI.cgm + electrode
+  m1.ac <- glmer(correct ~ demand.cwc * CEI.cgm + electrode.cwc
                  + (demand.cwc | ID), data = sub.ac,
                  family = binomial(link = "logit"))
   
   ## 5 set up GLMM for error rate / accuracy as is has a binomial distribution, additional predictor: fluid intelligence (Hypothesis 3)
-  m2.ac <- glmer(correct ~ demand.cwc * CEI.cgm + electrode + fluidIntelligence
+  m2.ac <- glmer(correct ~ demand.cwc * CEI.cgm + electrode.cwc + fluidIntelligence.cgm
                  + (demand.cwc | ID), data = sub.ac,
                  family = binomial(link = "logit"))
+  
+  ## Exploratory: controlling for block and nesting in lab
+  m1e <- lmer(criterion ~ demand.cwc * CEI.cgm + electrode.cwc + block.cwc
+              # + fluidIntelligence.cgm                                     # for m2e
+              + (demand.cwc | labID / ID), data = sub.df)
+  
   
   
   #########################################################
