@@ -7,6 +7,8 @@ Covariate = function(input = NULL, choice = NULL) {
   ## Contributors
   # Last checked by KP 12/22
   # Planned/Completed Review by:
+  
+  # CS 01/23
 
   # Handles all Choices listed above as well as choices from previous Steps 
   # (Attention Checks Personality, Outliers_Personality, Personality_Variable)
