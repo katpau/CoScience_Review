@@ -170,7 +170,7 @@ try
                 
             case "F3,F4,F5,F6,AF3,AF4"
                 if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-                    ElectrodeNames = ["F4,F6,AF4-F3,F5,AF3"];
+                    ElectrodeNames = ["F4.F6.AF4-F3.F5.AF3"];
                     Localisation = "Frontal";
                     
                 else
@@ -185,7 +185,7 @@ try
                 
             case "F3,F4,F5,F6,AF3,AF4,P3,P4,P5,P6,PO3,PO4"
                 if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-                    ElectrodeNames = ["F4,F6,AF4-F3,F5,AF3", "P4,P6,PO4-P3,P5,PO3"];
+                    ElectrodeNames = ["F4.F6.AF4-F3.F5.AF3", "P4.P6.PO4-P3.P5.PO3"];
                     Localisation = ["Frontal", "Parietal"];
                 else
                     ElectrodeNames = ["F4-F3", "F6-F5", "AF4-AF3", "P4-P3", "P6-P5", "PO4-PO3"];
@@ -203,7 +203,7 @@ try
                 
             case "F3,F4,F5,F6,AF3,AF4"
                 if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-                    ElectrodeNames = ["F34,F56,AF34", "F34,F56,AF34"];
+                    ElectrodeNames = ["F34.F56.AF34", "F34.F56.AF34"];
                     Localisation = ["Frontal", "Frontal"];
                     AlphaType = ["left", "right"];                  
                 else
@@ -220,7 +220,7 @@ try
                 
             case "F3,F4,F5,F6,AF3,AF4,P3,P4,P5,P6,PO3,PO4"
                 if INPUT.StepHistory.Cluster_Electrodes == "cluster"
-                    ElectrodeNames = ["F34,F56,AF34", "F34,F56,AF34", "P34,P56,PO34", "P34,P56,PO34"];
+                    ElectrodeNames = ["F34.F56.AF34", "F34.F56.AF34", "P34.P56.PO34", "P34.P56.PO34"];
                     Localisation = ["Frontal","Frontal", "Parietal", "Parietal"];
                     AlphaType = ["left",  "right", "left", "right"];
                     
@@ -262,8 +262,6 @@ try
     for i_cond = 1:length(Conditions)
         EEG = INPUT.data.(Conditions{i_cond});
         Trials(i_cond) = EEG.trials; % used for bookkeeping later
-        % ****** Get Info on Frequency Band ******
-        FrequencyChoice = INPUT.StepHistory.FrequencyBand;
         nfft = 2^nextpow2(EEG.pnts);    % Next power of 2 from length of epochs
         NrFreqs = nfft/2+1;
         frequencies.(Conditions{i_cond}) = EEG.srate/2*linspace(0,1,NrFreqs);
@@ -282,7 +280,9 @@ try
         end
         
         % ****** Apply Hanning Window ******
-             Data = Data.*[hann(EEG.pnts)]';
+        if contains(Conditions{i_cond},  "Resting")
+          Data = Data.*[hann(EEG.pnts)]';
+        end
 
         
         % ****** Calculate FFT ******
@@ -313,6 +313,8 @@ try
     
     
     % **** Get Info on Frequency Window ******
+    FrequencyChoice = INPUT.StepHistory.FrequencyBand;
+
     if ~contains(FrequencyChoice, "relative")
         % Window is set
         FreqChoice = strsplit(FrequencyChoice, "_");
@@ -345,9 +347,13 @@ try
             end
             % Calculate Frontal power only in relevant frequency window
             FrontalPower = mean(mean(mean(power_AllConditions(Idx_Frontal,[Broadwindow(1):Broadwindow(2)],:), 3,'omitnan' ) ,1,'omitnan' ),4,'omitnan' );
-            
-            % Identify Maximum Power within Range
-            [~, MaxIdx] = max(FrontalPower);
+            df = 1./(frequencies.(Conditions{i_cond})(Broadwindow(1):Broadwindow(2)));
+            % scale to find "peak" and find local maxima
+            [~, MaxIdx] = findpeaks( (FrontalPower./df)  );
+            % when no peak found ?
+             if isempty(MaxIdx)
+                 MaxIdx = round(length(Broadwindow(1):Broadwindow(2))/2);
+             end
             % add Index of this maximum alpha peak (! Important add the skipped
             % Frequencies Back from the "broad window"
             MaxFreq = [MaxFreq, frequencies.(Conditions{i_cond})(Broadwindow(1) + MaxIdx -1)];

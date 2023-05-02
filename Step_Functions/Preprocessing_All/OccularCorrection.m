@@ -70,6 +70,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 % initalize clean ICA mask
                 clean_ICA_Mask = ones(size(EEG_fil.icaact,1), 1);
                 
+                badIC =[];
                 % ****** identify bad ICA components ******
                 if strcmpi(Choice, "EPOS")
                     if  EEG.trials * EEG.pnts /EEG.srate < 15

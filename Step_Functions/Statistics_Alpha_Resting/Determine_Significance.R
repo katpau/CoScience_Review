@@ -1,6 +1,6 @@
 Determine_Significance = function(input = NULL, choice = NULL) {
   StepName = "Determine_Significance"
-  Choices = c("Holm", "Bonferroni", "None")
+  Choices = c("Holm", "Bonferroni", "FDR", "None")
   Order = 13
   output = input$data
   
@@ -165,69 +165,19 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                               DirectionEffect, collumns_to_keep,
                               "previousModel", H1_Model)
   
-
-  #########################################################
-  # (4) Test Hypothesis 2 
-  #########################################################
-  #  It is predicted that specificity of the effect to trait BAS versus other personality traits will be supported
-  print("Test Specificity")
-  lm_formula =   paste( "EEG_Signal ~ ((Experimenter_Sex * Behav_Attractiveness * Participant_Sex )", 
-                        "* (",  Personality_Name_BAS, "+ Personality_BFI_OpenMindedness + Personality_BFI_Conscientiousness + Personality_BFI_Agreeableness)",
-                        additional_Factor_Formula, ")", Covariate_Formula)
-  collumns_to_keep = c("Experimenter_Sex", "Behav_Attractiveness",  "Participant_Sex", Personality_Name_BAS, Covariate_Name, 
-                       "Personality_BFI_OpenMindedness","Personality_BFI_Conscientiousness","Personality_BFI_Agreeableness",   
-                       additional_Factors_Name) 
-  H1_Model_3otherBFI = wrap_test_Hypothesis("",lm_formula, output, "", "", 
-                                  collumns_to_keep, 
-                                  "exportModel")
   
-  
-  lm_formula =   paste( "EEG_Signal ~ ((Experimenter_Sex * Behav_Attractiveness * Participant_Sex )", 
-                        "* (",  Personality_Name_BAS, "+ Personality_BFI_OpenMindedness + Personality_BFI_Conscientiousness + Personality_BFI_Agreeableness + Personality_BFI_NegativeEmotionality)",
-                        additional_Factor_Formula, ")", Covariate_Formula)
-  collumns_to_keep = c("Experimenter_Sex", "Behav_Attractiveness",  "Participant_Sex", Personality_Name_BAS, Covariate_Name, 
-                       "Personality_BFI_OpenMindedness","Personality_BFI_Conscientiousness","Personality_BFI_Agreeableness", "Personality_BFI_NegativeEmotionality",  
-                       additional_Factors_Name) 
-  H1_Model_4otherBFI = wrap_test_Hypothesis("",lm_formula, output, "", "", 
-                                           collumns_to_keep, 
-                                           "exportModel")
-  
-  
-  Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BAS)
-  DirectionEffect = list("Effect" = "interaction_correlation",
-                         "Larger" = c("Experimenter_Sex", "Opposite"),
-                         "Smaller" = c("Experimenter_Sex", "Same"),
+  # Not a hypothesis, but for comparisons
+  Effect_of_Interest = c(Personality_Name_BAS)
+  Name_Test = c("BAS")
+  DirectionEffect = list("Effect" = "correlation",
                          "Personality" = Personality_Name_BAS)
   
-  Name_Test = c("BAS_ExperimenterSex_3OtherBFI")
-  H2_1A = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                              DirectionEffect, collumns_to_keep,
-                              "previousModel", H1_Model_3otherBFI)
   
-  Name_Test = c("BAS_ExperimenterSex_4OtherBFI")
-  H2_1B = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                               DirectionEffect, collumns_to_keep,
-                               "previousModel", H1_Model_4otherBFI)
+  H1_3 = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                                DirectionEffect, collumns_to_keep,
+                                "previousModel", H1_Model)
   
   
-  
-  
-  Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BAS, "Behav_Attractiveness")
-  DirectionEffect = list("Effect" = "interaction_correlation",
-                         "Larger" = c("Experimenter_Sex", "Opposite"),
-                         "Smaller" = c("Experimenter_Sex", "Same"),
-                         "Interaction" = c("Participant_Sex", "Female", "Male"),
-                         "Personality" = Personality_Name_BAS)
-  Name_Test = c("BAS_ExperimenterSex_AttractivenesssRating_3OtherBFI")
-  H2_2A = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                               DirectionEffect, collumns_to_keep,
-                               "previousModel", H1_Model_3otherBFI)
-  
-  Name_Test = c("BAS_ExperimenterSex_AttractivenesssRating_4OtherBFI")
-  H2_2B = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                               DirectionEffect, collumns_to_keep,
-                               "previousModel", H1_Model_4otherBFI)
-
   
   
   
@@ -254,12 +204,29 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                               "previousModel", H3_Model)
   
   
+  Effect_of_Interest = c(Personality_Name_BIS, "Behav_Attractiveness")
+  Name_Test = c("BIS_AttractivenesssRating")
+  DirectionEffect = list("Effect" = "correlation",
+                         "Personality" = Personality_Name_BIS)
+  
+  
+  H3_12b = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                                DirectionEffect, collumns_to_keep,
+                                "previousModel", H3_Model)
+  
   Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BIS, "Behav_Attractiveness")
-  Name_Test = c("BIS_ExperimenterSex_Attractiveness")
+  Name_Test = c("BIS_AttractivenesssRating_ExperimenterSex")
   DirectionEffect = list("Effect" = "interaction_correlation",
                          "Larger" = c("Experimenter_Sex", "Opposite"),
                          "Smaller" = c("Experimenter_Sex", "Same"),
-                         "Interaction" = c("Participant_Sex", "Female", "Male"),
+                         "Personality" = Personality_Name_BIS)
+  
+  
+  Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BIS, "Behav_Attractiveness")
+  Name_Test = c("BIS_AttractivenesssRating_ExperimenterSex")
+  DirectionEffect = list("Effect" = "interaction_correlation",
+                         "Larger" = c("Experimenter_Sex", "Opposite"),
+                         "Smaller" = c("Experimenter_Sex", "Same"),
                          "Personality" = Personality_Name_BIS)
   
   
@@ -267,34 +234,99 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                               DirectionEffect, collumns_to_keep,
                               "previousModel", H3_Model)
   
+
+  # Not a hypothesis, but for comparisons
+  Effect_of_Interest = c(Personality_Name_BIS)
+  Name_Test = c("BIS")
+  DirectionEffect = list("Effect" = "correlation",
+                         "Personality" = Personality_Name_BIS)
+  
+  
+  H3_3 = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                              DirectionEffect, collumns_to_keep,
+                              "previousModel", H3_Model)
   
   
   #########################################################
-  # (6) Test Hypothesis 2 
+  # (4) Test Hypothesis 2 
+  #########################################################
+  #  It is predicted that specificity of the effect to trait BAS versus other personality traits will be supported
+  print("Test Specificity")
+  collumns_to_keep = c("Experimenter_Sex", "Behav_Attractiveness",  "Participant_Sex", Personality_Name_BAS, Covariate_Name, 
+                       "Personality_BFI_OpenMindedness","Personality_BFI_Conscientiousness","Personality_BFI_Agreeableness", "Personality_BFI_NegativeEmotionality",   
+                       additional_Factors_Name) 
+  lm_formula =   paste( "EEG_Signal ~ (((Experimenter_Sex * Behav_Attractiveness * Participant_Sex )", 
+                        "* (",  Personality_Name_BAS, "))",additional_Factor_Formula,")", Covariate_Formula, 
+                        "+ Personality_BFI_OpenMindedness + Personality_BFI_Conscientiousness + Personality_BFI_Agreeableness" )
+  H2_Model_3otherBFI = wrap_test_Hypothesis("",lm_formula, output, "", "", 
+                                                        collumns_to_keep, 
+                                                        "exportModel")
+  
+  lm_formula =   paste( "EEG_Signal ~ (((Experimenter_Sex * Behav_Attractiveness * Participant_Sex )", 
+                        "* (",  Personality_Name_BAS, "))",additional_Factor_Formula,")", Covariate_Formula, 
+                        "+ Personality_BFI_OpenMindedness + Personality_BFI_Conscientiousness + Personality_BFI_Agreeableness + Personality_BFI_NegativeEmotionality" )
+  H2_Model_4otherBFI = wrap_test_Hypothesis("",lm_formula, output, "", "", 
+                                                        collumns_to_keep, 
+                                                        "exportModel")
+  
+  Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BAS)
+  DirectionEffect = list("Effect" = "interaction_correlation",
+                         "Larger" = c("Experimenter_Sex", "Opposite"),
+                         "Smaller" = c("Experimenter_Sex", "Same"),
+                         "Personality" = Personality_Name_BAS)
+  
+  Name_Test = c("BAS_ExperimenterSex_3OtherBFI")
+  H2_1A= wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                         DirectionEffect, collumns_to_keep,
+                         "previousModel", H2_Model_3otherBFI)
+  
+
+  Name_Test = c("BAS_ExperimenterSex_4OtherBFI")
+  H2_1B= wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                         DirectionEffect, collumns_to_keep,
+                         "previousModel", H2_Model_4otherBFI)
+  
+  
+  Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BAS, "Behav_Attractiveness")
+  DirectionEffect = list("Effect" = "interaction_correlation",
+                         "Larger" = c("Experimenter_Sex", "Opposite"),
+                         "Smaller" = c("Experimenter_Sex", "Same"),
+                         "Interaction" = c("Participant_Sex", "Female", "Male"),
+                         "Personality" = Personality_Name_BAS)
+  
+  Name_Test = c("BAS_ExperimenterSex_AttractivenesssRating_3OtherBFI")
+  H2_2A=  wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                         DirectionEffect, collumns_to_keep,
+                         "previousModel", H2_Model_3otherBFI)
+  
+  Name_Test = c("BAS_ExperimenterSex_AttractivenesssRating_4OtherBFI")
+  H2_2B=  wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                         DirectionEffect, collumns_to_keep,
+                         "previousModel", H2_Model_4otherBFI)
+    
+    
+  
+  #########################################################
+  # (6) Test Hypothesis 4
   ######################################################### 
   #  It is predicted that specificity of the effect to trait BIS versus other personality traits will be supported
   print("Test Specificity")
-  lm_formula =   paste( "EEG_Signal ~ ((Experimenter_Sex * Behav_Attractiveness * Participant_Sex )", 
-                        "* (",  Personality_Name_BIS, "+ Personality_BFI_OpenMindedness + Personality_BFI_Conscientiousness + Personality_BFI_Agreeableness)",
-                        additional_Factor_Formula, ")", Covariate_Formula)
   collumns_to_keep = c("Experimenter_Sex", "Behav_Attractiveness",  "Participant_Sex", Personality_Name_BIS, Covariate_Name, 
-                       "Personality_BFI_OpenMindedness","Personality_BFI_Conscientiousness","Personality_BFI_Agreeableness",   
+                       "Personality_BFI_OpenMindedness","Personality_BFI_Conscientiousness","Personality_BFI_Agreeableness", "Personality_BFI_Extraversion",   
                        additional_Factors_Name) 
-  H1_Model_3otherBFI = wrap_test_Hypothesis("",lm_formula, output, "", "", 
+  lm_formula =   paste( "EEG_Signal ~ (((Experimenter_Sex * Behav_Attractiveness * Participant_Sex )", 
+                        "* (",  Personality_Name_BIS, "))",additional_Factor_Formula,")", Covariate_Formula, 
+                        "+ Personality_BFI_OpenMindedness + Personality_BFI_Conscientiousness + Personality_BFI_Agreeableness" )
+  H4_Model_3otherBFI = wrap_test_Hypothesis("",lm_formula, output, "", "", 
                                             collumns_to_keep, 
                                             "exportModel")
   
-  
-  lm_formula =   paste( "EEG_Signal ~ ((Experimenter_Sex * Behav_Attractiveness * Participant_Sex )", 
-                        "* (",  Personality_Name_BIS, "+ Personality_BFI_OpenMindedness + Personality_BFI_Conscientiousness + Personality_BFI_Agreeableness + Personality_BFI_Extraversion)",
-                        additional_Factor_Formula, ")", Covariate_Formula)
-  collumns_to_keep = c("Experimenter_Sex", "Behav_Attractiveness",  "Participant_Sex", Personality_Name_BIS, Covariate_Name, 
-                       "Personality_BFI_OpenMindedness","Personality_BFI_Conscientiousness","Personality_BFI_Agreeableness", "Personality_BFI_Extraversion",  
-                       additional_Factors_Name) 
-  H1_Model_4otherBFI = wrap_test_Hypothesis("",lm_formula, output, "", "", 
+  lm_formula =   paste( "EEG_Signal ~ (((Experimenter_Sex * Behav_Attractiveness * Participant_Sex )", 
+                        "* (",  Personality_Name_BIS, "))",additional_Factor_Formula,")", Covariate_Formula, 
+                        "+ Personality_BFI_OpenMindedness + Personality_BFI_Conscientiousness + Personality_BFI_Agreeableness + Personality_BFI_Extraversion" )
+  H4_Model_4otherBFI = wrap_test_Hypothesis("",lm_formula, output, "", "", 
                                             collumns_to_keep, 
                                             "exportModel")
-  
   
   Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BIS)
   DirectionEffect = list("Effect" = "interaction_correlation",
@@ -303,16 +335,15 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                          "Personality" = Personality_Name_BIS)
   
   Name_Test = c("BIS_ExperimenterSex_3OtherBFI")
-  H4_1A = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                               DirectionEffect, collumns_to_keep,
-                               "previousModel", H1_Model_3otherBFI)
+  H4_1A= wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                              DirectionEffect, collumns_to_keep,
+                              "previousModel", H4_Model_3otherBFI)
+  
   
   Name_Test = c("BIS_ExperimenterSex_4OtherBFI")
-  H4_1B = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                               DirectionEffect, collumns_to_keep,
-                               "previousModel", H1_Model_4otherBFI)
-  
-  
+  H4_1B= wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                              DirectionEffect, collumns_to_keep,
+                              "previousModel", H4_Model_4otherBFI)
   
   
   Effect_of_Interest = c("Experimenter_Sex",  Personality_Name_BIS, "Behav_Attractiveness")
@@ -321,15 +352,18 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                          "Smaller" = c("Experimenter_Sex", "Same"),
                          "Interaction" = c("Participant_Sex", "Female", "Male"),
                          "Personality" = Personality_Name_BIS)
+  
   Name_Test = c("BIS_ExperimenterSex_AttractivenesssRating_3OtherBFI")
-  H4_2A = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+  H4_2A=  wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
                                DirectionEffect, collumns_to_keep,
-                               "previousModel", H1_Model_3otherBFI)
+                               "previousModel", H4_Model_3otherBFI)
   
   Name_Test = c("BIS_ExperimenterSex_AttractivenesssRating_4OtherBFI")
-  H4_2B = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+  H4_2B=  wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
                                DirectionEffect, collumns_to_keep,
-                               "previousModel", H1_Model_4otherBFI)
+                               "previousModel", H4_Model_4otherBFI)
+  
+  
   
   
   #########################################################
@@ -352,19 +386,24 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # (8) Correct for Multiple Comparisons for Hypothesis 1
   #########################################################
   
-  Estimates_to_Correct = as.data.frame(rbind(H1_1, H1_2, H1_12b, H3_1, H3_2)) # add other estimates here
+  Estimates_to_Correct = as.data.frame(rbind(H1_1, H1_2, H3_1, H3_2)) # add other estimates here
   comparisons = sum(!is.na(Estimates_to_Correct$p_Value))
   
   if (choice == "Holm"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "holm", n = comparisons)
   }  else if (choice == "Bonferroni"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "bonferroni", n = comparisons)
+  } else if (choice == "FDR"){
+    Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "fdr", n = comparisons)
   }
   
   Estimates = rbind(Estimates_to_Correct,
+                    H1_12b, H3_12b,
                     H2_1A, H2_1B,H2_2A, H2_2B, 
-                    H4_1A, H4_1B,H4_2A, H4_2B ) # Add other estimates here
+                    H4_1A, H4_1B,H4_2A, H4_2B,
+                    H1_3, H3_3) 
   
+
   
   #########################################################
   # (9) Export as CSV file

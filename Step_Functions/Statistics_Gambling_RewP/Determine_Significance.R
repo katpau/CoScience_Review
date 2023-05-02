@@ -1,6 +1,6 @@
 Determine_Significance = function(input = NULL, choice = NULL) {
   StepName = "Determine_Significance"
-  Choices = c("None")
+  Choices = c( "None")
   Order = 13
   output = input$data
   

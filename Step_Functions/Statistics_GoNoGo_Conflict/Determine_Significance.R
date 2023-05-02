@@ -1,6 +1,6 @@
 Determine_Significance = function(input = NULL, choice = NULL) {
   StepName = "Determine_Significance"
-  Choices = c("Holm", "Bonferroni", "None")
+  Choices = c("Holm", "Bonferroni", "FDR", "None")
   Order = 13
   output = input$data
   
@@ -278,7 +278,10 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "holm", n = comparisons)
   }  else if (choice == "Bonferroni"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "bonferroni", n = comparisons)
+  } else if (choice == "FDR"){
+    Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "fdr", n = comparisons)
   }
+  
   
   Estimates = rbind(Estimates_to_Correct,
                     H1_1 , H2_1, H2_2 ) # Add other estimates here
