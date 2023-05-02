@@ -94,7 +94,19 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
   # use lmerTest 
   library(lmerTest)         # version  3.1.3            for LMM
 
-  
+  ## 5. add covariates as follows
+  # gender (as factor or even better centered)
+    sub.rt$gender.cgm <- scale(sub.rt$gender, scale = F)
+    # add as main effect only     + gender.cgm
+    # add total effect            * gender.cgm
+  # age 
+    sub.rt$age.cgm <- scale(sub.rt$age, scale = F)
+    # add as main effect only     + age.cgm
+    # add total effect            * age.cgm
+  # depression, anxiety, O, C, A, E, N
+    sub.rt$X.cgm <- scale(sub.rt$X, scale = F)
+    # add as main effect only     + X.cgm
+    # add total effect            * X.cgm
   
   
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

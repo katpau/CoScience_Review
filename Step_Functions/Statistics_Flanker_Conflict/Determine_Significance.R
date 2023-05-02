@@ -49,6 +49,9 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   }
   
   
+  # CK: covariates to be added to the LMM (in the following way)see test_Hypotheses)
+  
+  
   # Get possible additional factors to be included in the GLM (depends on the forking
   # if e.g. no difference scores were calculated, then hemisphere should be added.
   # these have been determined at earlier step (Covariate) when determining the grouping variables)
