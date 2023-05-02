@@ -6,7 +6,7 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: CK 5/23
 
   # if ACC is used as a predictor/DV, scan for outliers per Condition
   # otherwise scan for outliers across all Conditions
@@ -71,7 +71,7 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
     output$Behav_RT[as.logical(output$Outliers_ACC)] = NA
     
     
-    # Remove collumns
+    # Remove columns
     output = output[,!names(output) %in% c("Outliers_ACC",  "Min", "Max")]
     
   }
@@ -80,7 +80,7 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
   
   
   
-  #No change needed below here - just for bookkeeping
+  # No change needed below here - just for bookkeeping
   stephistory = input$stephistory
   stephistory[StepName] = choice
   return(list(

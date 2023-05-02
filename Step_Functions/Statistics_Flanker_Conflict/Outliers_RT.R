@@ -6,7 +6,7 @@ Outliers_RT = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: CK 5/23
 
   # if RT is used as a predictor/DV, scan for outliers
   # identifies and removes outliers based on previous criteria (thresholds)
@@ -50,7 +50,7 @@ Outliers_RT = function(input = NULL, choice = NULL) {
     #########################################################
     # (2) Identify Outliers 
     #########################################################
-    # for RT, only one value per Task and Subject should be used
+    # for RT, only one value per Task and Subject should be used  # CK: for LMM we would need RT trialwise
     # select only relevant columns and drop duplicates
     output_RT = output[,c("ID", "Congruency", "Behav_RT")] 
     output_RT = output_RT[!is.na(output_RT$Behav_RT), ]
@@ -76,7 +76,7 @@ Outliers_RT = function(input = NULL, choice = NULL) {
     # (3) Treat Outliers RT
     #########################################################
     if (Treatment == "Replace" ){
-      # Save Min/Max in collumn for later
+      # Save Min/Max in column for later
       MinMax = output_RT %>%
         group_by(Congruency)%>%
         do(outlierfunction(Threshold, .$Behav_RT, 1))%>%
@@ -99,7 +99,7 @@ Outliers_RT = function(input = NULL, choice = NULL) {
       output$Behav_RT[as.logical(output$Outliers_RT)] = NA  }
     
     
-    # Remove collumns
+    # Remove columns
     output = output[,!names(output) %in% c("Outliers_RT",  "Min", "Max")]
     
   }
@@ -108,7 +108,7 @@ Outliers_RT = function(input = NULL, choice = NULL) {
   
   
   
-  #No change needed below here - just for bookkeeping
+  # No change needed below here - just for bookkeeping
   stephistory = input$stephistory
   stephistory[StepName] = choice
   return(list(

@@ -6,7 +6,7 @@ Covariate = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: CK 5/23
 
   # Handles all Choices listed above as well as choices from previous Steps 
   # (Attention Checks Personality, Outliers_Personality, Personality_Variable)
@@ -121,6 +121,8 @@ Covariate = function(input = NULL, choice = NULL) {
   FactorVariables = c("ID", "Congruency", "Electrode", 
                       names(output)[grepl("Covariate_Gender", names(output))],
                       "Component")
+  # CK: I would keep congruency (demand) as numeric, not factor, as it has a natural zero point and is expected to increase linear
+    # it would facilitate lmm calculation
   
   
   output[NumericVariables] = lapply(output[NumericVariables], as.numeric)

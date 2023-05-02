@@ -6,7 +6,7 @@ Outliers_IQ = function(input = NULL, choice = NULL) {
 
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: CK 5/23
   
   # Adds IQ Data but no change here. Outliers detected in outliers_Threshold
   # (1) Get previous choices about threshold and prepare function, get Data
@@ -70,7 +70,7 @@ Outliers_IQ = function(input = NULL, choice = NULL) {
     # (3) Treat Outliers IQ
     #########################################################
     if (Treatment == "Replace" ){
-      # Save Min/Max in collumn for later
+      # Save Min/Max in column for later
       MinMax = output_IQ %>%
         do(outlierfunction(Threshold, .$IST, 1))%>%
         ungroup()
@@ -91,7 +91,7 @@ Outliers_IQ = function(input = NULL, choice = NULL) {
       output_IQ$IST[as.logical(output_IQ$Outliers_IQ)] = NA  }
     
     
-    # Remove collumns
+    # Remove columns
     output_IQ = output_IQ[,!names(output_IQ) %in% c("Outliers_IQ",  "Min", "Max")]
     
   }
@@ -112,7 +112,7 @@ Outliers_IQ = function(input = NULL, choice = NULL) {
   
   
   
-  #No change needed below here - just for bookkeeping
+  # No change needed below here - just for bookkeeping
   stephistory = input$stephistory
   stephistory[StepName] = choice
   return(list(

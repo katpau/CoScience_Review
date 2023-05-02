@@ -6,7 +6,7 @@ RT = function(input = NULL, choice = NULL) {
 
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: CK 5/23
   
   # Handles how RTs are defined
   # Handles all Choices listed above as well as choices from previous Step (StateAnxiety)
@@ -33,9 +33,9 @@ RT = function(input = NULL, choice = NULL) {
   #########################################################
   # only without experimenter
   BehavData = BehavData[BehavData$ExperimenterPresence %in% "absent",]
-  # only correct Trials
+  # only correct Trials       # CK: these would be needed for Accuracy calculation within GLMM
   BehavData = BehavData[BehavData$Accuracy %in% 1,]
-  # only Trials with Response
+  # only Trials with Response # CK: for GLMM (Accuracy) these might be treated as incorrect
   BehavData = BehavData[!is.na(BehavData$RT),]
   
   # if RT also used as criteria
@@ -92,7 +92,7 @@ RT = function(input = NULL, choice = NULL) {
   
   
   
-  #No change needed below here - just for bookkeeping
+  # No change needed below here - just for bookkeeping
   stephistory = input$stephistory
   stephistory[StepName] = choice
   return(list(

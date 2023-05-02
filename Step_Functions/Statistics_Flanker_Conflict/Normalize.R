@@ -6,7 +6,7 @@ Normalize = function(input = NULL, choice = NULL) {
 
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: CK 5/23
   
   # Handles all Choices listed above 
   # Tests if Data should be normalized or not (is grouped for Analyses, Tasks, Condition, etc.)
@@ -40,7 +40,7 @@ Normalize = function(input = NULL, choice = NULL) {
         
         # Apply Log
       } else if (choice == "Log")  {
-        # Add Constant to each collum to make all values > 0
+        # Add Constant to each column to make all values > 0
         Min = min(data, na.rm = TRUE)
         if (Min<=0) { data = data + abs(Min) +1 }
         normal = log(data)
