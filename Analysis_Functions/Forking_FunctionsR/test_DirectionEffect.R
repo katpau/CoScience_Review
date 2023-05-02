@@ -1,10 +1,10 @@
 test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResult = NULL) {
   # DirectionEffect is a list with the following named elements:
   #               Effect - char to determine what kind of test, either main, interaction, correlation, interaction_correlation, interaction2_correlation
-  #               Personality - char name of personality collumn
-  #               Larger - array of 2 chars: first name of collumn coding condition, second name of factor with larger effect
-  #               Smaller - array of 2 chars: first name of collumn coding condition, second name of factor with smaller effect
-  #               Interaction - array of 3 chars: first name of collumn coding condition additional to Larger/Smaller, second name of factor with smaller effect, third with larger effect
+  #               Personality - char name of personality column
+  #               Larger - array of 2 chars: first name of column coding condition, second name of factor with larger effect
+  #               Smaller - array of 2 chars: first name of column coding condition, second name of factor with smaller effect
+  #               Interaction - array of 3 chars: first name of column coding condition additional to Larger/Smaller, second name of factor with smaller effect, third with larger effect
   # Subset is dataframe including all Data (Personality, EEG_Signal, Conditions)
   # ModelResult are the Estimates exported from test_Hypothesis
   

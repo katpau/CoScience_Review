@@ -1,6 +1,6 @@
 ########### Functions for Forking ################
 
-## Write seperate Function Files for Steps
+## Write separate Function Files for Steps
 write_Step_Function = function(design, design_dir) {
   if (dir.exists(design_dir) == FALSE) {
     dir.create(design_dir)
@@ -256,7 +256,7 @@ run_Steps = function( OUTPUT_File,
   
   OUTPUT = read.table(OUTPUT_File,  sep = ";", header = TRUE)
   
-  # Initate for summary
+  # Initiate for summary
   # Create Function to run in Parallel
   run_Steps_parallel = function (i_Fork, OUTPUT, Path_to_Merged_Files, Path_to_Export, Root){
 
@@ -293,7 +293,7 @@ run_Steps = function( OUTPUT_File,
         # Save completion status to ParList = Protocol
         return("Newly Completed")
         
-      },  # if error ocurrs, save error to Parlist = Protocol
+      },  # if error occurs, save error to Parlist = Protocol
       error = function(e) {
         
         return(paste("Error with Step:", iStep, "and Choice:", OUTPUT[i_Fork, iStep], ". The error message was: ", e))
