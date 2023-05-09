@@ -239,6 +239,28 @@ for s = 1:ANALYSIS.nsbj
     load(open_name);
     fprintf('Done.\n');
     
+    %[elisa] save otuput file for all participants with part_code and decoding
+    %accuracies to jackknife decoding onset later
+    part_accuracies = zeros(length(RESULTS.subj_acc),2);
+    part_accuracies(:,1) = RESULTS.subj_acc;
+    part_accuracies(:,2) = RESULTS.subj_perm_acc;
+    id = repmat(STUDY.part_code,length(part_accuracies),1);
+    timestep = [-300:10:290]';
+    part_accuracies = [cell2table(cellstr(id)), array2table(timestep), array2table(part_accuracies)];
+    colNames={'id', 'timestep', 'subj_acc', 'subj_perm_acc'};
+    part_accuracies.Properties.VariableNames = colNames;
+    
+    if ~isfile([SLIST.output_dir 'all_part_acc.mat'])
+             all_part_accuracies = part_accuracies; 
+    else 
+        load([SLIST.output_dir 'all_part_acc.mat']);
+        if ~any(strcmp(STUDY.part_code, all_part_accuracies.id)) %only append when current part has not been appended 
+             all_part_accuracies = vertcat(all_part_accuracies, part_accuracies); 
+         end
+    end
+    
+    save([SLIST.output_dir 'all_part_acc.mat'], 'all_part_accuracies'); % Save into a .mat file
+
     ANALYSIS.analysis_mode=STUDY.analysis_mode;
     ANALYSIS.pointzero=SLIST.pointzero;
     
