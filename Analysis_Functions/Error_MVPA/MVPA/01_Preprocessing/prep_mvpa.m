@@ -55,7 +55,16 @@ EEG_data = load(filename);
 %% Create vector containing the response types
 
 events = struct2table(EEG_data.Data.data.EEG.event);
+events.Event(cellfun(@isempty,events.Event)) = {"NaN"};
+if iscell(events.Event)
+    events.Event = string(events.Event);
+end
+
 events_response = events(strcmp(events.Event, 'Response'),:);
+
+if iscell(events_response.ACC)
+    events_response.ACC = str2double(string(events_response.ACC));
+end
 
 if AnalysisName == "Flanker_MVPA"
     for i = 1:(height(events_response))
