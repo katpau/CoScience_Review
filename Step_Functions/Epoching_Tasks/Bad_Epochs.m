@@ -73,7 +73,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                         109, 119, 129, 139  ]; %Responses Experimenter Absent
                     
                 elseif INPUT.AnalysisName == "GoNoGo_MVPA"
-                    Event_Window = [-0.500 0.800]; % Epoch length in seconds
+                    Event_Window = [-0.300 0.300]; % Epoch length in seconds %[elisa] CHANGED from -0.500 0.800 for MVPA
                     Relevant_Triggers = [211, 220 ]; %Responses Speed/Acc emphasis
                     
                 elseif INPUT.AnalysisName == "Flanker_Conflict"
