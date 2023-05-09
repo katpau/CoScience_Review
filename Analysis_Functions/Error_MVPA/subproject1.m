@@ -2,14 +2,14 @@
 
 %% Specifications 
 global AnalysisName;
-AnalysisName = "Flanker_MVPA"; %or "GoNoGo_MVPA" 
+AnalysisName = "GoNoGo_MVPA"; %or "Flanker_MVPA" 
 
 %Preprocessing MVPA
 first_part = 1; %index of first participant in folder to analyse
-last_part = 6; %index of last participant in folder to analyse 
+last_part = 2; %index of last participant in folder to analyse 
 
 %Main analyses MVPA
-participants = [1:6]; % index of participants in PreprocessedData to analyse
+participants = [1:2]; % index of participants in PreprocessedData to analyse
 
 %% Add Relevant Paths 
 global bdir;
@@ -18,44 +18,43 @@ bdir = pwd; % Base directory
 addpath(genpath(strcat(bdir, "/Only_ForGit_to_TestRun/")))
 addpath(genpath(strcat(bdir, "/Analysis_Functions/Error_MVPA/")))
 
-%% LRP
-% Preprocessing 
-prep_lrp
-
-% Jackknifing
-jackknifing_lrp
-
-%% MVPA
-% Preprocessing
-% run for all specified participants
-
-for part = first_part:last_part   
-    try
-        prep_mvpa(part)      
-    catch 
-        fprintf('Participant %d does not exist \n', part)   
-    end    
-end
+% %% LRP
+% % Preprocessing 
+% prep_lrp
 % 
-% First-level Analyses
-error = 1;
-for part = participants
-    for group = 1
-        try
-            DECODING_ERP('coscience', 1, 0, part, group, 0);
-        catch
-            protocol(error, 1) = part;
-            protocol(error, 2) = group;
-            error = error + 1;
-        end 
-    end 
-end 
+% % Jackknifing
+% jackknifing_lrp
 % 
-% % % Second-level Analyses
-ANALYSE_DECODING_ERP('coscience',1,0,'all',1)
+% %% MVPA
+% % Preprocessing
+% % run for all specified participants
+% 
+% for part = first_part:last_part   
+%     try
+%         prep_mvpa(part)      
+%     catch 
+%         fprintf('Participant %d does not exist \n', part)   
+%     end    
+% end
+% 
+% % First-level Analyses
+% error = 1;
+% for part = participants
+%     for group = 1
+%         try
+%             DECODING_ERP('coscience', 1, 0, part, group, 0);
+%         catch
+%             protocol(error, 1) = part;
+%             protocol(error, 2) = group;
+%             error = error + 1;
+%         end 
+%     end 
+% end 
+% 
+% % Second-level Analyses
+% ANALYSE_DECODING_ERP('coscience',1,0,'all',1)
 
 %% Compare lrp and mvpa onsets
-
 %load lrp data
 if strcmp(AnalysisName, "Flanker_MVPA")
       input_dir_lrp = [bdir '\Analysis_Functions\Error_MVPA\LRP\lrp_onsets\flanker\'];   
@@ -85,7 +84,7 @@ for i = 1:length(part)
     data_subset = all_part_accuracies(~remove_part,:); % leave participant out
     data_new = groupsummary(data_subset, "timestep", "mean", ["subj_acc", "subj_perm_acc"]); %compute average of amplitudes across remaining ids for each time step
     id = repmat(part(i),length(data_new.timestep),1);
-    data_new =  [id, data_new]; % append participant code that has been leftout
+    data_new =  [cell2table(id), data_new]; % append participant code that has been leftout
     colNames={'id', 'timestep', 'groupcount', 'subj_acc', 'subj_perm_acc'};
     data_new.Properties.VariableNames = colNames;
     if exist('jack_all_part_acc', 'var') == 0
@@ -121,11 +120,11 @@ end
 clear i ii
 
 % determine mvpa onset as first time step where decoding accuracy exceeds threshold
-mean_acc.mvpa_onset = NaN([length(mean_acc.id), 1]);
+mean_acc.mvpa_onset = zeros([length(mean_acc.id), 1]);
 for i = 1:length(mean_acc.id)
     part_code = mean_acc.id(i);
     part_onset = jack_all_part_acc(ismember(jack_all_part_acc.id, part_code),:);  
-    mean_acc.mvpa_onset(i) =  jack_all_part_acc.subj_acc(find(part_onset.threshold, 1, 'first'));
+    mean_acc.mvpa_onset(i) =  jack_all_part_acc.timestep(find(part_onset.threshold, 1, 'first'));
 
     clear part_code part_onset
 end
@@ -133,7 +132,7 @@ end
 clear i
 
 % smulders transformation to obtain individual latencies
-mean_acc.mvpa_smulders = NaN([length(mean_acc.id), 1]);
+mean_acc.mvpa_smulders = zeros([length(mean_acc.id), 1]);
 for i = 1:length(mean_acc.id)
     mean_acc.mvpa_smulders(i) = length(mean_acc.mvpa_onset)*mean(mean_acc.mvpa_onset)-(length(mean_acc.mvpa_onset)-1)*mean_acc.mvpa_onset(i);
 end
@@ -142,7 +141,9 @@ end
 mvpa_onsets = [mean_acc(:,1)  mean_acc(:,7)];
 lrp_onsets = [max_amp(:,1) max_amp(:,6)];
 onsets = join(mvpa_onsets, lrp_onsets);
+
 %test lrp onsets against mvpa onsets
-[h,p,ci,stats] = ttest(onsets.mvpa_smulders, onsets.lrp_smulders, "Tail", "right");
+[h,p,~,stats] = ttest(onsets.mvpa_smulders, onsets.lrp_smulders, "Tail", "right");
+
 %test mvpa onset against response onset
-[h,p,ci,stats] = ttest(onsets.mvpa)
+[h,p,~,stats] = ttest(onsets.mvpa_smulders);
