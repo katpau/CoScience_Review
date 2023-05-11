@@ -78,7 +78,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       Predictors = Predictors[!grepl("_Sex", Predictors)]
       
       # Add Lab Predictor
-      lm_formula = paste(lm_formula, "+ Lab")  
+      lm_formula = paste(lm_formula, "+ (1|Lab)")  
       
       
       # check how many levels per factor
@@ -112,6 +112,8 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       # Calculate LM Model
       if (noRandomFactor == 1) {
         Model_Result = tryCatch({
+          if (is.factor(Subset$Lab)) {Subset$Lab = as.numeric(Subset$Lab)}
+          
           Model_Result = lm(as.formula(lm_formula), 
                             Subset)
           Model_Result$formula = lm_formula
@@ -191,8 +193,8 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       print("no Estimates since Error with Model ")
       Estimates = cbind.data.frame(Name_Test, NA, NA, NA, NA, NA, NA, length(unique(as.character(Subset$ID))),mean(Subset$Epochs, na.rm=TRUE),
                                    sd(Subset$Epochs, na.rm=TRUE), NA, lm_formula, NA, NA, NA)
-      c("Effect_of_Interest", "Statistical_Test", "EffectSizeType" ,"value_EffectSize", "CI_low", "CI90_high", 
-        "p_Value",  "n_participants", "av_epochs", "sd_epochs", "Singularity", "formula", "F_value", "dfN", "dfD")
+     # c("Effect_of_Interest", "Statistical_Test", "EffectSizeType" ,"value_EffectSize", "CI_low", "CI90_high", 
+     #   "p_Value",  "n_participants", "av_epochs", "sd_epochs", "Singularity", "formula", "F_value", "dfN", "dfD")
     } else {
       # get Anova from model
       AnovaModel = anova(Model_Result)
@@ -270,7 +272,8 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
 
       # get subject nr
       if (noRandomFactor == 0) { 
-        Nr_Subs = min(summary(Model_Result)$ngrps)
+        Groups = summary(Model_Result)$ngrps
+        Nr_Subs = Groups[names(Groups)=="ID"]
       } else { # if no within Subject design, that just number of unique IDs
         Nr_Subs = length(unique(Subset$ID))
         }
