@@ -52,10 +52,13 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
     
     % Get EEGlab EEG structure from the provided Input Structure
     EEG = INPUT.data.EEG;
-    
+
+    % [ocs] The analysis name can be stored in a local var for brevity and
+    % faster access.
+    anaName = INPUT.AnalysisName;    
 
      % ****** for Resting Tasks remove 2s after change in instruction
-     if contains(INPUT.AnalysisName,  "Resting") 
+     if contains(anaName,  "Resting") 
         % remove 2s after Change in instruction
         changeInstr = [EEG.event(find(ismember({EEG.event.type}, ['11'; '12'; '22'; '21'; '31'; '32']))).latency];
         changeInstr = [changeInstr', changeInstr'+EEG.srate*2];
@@ -64,44 +67,44 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             
     if strcmpi(Choice , "epoched")
         % ****** Define Triggers and Window based on Analysis ******
-        if ~(contains(INPUT.AnalysisName, 'Resting')) && ~(contains(INPUT.AnalysisName, 'Alpha'))           
-            if INPUT.AnalysisName == "Flanker_Error"
+        if ~(contains(anaName, 'Resting')) && ~(contains(anaName, 'Alpha'))           
+            if anaName == "Flanker_Error"
                 Event_Window = [-0.500 0.800]; % Epoch length in seconds
                 Relevant_Triggers = [ 106, 116, 126,  136, 206, 216, 226, 236, ...
                     107, 117, 127, 137, 207, 217, 227, 237, 108, 118, 128, 138,  208, 218, ...
                     228, 238, 109, 119, 129, 139, 209, 219, 229, 239  ]; %Responses
                 
-            elseif INPUT.AnalysisName == "Flanker_MVPA"
+            elseif anaName == "Flanker_MVPA" || anaName == "Flanker_GMA"
                 Event_Window = [-0.500 0.800]; % Epoch length in seconds
                 Relevant_Triggers = [ 106, 116, 126,  136, ...
                     107, 117, 127, 137, 108, 118, 128, 138, ...
                     109, 119, 129, 139  ]; %Responses Experimenter Absent
                 
-            elseif INPUT.AnalysisName == "GoNoGo_MVPA"
+            elseif anaName == "GoNoGo_MVPA" || anaName == "GoNoGo_GMA"
                 Event_Window = [-0.500 0.800]; % Epoch length in seconds
                 Relevant_Triggers = [211, 220 ]; %Responses Speed/Acc emphasis
                 
-            elseif INPUT.AnalysisName == "Flanker_Conflict"
+            elseif anaName == "Flanker_Conflict"
                 Event_Window = [-0.500 .650];
                 Relevant_Triggers = [ 104, 114, 124, 134]; % Target Onset experimenter absent
                 
-            elseif INPUT.AnalysisName == "GoNoGo_Conflict" 
+            elseif anaName == "GoNoGo_Conflict" 
                 Event_Window = [-0.200 0.500];
                 Relevant_Triggers = [101, 102, 201, 202 ]; % Target Onset
                 
-            elseif INPUT.AnalysisName == "Ultimatum_Offer"
+            elseif anaName == "Ultimatum_Offer"
                 Event_Window = [-0.500 1.000];
                 Relevant_Triggers = [1,2,3 ]; % Offer Onset
                 
-            elseif INPUT.AnalysisName == "Gambling_FeedbackTheta" || INPUT.AnalysisName == "Gambling_RewP"
+            elseif anaName == "Gambling_FeedbackTheta" || anaName == "Gambling_RewP"
                 Event_Window = [-0.500 1.000];
                 Relevant_Triggers = [100, 110, 150, 101, 111, 151, 200, 210, 250, 201, 211, 251]; % FB Onset
                 
-            elseif INPUT.AnalysisName == "Gambling_N300H"
+            elseif anaName == "Gambling_N300H"
                 Event_Window = [-0.200 2.000];
                 Relevant_Triggers = [100, 110, 150, 101, 111, 151, 200, 210, 250, 201, 211, 251]; % FB Onset
                 
-            elseif INPUT.AnalysisName == "Stroop_LPP"
+            elseif anaName == "Stroop_LPP"
                 Event_Window = [-0.300 1.000];
                 Relevant_Triggers = [ 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, ...
                     41, 42, 43, 44, 45, 46, 47, 48, 51, 52, 53, 54, 55, 56, 57, 58, 61, 62, 63, 64, 65, 66, 67, 68, ...
@@ -115,7 +118,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             
             % ****** Alpha Tasks are split into different analytical
             % procedures within the tasks (Anticipation and Consumption) ******
-        elseif INPUT.AnalysisName == "Stroop_Alpha"
+        elseif anaName == "Stroop_Alpha"
             Relevant_Triggers = [ 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, ...
                 41, 42, 43, 44, 45, 46, 47, 48, 51, 52, 53, 54, 55, 56, 57, 58, 61, 62, 63, 64, 65, 66, 67, 68, ...
                 71, 72, 73, 74, 75, 76, 77, 78]; % Picture Onset
@@ -129,7 +132,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             % Combine Conditions to Output: Name Conditions
             Condition = {'Stroop_Anticipation', 'Stroop_Consumption'};
             
-        elseif INPUT.AnalysisName == "Gambling_Alpha"
+        elseif anaName == "Gambling_Alpha"
             Relevant_Triggers = [100, 110, 150, 101, 111, 151, 200, 210, 250, 201, 211, 251]; % FB Onset
             % Anticipation
             EEG1 = pop_epoch( EEG, num2cell(Relevant_Triggers), [-2 0], 'epochinfo', 'yes');
@@ -140,7 +143,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             Condition = {'Gambling_Anticipation', 'Gambling_Consumption'};
             
             % ****** Resting Tasks are epoched in consecutive epochs ******
-        elseif contains(INPUT.AnalysisName,  "Resting") || INPUT.AnalysisName == "Alpha_Context"                       
+        elseif contains(anaName,  "Resting") || anaName == "Alpha_Context"                       
             % Epoch Data in 1s intervals
             EEG = eeg_regepochs(EEG, 1,[0 1], 0, 'X', 'on');
             % Keep Collumn with urepochs to check continuity later
