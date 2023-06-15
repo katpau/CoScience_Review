@@ -61,7 +61,7 @@ sn = SBJTODO;
     SLIST.data_struct_name = 'eeg_sorted_cond';
     
     % channels    
-    SLIST.nchannels = 61; % Number of channels in the dataset
+    SLIST.nchannels = 59; % Number of channels in the dataset
     SLIST.channels = 'ChannelLabels'; 
     SLIST.channel_names_file = 'channel_inf.mat'; % Name of the .mat file containing channel information
     SLIST.channellocs = [bdir '\Analysis_Functions\Error_MVPA\MVPA\02_MVPA\locations\']; % Directory of the .mat file containing channel information
@@ -103,11 +103,8 @@ sn = SBJTODO;
     % [elisa] read files to extract sampling rate from info
     open_file = (SLIST.data_open_name);
     load(open_file);
-    if info.sampling_rate == 500
-        SLIST.sampling_rate = 500; % Sampling rate (Hz)
-    elseif info.sampling_rate == 512
-        SLIST.sampling_rate = 512; % Sampling rate (Hz)
-    end
+    SLIST.sampling_rate = info.sampling_rate;
+
 %% SAVE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %__________________________________________________________________________
 
