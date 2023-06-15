@@ -83,7 +83,8 @@ out_file = [output_dir 'lrp_onsets.mat'];
 save(out_file, 'max_amp');
 
 
-% %% load preprocessed data
+% in case we want to analyse errors and correct responses seperately 
+%% load preprocessed data
 % filename_corrects = [input_dir, 'data_lrp_correct_aver.mat'];
 % load(filename_corrects);
 % 
