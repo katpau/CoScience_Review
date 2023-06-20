@@ -43,6 +43,8 @@ CoScience_Review.prj
 resources/
 _proj/
 xxx/
+**/Only_ForGit_To_TestRun/ForkingFiles/Error_GMA
+**/Only_ForGit_To_TestRun/Preproc_forked/Error_GMA
 
 
 # Some additions for MATLAB
