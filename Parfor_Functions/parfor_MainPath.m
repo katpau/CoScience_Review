@@ -181,7 +181,9 @@ parpool(ParPools);
 
 Retry_Loop_Max = 0;
 
-while sum(RetryFork)>1 && Retry_Loop_Max < 50
+% [ocs] FIXED: sum(RetryFork)>1 would not work for a single subject, so we just
+% check if it is not zero.
+while sum(RetryFork) && Retry_Loop_Max < 50
     fprintf('Subset %d. Number of Combinations that need to be retried/calculated: %d. \n', IndexSubjectsIN, sum(RetryFork));
     [CountErrors, CountCompleted, CountPreviouslyCompleted, ...
         RetryFork, Subjects] = run_Steps(Subjects, AnalysisName, DESIGN, ...
