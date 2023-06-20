@@ -1,33 +1,44 @@
-function [DESIGN, OUTPUT] = sourceDesigns(Paths_StepFunctions)
-    % sourceDesigns A slightly optmized variant of source_design.
+function [DESIGN, OUTPUT] = sourceDesigns(Paths_StepFunctions, mainPathOnly)
+    %% sourceDesigns
+    % A slightly extended variant of source_design.
     %
-    %% Description:
-    %   If you want an OUTPUT of all forks, just assign a second output
-    %   parameter (no additional argument required).
+    %% Description
+    % If you want an OUTPUT of all forks, just assign a second output
+    % parameter (no additional argument required).
     %
     %% Details:
-    %   The main performance bottleneck of the original source_design was
-    %   handling the OUTPUT as strings and parsing |cell2mat(strfind…)|.
-    %   Instead, we deal with structured data until the we return the finished
-    %   paths.
+    % The main performance bottleneck of the original source_design was handling
+    % the OUTPUT as strings and parsing |cell2mat(strfind…)|. Instead, we deal
+    % with structured data until the we return the finished paths.
     %
     %% Input Parameters:
-    %   Paths_StepFunctions   - [char, string, cell] A single or multiple paths
-    %                           to folders, which contain the Step functions.
+    % Paths_StepFunctions   - [char, string, cell] A single or multiple paths
+    %                         to folders, which contain the Step functions.
+    % mainPathOnly          - [logical]; true = reduce the OUTPUT to the first
+    %                         choice of each step to create the main path. 
+    %                         false = (default) combine all choices of each step.
+    %
+    %% Examples:
+    %   [DESIGN, OUT] = sourceDesigns({'Step_Functions/Preprocessing_All/',
+    %   'Step_Functions/Epoching_Tasks/'});
     %
     %% See also
-    %   source_design
+    % source_design
 
     %% Disclaimer
-    %   Original code by katpau (Katharina Paul, Universität Hamburg)
-    %   GitHub https://github.com/katpau/CoScience_Review
-    %   Modifications by Olaf Schmidtmann (University of Cologne).
+    % Original code by katpau (Katharina Paul, Universität Hamburg)
+    % GitHub https://github.com/katpau/CoScience_Review
+    % Modifications by Olaf Schmidtmann (University of Cologne).
 
     %% Changelog
     % 31.05.2023 [ocs] Removed some unused variables and assignmnts.
     % 01.06.2023 [ocs] FIXED It was not possible to search for conditions, which
     %   include inner spaces (e.g. for Electrodes = "C3, C4").
+    % 13.06.2023 [ocs] ADDED option to pursue the main path (i.e., only the fist
+    % choice of each step), only.
+    %
 
+    if nargin < 2, mainPathOnly = false; end
 
     if nargout > 1, Combine_Output = 1;
     else
@@ -41,7 +52,11 @@ function [DESIGN, OUTPUT] = sourceDesigns(Paths_StepFunctions)
     Step_Names = {};
 
     if ~iscell(Paths_StepFunctions)
-        Paths_StepFunctions = {Paths_StepFunctions};
+        if isstring(Paths_StepFunctions)
+            Paths_StepFunctions = cellstr(Paths_StepFunctions);
+        else
+            Paths_StepFunctions = {Paths_StepFunctions};
+        end
     end
 
     for ipath = 1:length(Paths_StepFunctions)
@@ -72,17 +87,24 @@ function [DESIGN, OUTPUT] = sourceDesigns(Paths_StepFunctions)
 
     if Combine_Output == 1
         % Combine all Choices and remove those excdluded by the conditionals.
-        choicePath = DESIGN.(Step_Names{1}).Choices';
+        if mainPathOnly
+            choicePath = DESIGN.(Step_Names{1}).Choices(1);
+        else
+            choicePath = DESIGN.(Step_Names{1}).Choices';
+        end
 
         for iStep = 2:length(Step_Names)
             currStep = DESIGN.(Step_Names{iStep});
 
-            pathIdx = 1:length(choicePath);
-            currChoices = currStep.Choices';
-            newChoiceIdx = 1:length(currChoices);
-            combChoices = allcomb(pathIdx, newChoiceIdx);
+            if mainPathOnly
+                currChoices = currStep.Choices(1);
+            else
+                currChoices = currStep.Choices';
+            end
+            newChoiceIdx = 1:size(currChoices, 1);
+            combChoices = allcomb(1:size(choicePath, 1), newChoiceIdx);
 
-            nCombChoices = length(combChoices);
+            nCombChoices = size(combChoices, 1);
             extPath = strings(nCombChoices, size(choicePath, 2) + 1);
 
             for iext = 1:nCombChoices
