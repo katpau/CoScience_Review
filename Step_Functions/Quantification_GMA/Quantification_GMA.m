@@ -40,7 +40,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
     % saved on the harddrive (in order to be loaded and forked from there).
     % Order determines when it should be run.
     StepName = "Quantification_GMA";
-    Choices = ["nonneg", "full"];
+    Choices = ["full", "nonneg"];
     Conditional = ["NaN", "NaN"];
     SaveInterim = true;
     Order = 19;
@@ -55,6 +55,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
     COMPONENT = 'Ne/c';
     EVENT_WIN = [-100, 250];
     MIN_TRIALS = 10;
+    SEG_MIN_MS = 20;
 
     ELECTRODES = {'Fz', 'FCz', 'Cz'};
     nElectrodes = length(ELECTRODES);
@@ -88,6 +89,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
     OUTPUT.data = [];
 
     subjectLabel = char(strrep(INPUT.Subject, "sub-", ""));
+
 
     %% Response type conditions: triggers depend on the analysis name
     if alysName == FLANKER_ID
@@ -126,13 +128,10 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
             elPresent = elPresent(chValid);
 
             EEG = pop_select(EEG, 'channel', elPresent);
+            srate = EEG.srate;
+            % Minimum nonnegative segment in points (20 ms @500 Hz).
+            segMinPnts = round(SEG_MIN_MS * srate / 1000);
 
-
-            % TIME WINDOW of interest, relative to the epoch in samples
-            ratefMs = EEG.srate / 1000;
-            epochMs = EVENT_WIN / 1000;
-            sampleWin = (timeWin - EVENT_WIN(1)) * ratefMs;
-            winLength = sampleWin(2) - sampleWin(1) + 1;
 
             %% Master table for output variables
 
@@ -152,6 +151,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
                 'time_win', repmat({num2str(timeWin)}, nComb, 1), ...
                 'n_trials', emp, ...
                 'eeg_data', emp, ...
+                'eeg_srate', repmat({srate}, nComb, 1), ...
                 'eeg_mean', emp, ...
                 'eeg_sme', emp, ...
                 'eeg_peak_neg', emp, ...
@@ -160,22 +160,28 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
                 'inverted', num2cell(true(nComb, 1)), ...
                 'GmaResult', repmat({GmaResults}, nComb, 1), ...
                 'GmaArgs', repmat({struct}, nComb, 1), ...
-                'gma_error', num2cell(true(nComb, 1)), ...
                 'x', emp, ...
                 'y', emp, ...
                 'shape', emp, ...
                 'rate', emp, ...
                 'yscale', emp, ...
                 'ip1', emp, ...
+                'ip1_ms', emp, ...
                 'mode', emp, ...
+                'mode_ms', emp, ...
                 'ip2', emp, ...
+                'ip2_ms', emp, ...
                 'skew', emp, ...
                 'excess', emp, ...
                 'rmse', emp, ...
                 'nrmse', emp, ...
                 'r', emp, ...
+                'rmse_full', emp, ...
+                'nrmse_full', emp, ...
+                'r_full', emp, ...
                 'version', repmat({GmaResults.version}, nComb, 1), ...
                 'timestamp', repmat({char(NaT)}, nComb, 1), ...
+                'gma_error', num2cell(true(nComb, 1)), ...
                 'gma_log', repmat({''}, nComb, 1));
 
 
@@ -183,8 +189,19 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
             for iResp = 1:nRespType
                 % filter by triggers, shorten epoch and average over all trials
                 triggers = num2cell(respTriggers(iResp, :));
+                epochMs = EVENT_WIN / 1000;
                 ERP = pop_epoch(EEG, triggers, epochMs, 'epochinfo', 'yes');
                 ntrials = ERP.trials;
+
+                % TIME WINDOW of interest, relative to the epoch in samples
+                sampleWin = round((timeWin / 1000 - ERP.xmin) * srate + 1);
+                winLength = sampleWin(2) - sampleWin(1) + 1;
+
+                % Indices of present channels
+                outIdx = (iResp - 1) * nElectrodes + chPresent;
+
+                ntrialsCond = repmat({ntrials}, nElectrodes, 1);
+                [gmaOut(outIdx).('n_trials')] = ntrialsCond{:};
 
                 % SKIP channel(s), if below number of minimum trials
                 if ntrials < MIN_TRIALS, continue; end
@@ -200,11 +217,6 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
                 ERPavg.condition = char(strjoin([taskLabel, RESP_TYPE_LABEL(iResp)]));
                 ERPavg.setname = ERPavg.condition;
 
-                % Indices of present channels
-                outIdx = (iResp - 1) * nElectrodes + chPresent;
-
-                ntrialsCond = repmat({ntrials}, nElectrodes, 1);
-                [gmaOut(outIdx).('n_trials')] = ntrialsCond{:};
                 eegData = num2cell(ERPavg.data, 2);
                 [gmaOut(outIdx).('eeg_data')] = eegData{:};
                 eegMean = num2cell(mean(ERPavg.data, 2), 2);
@@ -223,43 +235,64 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
 
                     iOut = (iResp - 1) * nElectrodes + iCh;
 
-                    rightNow = datetime();
-                    rightNow.Format = 'yyyy-MM-dd HH:mm:ss.SSS';
-                    gmaOut(iOut).('timestamp') = char(rightNow);
-
                     % Index within remaining ERP
                     chIdx = sum(chValid(1:iCh));
 
+                    rightNow = datetime();
+                    rightNow.Format = 'yyyy-MM-dd HH:mm:ss.SSS';
+                    gmaOut(iOut).('timestamp') = char(rightNow);
+                    
                     try
                         %% Run the GMA
+                        % Determine if the GRNMA should use the complete data
                         if strcmpi(Choice, 'full'), fullOpt = true;
                         else, fullOpt = false; end
 
                         [gResult, ~, gArgsUsed] = gmaFitEeg(ERPavg, chIdx, ...
                             sampleWin(1), winLength, invData = true, ...
-                            segMinLength = 10, optimizeFull = fullOpt, ...
+                            segMinLength = segMinPnts, optimizeFull = fullOpt, ...
                             logEnabled = false);
 
                         gmaOut(iOut).('GmaResult') = gResult;
-                        gmaOut(iOut).('GmaArgs') = gArgsUsed;
                         gmaOut(iOut).('fit') = gResult.isFit;
-                        gmaOut(iOut).('gma_error') = false;
                         gmaOut(iOut).('x') = gResult.x;
                         gmaOut(iOut).('y') = gResult.y;
                         gmaOut(iOut).('shape') = gResult.shape;
                         gmaOut(iOut).('rate') = gResult.rate;
                         gmaOut(iOut).('yscale') = gResult.yscale;
                         gmaOut(iOut).('ip1') = gResult.ip1;
+                        gmaOut(iOut).('ip1_ms') = gResult.pnt2ms(gResult.ip1);
                         gmaOut(iOut).('mode') = gResult.mode;
+                        gmaOut(iOut).('mode_ms') = gResult.pnt2ms(gResult.mode);
                         gmaOut(iOut).('ip2') = gResult.ip2;
+                        gmaOut(iOut).('ip2_ms') = gResult.pnt2ms(gResult.ip2);
                         gmaOut(iOut).('skew') = gResult.skew;
                         gmaOut(iOut).('excess') = gResult.excess;
                         gmaOut(iOut).('rmse') = gResult.rmse;
                         gmaOut(iOut).('nrmse') = gResult.nrmse;
                         gmaOut(iOut).('r') = gResult.r;
+                        gmaOut(iOut).('GmaArgs') = gArgsUsed;
+                        gmaOut(iOut).('gma_error') = false;
+                        
+                        % Relate fitted PDF to the full data range to obtain
+                        % correlation and  error messages for the complete
+                        % epoch.
+                        if gResult.isValidPdf
+                            try
+                                gmaFull = gResult.relateWhole();
+                                gmaOut(iOut).('rmse_full') = gmaFull.rmse;
+                                gmaOut(iOut).('nrmse_full') = gmaFull.nrmse;
+                                gmaOut(iOut).('r_full') = gmaFull.r;
+                            catch
+                                % Should only happen, if the GmaResult is not
+                                % zero-padded for the whole segment preceding
+                                % the Gamma PDF (see help GmaResults.isaligned).
+                            end
+                        end
 
                     catch ME
                         % Add  (error) log, but continue
+                        gmaOut(iOut).('gma_error') = true;
                         gmaOut(iOut).('gma_log') = ME.message;
                     end
                 end
@@ -290,7 +323,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
             gmaDrop = {'lab', 'experimenter', 'time_win', 'eeg_mean', ...
                 'eeg_sme', 'eeg_peak_neg', 'eeg_peak_neg_sme', 'shape', ...
                 'rate', 'yscale', 'ip1', 'mode', 'ip2', 'skew', 'excess', ...
-                'rmse', 'nrmse', 'r'};
+                'rmse', 'nrmse', 'r', 'rmse_full', 'nrmse_full', 'r_full'};
 
             gmaOut = rmfield(gmaOut, gmaDrop);
             OUTPUT.data.GMA = gmaOut;
@@ -308,3 +341,4 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
         OUTPUT.Error = ErrorMessage;
 
     end
+end
