@@ -109,3 +109,4 @@ function OUTPUT = Trials_Performance(INPUT, Choice)
         end
         OUTPUT.Error = ErrorMessage;
     end
+end
