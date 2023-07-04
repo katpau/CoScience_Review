@@ -130,7 +130,12 @@ afSplit = strsplit(afPaths, ':');
 % Remove all subfolders of eeglab2022
 afSplit = afSplit(cellfun(@(x) ~contains(x, ['eeglab2022.0', filesep]), afSplit));
 addpath(strjoin(afSplit, ':'));
-eeglab('nogui');
+
+% A simple (not robust) check, if EEGLAB was initialized (i.e., added its
+% /functions subpath.
+if ~contains(path, 'eeglab2022.0/functions')
+    eeglab('nogui');
+end
 
 % Add Paths relevant for the Preprocessing of this specific Analysis (some
 % analyses differ in their choices and oiptions)
