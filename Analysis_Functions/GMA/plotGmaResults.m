@@ -1,7 +1,7 @@
-%plotGma Plots GMA results (GmaResults) 
+%plotGma Plots GMA results (GmaResults)
 %
 %% Description
-%   The function plots the content of GmaResults for data of a single channel 
+%   The function plots the content of GmaResults for data of a single channel
 %   with the fitted probability density function (PDF) of a Gamma Model
 %   Analysis as well as some Gamma PDF parameters and error measures as well as
 %   a status as successful or unsuccessful fit.
@@ -14,7 +14,7 @@
 %   The created plot will be tagged as 'gmaPlot' for easy identification within
 %   the MATLAB figures.
 %
-%   Important: 
+%   Important:
 %   This function is still very much BETA and mostly serves demonstration
 %   purposes. It is not robust and not optimized, but should work to glance a
 %   at a GMA fit.
@@ -24,11 +24,11 @@
 %               including EEG meta information.
 %
 %   [Optional] Name-value parameters
-%   invData     - [logical| true, will invert the data in the plot (to be used 
+%   invData     - [logical| true, will invert the data in the plot (to be used
 %               if the data had been inverted before fitting it; false (default)
 %               will plot the data without changing the ploarity.
-%               A changed polarity will also be stated below the plot. If the 
-%               GmaResults.eegInfo already flagged the data as inverted, 
+%               A changed polarity will also be stated below the plot. If the
+%               GmaResults.eegInfo already flagged the data as inverted,
 %               invData will reverse the inversion state.
 %   headl       - [char] Headline for the graph. If empty (default), uses the
 %               setname from GmaResults.eegInfo
@@ -36,26 +36,27 @@
 %               (default), the desc field in 'eegInfo' will be used, instead.
 %   yrev        [logical] true (default) reverses y-axis (negative is up) for
 %               the data plot
-%   xorigin     - [double] The origin offset of the x-axis (time). The scalar is
-%               used to set time zero within the data and adjust all times
-%               accordingly. The parameter will only be used, if eegInfo does 
-%               not contain the field 'xmin', which overrides this setting.
-%   ticksMs     - [double {integer}] Desired tick spacing in milliseconds. 
+%   xorigin     - [double] The origin offset of the x-axis in data points sets
+%               the time of zero within the data and adjusts all times
+%               accordingly. The default of 0, will either set the orgin to the
+%               data point, converted from ms in the field 'xmin' of eegInfo or
+%               to 1, if 'xmin' is not present.
+%   ticksMs     - [double {integer}] Desired tick spacing in milliseconds.
 %               Default: 50
-%   srate       - [double {integer}] The sampling rate of the data used for 
-%               conversions. The parameter will only be used, if eegInfo does 
-%               not contain the field 'srate', which overrides this setting. 
+%   srate       - [double {integer}] The sampling rate of the data used for
+%               conversions. The parameter will only be used, if eegInfo does
+%               not contain the field 'srate', which overrides this setting.
 %               Otherwise defaults to 1000.
-%   xline       - [double {integer}] Add vertical lines as array, which can be 
+%   xline       - [double {integer}] Add vertical lines as array, which can be
 %               labeled, using xlineLabel.
-%   xlineLabel  - [char cell] Cell array of texts to be used as label for 
+%   xlineLabel  - [char cell] Cell array of texts to be used as label for
 %               vertical lines as provided by xline (e.g., e.g., {'Stimulus',
 %               'Onset'}).
 %   xlim        [double] Limits of the x-axis of the plot as two-element vector.
 %               Default: [NaN, NaN]
-%   data        - [double] Vector of data to plot. If left empty (default), the 
+%   data        - [double] Vector of data to plot. If left empty (default), the
 %               data contained in the GmaResults ('data') will be used.
-%   plotTails   - [logical] true (default) enables plotting the tails, before 
+%   plotTails   - [logical] true (default) enables plotting the tails, before
 %               and after a segment in the data, fitted  by GMA. false will only
 %               plot the PDF "above" the segment.
 %
@@ -69,7 +70,7 @@
 %   GmaResults, gmaFit, gmaFitEeg
 
 %% Attribution
-%	Last author: Olaf C. Schmidtmann, last edit: 27.06.2023
+%	Last author: Olaf C. Schmidtmann, last edit: 06.07.2023
 %   Code adapted from the original version by André Mattes and Kilian Kummer.
 %   Source: https://github.com/0xlevel/gma
 %	MATLAB version: 2023a
@@ -79,7 +80,7 @@
 %   it under the terms of the GNU General Public License as published by
 %   the Free Software Foundation, either version 3 of the License, or
 %   (at your option) any later version.
-% 
+%
 %   This program is distributed in the hope that it will be useful,
 %   but WITHOUT ANY WARRANTY; without even the implied warranty of
 %   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -93,9 +94,9 @@ function plotGmaResults(results, args)
         args.headl = ''
         args.desc = ''
         args.yrev logical = true
-        args.xorigin (1, 1) = 1;
-        args.ticksMs (1, 1) = 50;
-        args.srate (1, 1) = 1000;
+        args.xorigin(1, 1) = 0;
+        args.ticksMs(1, 1) = 50;
+        args.srate(1, 1) = 1000;
         args.xline(1, :) {mustBeInteger} = []
         args.xlineLabel(1, :) {mustBeText} = ''
         args.xlim(1, 2) double = [NaN, NaN]
@@ -111,7 +112,7 @@ function plotGmaResults(results, args)
         fprintf("No data to plot.\n");
         return;
     end
-    
+
     if ~isempty(results.eegInfo)
         % Mandatory fields
         srate = results.eegInfo.srate;
@@ -131,11 +132,11 @@ function plotGmaResults(results, args)
         if isfield(results.eegInfo, 'dataid')
             setname = strjoin({results.eegInfo.dataid, setname, chLabel}, '_');
         end
-        
+
         if ~strlength(args.desc) && isfield(results.eegInfo, 'desc')
             args.desc = results.eegInfo.desc;
         end
-        
+
         if ~strlength(args.headl)
             if isfield(results.eegInfo, 'condition')
                 args.headl = [DEF_HEAD, ': ', results.eegInfo.condition];
@@ -146,17 +147,24 @@ function plotGmaResults(results, args)
             end
         end
 
-        % Get x origin offset (for locked epochs) in samples, already
-        % compensated for other 1-based offsets (thus +1).
-        if isfield(results.eegInfo, 'xmin')
-            args.xorigin = -results.eegInfo.xmin * srate + 1;
+        if args.xorigin <= 0
+            if isfield(results.eegInfo, 'xmin')
+                % Get x origin offset (for locked epochs) in samples, already
+                % compensated for other 1-based offsets (thus +1).
+                args.xorigin = -results.eegInfo.xmin * srate + 1;
+            else
+                args.xorigin = 1;
+            end
         end
-        
+
     else
         % Set minimum required settings
         setname = DEF_HEAD;
         ratef = 1000 / args.srate;
         chLabel = '';
+        if args.xorigin <= 0
+            args.xorigin = 1;
+        end
     end
 
     if ~isempty(args.data)
@@ -175,25 +183,23 @@ function plotGmaResults(results, args)
         invStatus = '';
         dsign = 1;
     end
-    
+
     if strlength(args.desc) && strlength(chLabel)
         args.desc = [args.desc, ' | '];
     end
     subhead = sprintf('%s%s', args.desc, chLabel);
 
+
     %% Compose figure
-    figure(Color="white");
-    set(gcf, 'Tag', PLOT_TAG);
-    set(gcf, 'Name', ['GMA_', setname]);
-    set(gca,'TickLabelInterpreter','latex');
+    fig = figure(Color = "white");
+    set(fig, 'Tag', PLOT_TAG);
+    set(fig, 'Name', ['GMA_', setname]);
+    set(fig, 'MenuBar', 'none');
+    set(fig, 'ToolBar', 'none');
+    % set(gca,'TickLabelInterpreter','latex');
 
     hold on;
     title(args.headl, subhead, 'fontsize', 11);
-
-    [l1, u1] = bounds([chData, results.y]);
-    maxLim = max(abs([l1, u1]));
-    % Slightly increase the limits beyond the bounds to display curves properly.
-    yBounds = [min(-1, -maxLim), max(1, maxLim)] * 1.1;
 
     %% Plot data
     yyaxis right;
@@ -206,15 +212,23 @@ function plotGmaResults(results, args)
     dx = 1:nData;
     ppData = plot(dx, chData * dsign);
 
-    if anynan(args.xlim) 
+    if anynan(args.xlim)
         if nData && ~isempty(results.y)
-            args.xlim = [0, round(max(nData, length(results.y))) + 1];
+            args.xlim = [0, round(max(nData, length(results.y)))];
         else
-            args.xlim = [round(dx(1), 2), round(dx(end)) + 1];
+            args.xlim = [round(dx(1), 2), round(dx(end))];
         end
     end
-    xlim(args.xlim);
+
+    [l1, u1] = bounds([chData(:, args.xlim(1) + 1:args.xlim(2)), results.y]);
+    maxLim = max(abs([l1, u1]));
+    % Slightly increase the limits beyond the bounds to display curves properly.
+    yBounds = [min(-1, -maxLim), max(1, maxLim)] * 1.1;
+
+    % include the last point
+    xlim(args.xlim + [0, 1]);
     ylim(yBounds);
+
     if dataInverted && args.yrev, ax.YDir = "reverse"; end
     % ax.YColor = ppData.Color;
 
@@ -229,7 +243,7 @@ function plotGmaResults(results, args)
         % Re-base the x values to zero and add the segment offset
         px = results.x + results.localOffset;
         py = results.y;
-        
+
         if results.isValidPdf
             % shift zero-based local values
             pois = [results.ip1, results.mode, results.ip2];
@@ -238,7 +252,7 @@ function plotGmaResults(results, args)
         else
             pois = [];
         end
-        
+
         if fitSuccessful
             ppGma = plot(px, py, LineWidth = 2, ...
                 Marker = 'o', MarkerSize = 3, MarkerIndices = markers);
@@ -246,12 +260,18 @@ function plotGmaResults(results, args)
             ppGma = plot(px, py, ':', LineWidth = 2, ...
                 Marker = 'o', MarkerSize = 3, MarkerIndices = markers);
         end
-        
+
         xlim(args.xlim);
         ylim(yBounds);
-        
+
         % Plot tails
         if args.plotTails
+            if results.isFullOpt
+                tailLine = '-';
+            else
+                tailLine = ':';
+            end
+
             if results.seg(2) < nData
                 [tx, ty] = results.getTailRear();
                 if ~isempty(pois)
@@ -261,7 +281,7 @@ function plotGmaResults(results, args)
                     tailPois = [];
                 end
                 % Shift the plot by the local offset
-                plot(tx + results.localOffset, ty, LineStyle = ':', ...
+                plot(tx + results.localOffset, ty, LineStyle = tailLine, ...
                     LineWidth = 2, Color = '#666', ...
                     Marker = 'o', MarkerSize = 2, MarkerIndices = tailPois);
             end
@@ -269,15 +289,21 @@ function plotGmaResults(results, args)
             if results.x(1) > 1
                 [tx, ty] = results.getTailFront();
                 % Shift the plot by the local offset
-                plot(tx + results.localOffset, ty, LineStyle = ':', ...
+                plot(tx + results.localOffset, ty, LineStyle = tailLine, ...
                     LineWidth = 2, Color = '#666');
             end
         end
     end
 
+    if dx(1) ~= args.xorigin
+        % Draw time lock
+        xline(args.xorigin);
+    end
+    yline(0);
+
     % Mark nonnegative interval found by the pre-search
     segmarks = results.seg;
-    segmarksMs = (results.seg' - args.xorigin) * ratef;
+    segmarksMs = round((segmarks' - args.xorigin) * ratef, 2);
     if all(segmarks > 0)
         segLabel = sprintf("[%g, %g) ms", segmarksMs);
         segxl = xline(max(1, segmarks(1)), ":", segLabel, LineWidth = 1, ...
@@ -288,44 +314,29 @@ function plotGmaResults(results, args)
 
     % Mark search window for mode
     winmarks = results.win;
-    winmarksMs = round((winmarks - args.xorigin) * ratef);
+    winmarksMs = round((winmarks - args.xorigin) * ratef, 2);
     if winmarks(1) > 1
         wxl1 = xline(winmarks(1), "-.", sprintf("  %g ms", winmarksMs(1)), ...
-            LineWidth = 0.5, color = [0.4660 0.6740 0.1880], ...
-            LabelHorizontalAlignment = "right", LabelVerticalAlignment="bottom");
+            LineWidth = 0.5, color = [0.4660, 0.6740, 0.1880], ...
+            LabelHorizontalAlignment = "right", LabelVerticalAlignment = "bottom");
         wxl1.FontSize = 9;
     end
 
     if winmarks(2) >= winmarks(1) && winmarks(2) < nData
         wxl2 = xline(winmarks(2), "-.", sprintf("  %g ms", winmarksMs(2)), ...
-            LineWidth = 0.5, color = [0.4660 0.6740 0.1880], ...
-            LabelHorizontalAlignment = "left", LabelVerticalAlignment="bottom");
+            LineWidth = 0.5, color = [0.4660, 0.6740, 0.1880], ...
+            LabelHorizontalAlignment = "left", LabelVerticalAlignment = "bottom");
         wxl2.FontSize = 9;
     end
 
-    % Draw time lock
-    if dx(1) ~= args.xorigin
-        xline(args.xorigin);
-    end
-
-    yline(0);
-    
     tickDist = args.ticksMs / ratef;
     % Set ticks before and after the origin and include the outer values
-    xticks([dx(1):tickDist:dx(args.xorigin) - 1, dx(args.xorigin):tickDist:dx(end) + 1]);
-    xticklabels(round((xticks - args.xorigin) * ratef));
-    xlabel('Time (ms)', 'fontsize', 12);
-    grid on;
+    ticks = (tickDist:tickDist:dx(end) + 1) + 1;
+    xticks(ticks);
 
-    % NOTE: Panning vertically moves separate axes
-    % This may be fixed by switching to yyplot, see:
-    % https://stackoverflow.com/questions/50055529/how-to-link-each-left-and-right-y-axis-in-subplots-with-two-y-axes
-    
-    p = pan;
-    setAxesPanMotion(p,ax,'horizontal');
-    
-    % Link zoom
-    linkprop([ax, ax],{'CameraPosition','CameraTarget'});
+    xticklabels(round((ticks - args.xorigin) * ratef));
+    xlabel('Time (ms)', 'fontsize', 12);
+    % grid on;
 
     % Legend
     if isempty(results.y)

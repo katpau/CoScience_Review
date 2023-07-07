@@ -116,7 +116,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
             %#####################################################################
 
             % EARLY EXIT if not epoched
-            if isempty(EEG.epoch)
+            if ~isfield(EEG, 'epoch') || isempty(EEG.epoch)
                 error("Data is not epoched.");
             end
 
@@ -154,10 +154,15 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
                 'eeg_srate', repmat({srate}, nComb, 1), ...
                 'eeg_mean', emp, ...
                 'eeg_sme', emp, ...
-                'eeg_peak_neg', emp, ...
-                'eeg_peak_neg_sme', emp, ...
+                'eeg_peak', emp, ...
+                'eeg_peak_ms', emp, ...
+                'eeg_peak_sme', emp, ...
+                'eeg_mean_win', emp, ...
+                'eeg_peak_win', emp, ...
+                'eeg_peak_win_ms', emp, ...
                 'fit', num2cell(false(nComb, 1)), ...
                 'inverted', num2cell(true(nComb, 1)), ...
+                'fullOpt', num2cell(true(nComb, 1)), ...
                 'GmaResult', repmat({GmaResults}, nComb, 1), ...
                 'GmaArgs', repmat({struct}, nComb, 1), ...
                 'x', emp, ...
@@ -217,16 +222,33 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
                 ERPavg.condition = char(strjoin([taskLabel, RESP_TYPE_LABEL(iResp)]));
                 ERPavg.setname = ERPavg.condition;
 
+                % For the full epoch
                 eegData = num2cell(ERPavg.data, 2);
                 [gmaOut(outIdx).('eeg_data')] = eegData{:};
                 eegMean = num2cell(mean(ERPavg.data, 2), 2);
                 [gmaOut(outIdx).('eeg_mean')] = eegMean{:};
                 eegSme = num2cell(Mean_SME(ERP.data));
                 [gmaOut(outIdx).('eeg_sme')] = eegSme{:};
-                eegPeakNeg = num2cell(Peaks_Detection(ERPavg.data, "NEG"));
-                [gmaOut(outIdx).('eeg_peak_neg')] = eegPeakNeg{:};
+                [eegPeakNeg, eegPeakNegLat] = Peaks_Detection(ERPavg.data, "NEG");
+                eegPeakNegMs = num2cell(ERPavg.times(eegPeakNegLat));
+                eegPeakNeg = num2cell(eegPeakNeg);
+                [gmaOut(outIdx).('eeg_peak')] = eegPeakNeg{:};
+                [gmaOut(outIdx).('eeg_peak_ms')] = eegPeakNegMs{:};
                 eegPeakNegSme = num2cell(Peaks_SME(ERP.data, "NEG"));
-                [gmaOut(outIdx).('eeg_peak_neg_sme')] = eegPeakNegSme{:};
+                [gmaOut(outIdx).('eeg_peak_sme')] = eegPeakNegSme{:};
+
+                % Window of interest, only
+                ERPdataWin = ERPavg.data(:, sampleWin(1):sampleWin(2));
+
+                eegMeanWin = num2cell(mean(ERPdataWin, 2), 2);
+                [gmaOut(outIdx).('eeg_mean_win')] = eegMeanWin{:};
+                [eegPeakNegWin, eegPeakNegLatWin] = Peaks_Detection( ...
+                    ERPdataWin, "NEG");
+                eegPeakNegWin = num2cell(eegPeakNegWin);
+                eegPeakNegMsWin = num2cell( ...
+                    ERPavg.times(eegPeakNegLatWin + sampleWin(1) - 1));
+                [gmaOut(outIdx).('eeg_peak_win')] = eegPeakNegWin{:};
+                [gmaOut(outIdx).('eeg_peak_win_ms')] = eegPeakNegMsWin{:};
 
                 % Loop available channels for GMA
                 for iCh = 1:nElectrodes
@@ -255,6 +277,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
 
                         gmaOut(iOut).('GmaResult') = gResult;
                         gmaOut(iOut).('fit') = gResult.isFit;
+                        gmaOut(iOut).('fullOpt') = gResult.isFullOpt;
                         gmaOut(iOut).('x') = gResult.x;
                         gmaOut(iOut).('y') = gResult.y;
                         gmaOut(iOut).('shape') = gResult.shape;
@@ -320,8 +343,10 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
             % on the MATLAB path! Otherwise the instance cannot be created and
             % the 'GmaResult' field will be empty. Sadly, MATLAB load() does not
             % throw errors in these cases.
+            
             gmaDrop = {'lab', 'experimenter', 'time_win', 'eeg_mean', ...
-                'eeg_sme', 'eeg_peak_neg', 'eeg_peak_neg_sme', 'shape', ...
+                'eeg_sme', 'eeg_peak', 'eeg_peak_ms', 'eeg_peak_sme', ...
+                'eeg_mean_win', 'eeg_peak_win', 'eeg_peak_win_ms', 'shape', ...
                 'rate', 'yscale', 'ip1', 'mode', 'ip2', 'skew', 'excess', ...
                 'rmse', 'nrmse', 'r', 'rmse_full', 'nrmse_full', 'r_full'};
 

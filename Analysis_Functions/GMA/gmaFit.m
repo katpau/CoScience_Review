@@ -9,8 +9,8 @@
 %
 %% Description
 %   Fits an initial guess of a Gamma probability density function on the largest
-%   nonnegative interval, found in  in the data and optimizes the fit, using
-%   Grid Restrained Nelder-Mead Algoritm (GRNMA).
+%   nonnegative interval (LNNI), found in  in the data and optimizes the fit
+%   using Grid Restrained Nelder-Mead Algoritm (GRNMA).
 %
 %   GMA was developed by Kummer et al. (2020) to investigate empirical
 %   event-related potential (ERP) components, by fitting a Gamma PDF on the EEG
@@ -24,7 +24,7 @@
 %       length 20 data points (see <a href="matlab:help('nnegIntervals')">nnegIntervals</a>),
 %       which intersects with the time window.
 %   2.  Add zeros before the first point of the LNNI up to the first index in
-%       the data (e.g. for an LNNI of [10, 55] nine zeros will be inserted.
+%       the data (e.g. for an LNNI of [10, 55] nine zeros would be inserted).
 %   3.  The parameters of a Gamma PDF will be estimated for the zero padded
 %       LNNI, using close-form estimation (Ye & Chen, 2017,
 %       see <a
@@ -159,7 +159,7 @@
 %   presearch_random, presearch_random2, presearch_closeform, meeseeks
 
 %% Attribution
-%	Last author: Olaf C. Schmidtmann, last edit: 27.06.2023
+%	Last author: Olaf C. Schmidtmann, last edit: 06.07.2023
 %   Code adapted from the original version by André Mattes and Kilian Kummer.
 %   Source: https://github.com/0xlevel/gma
 %	MATLAB version: 2023a
@@ -244,7 +244,6 @@ function [result, x0, argsUsed] = gmaFit(data, winStart, winLength, args)
     mWin = [winStart, winStart + winLength - 1];
 
     % Check the cost function and if ok, insert the nonnegative interval
-    % TODO: To be safe, try to execute the function first?
     if nargin(args.costFn) ~= 2
         error("The cost function must accept two parameters:\n a data " + ...
             "vector and a 3-column-vector of Gamma parameters for shape, " + ...
@@ -263,9 +262,10 @@ function [result, x0, argsUsed] = gmaFit(data, winStart, winLength, args)
 
 
     %% Find the longest viable interval of nonnegative values
-    % which overlaps the search window, i.e. could contain a mode.
+    % which sufficiently overlaps the search window, i.e. could contain a mode.
     args.segMinLength = max(args.segMinLength, SEG_MIN_PNTS);
-    [x0seg, ivMsg] = maxPosInterval(data, mWin, args.segMinLength);
+    [x0seg, ivMsg] = maxPosInterval(data, mWin, args.segMinLength, ...
+        round(args.segMinLength * 0.5));
     logger(ivMsg);
 
     if isempty(x0seg)
@@ -273,7 +273,7 @@ function [result, x0, argsUsed] = gmaFit(data, winStart, winLength, args)
             "(with min. samples=%i) found.", args.segMinLength);
         % EXIT with failed results.
         result = GmaResults(NaN, NaN, 1, data, win = mWin, seg = [NaN, NaN], ...
-            isInverted = args.invData);
+            isInverted = args.invData, isFullOpt = args.optimizeFull);
         x0 = [NaN, NaN, NaN];
         return;
     end
@@ -340,7 +340,7 @@ function [result, x0, argsUsed] = gmaFit(data, winStart, winLength, args)
         logger("[gmaFit] Initial guess is invalid or out of range.");
         % EARLY EXIT with NaN results, but provide the segment as information.
         result = GmaResults(NaN, NaN, 1, data, seg = x0seg, win = mWin, ...
-            isInverted = args.invData);
+            isInverted = args.invData, isFullOpt = args.optimizeFull);
         return;
     end
 
@@ -349,9 +349,7 @@ function [result, x0, argsUsed] = gmaFit(data, winStart, winLength, args)
     if args.optimizeFull
         % Use the all available data (instead of the nonnegative interval, only)
         % to optimize the PDF.
-        x0seg = [1, numel(data)];
         costFn = @(p) args.costFn(data, p);
-        gX = 1:numel(data);
     end
 
 
@@ -373,7 +371,7 @@ function [result, x0, argsUsed] = gmaFit(data, winStart, winLength, args)
     % orignal (unpadded) segment.
     result = GmaResults(gFit(1), gFit(2), gFit(3), data, ...
         gX, seg = x0seg, win = mWin, ...
-        isInverted = args.invData);
+        isInverted = args.invData, isFullOpt = args.optimizeFull);
 
     logger(newline, 'Gamma Model Analysis - Finished');
 
@@ -381,15 +379,19 @@ function [result, x0, argsUsed] = gmaFit(data, winStart, winLength, args)
     if args.logEnabled; logger(result.resultStr); end
 end
 
-function [iv, msg] = maxPosInterval(data, win, minLength)
+function [iv, msg] = maxPosInterval(data, win, minLength, minOverlap)
     %maxPosInterval Get the (first) largest nonnegative interval within a time
     %window
     %
-    %   Returns the full interval, even if it only partly overlaps the window between
-    %   the indices, i.e.
+    %   Returns the full interval, even if it only partly overlaps the window
+    %   between the indices, i.e.
 
-    if nargin < 3, minLength = 1; end
-    if nargin < 2, win = [1, numel(data)]; end
+    arguments
+        data (1, :)
+        win = [1, numel(data)]
+        minLength = 1
+        minOverlap = 1
+    end
 
     iv = [];
 
@@ -402,7 +404,8 @@ function [iv, msg] = maxPosInterval(data, win, minLength)
     end
 
     % All intervals intersecting the window (from..to)
-    ivWin = nnegIv(:, nnegIv(1, :) <= win(2) & nnegIv(2, :) >= win(1));
+    ivWin = nnegIv(:, win(2) - nnegIv(1, :) >= minOverlap - 1 & ...
+        nnegIv(2, :) - win(1) >= minOverlap - 1);
     ivWinInside = [max(ivWin(1, :), win(1)); min(ivWin(2, :), win(2))];
 
     if isempty(ivWinInside)

@@ -125,7 +125,7 @@
 %   GammaDist, gmaFit
 
 %% Attribution
-%	Last author: Olaf C. Schmidtmann, last edit: 27.06.2023
+%	Last author: Olaf C. Schmidtmann, last edit: 06.07.2023
 %   Code adapted from the original version by André Mattes and Kilian Kummer.
 %   Source: https://github.com/0xlevel/gma
 %	MATLAB version: 2023a
@@ -175,6 +175,10 @@ classdef GmaResults < GammaDist
         % isInverted    - [logical] true: indicates that the data's polarity was
         %               reversed (data * -1), false: data is unchanged.
         isInverted(1, 1) logical
+        % isFullOpt     - [logical] true: indicates that the whole data range 
+        %               was used for optimization; false: the optimization was 
+        %               performed on the nonnegative interval, only
+        isFullOpt(1, 1) logical
         % minCorr       - [double] Minimal correlation between data and the PDF
         %               (y) a criterion for a successful fit. Must at least
         %               barely positive, between the smallest double precision
@@ -246,7 +250,13 @@ classdef GmaResults < GammaDist
             %           into time units.
             %
             %   [Optional] Name-value parameters
-            %   isInverted  - [logical] true indicates reversed polarity of the data
+            %   isInverted  - [logical] true: the polarity of the data was 
+            %               inversed; false (default: the polarity of the data
+            %               was not changed
+            %   isFullOpt   - [logical] true: indicates that the whole data 
+            %               range was used for optimization; false (default):
+            %               the optimization was performed on the nonnegative
+            %               interval, only
             %   minCorr     - [double] Minimal correlation between data and the
             %               PDF for a valid fit: Must be larger than 2.2204e-16
             %               (~eps(1) is fine) and 1. Default: 2.2204e-16
@@ -270,6 +280,7 @@ classdef GmaResults < GammaDist
                 args.seg = [min(1, numel(data)), numel(data)]
                 args.win = [min(1, numel(data)), numel(data)]
                 args.isInverted = false
+                args.isFullOpt = false
                 args.minCorr = 2.2204e-16
             end
             obj@GammaDist(shape, rate, yscale, x);
@@ -278,6 +289,7 @@ classdef GmaResults < GammaDist
             obj.seg = args.seg;
             obj.win = args.win;
             obj.isInverted = args.isInverted;
+            obj.isFullOpt = args.isFullOpt;
 
             % Range between barely positive and 1.
             obj.minCorr = max(2.2204e-16, min(1, args.minCorr));
@@ -669,8 +681,8 @@ classdef GmaResults < GammaDist
             %   the complete data.
             %
             %   Note:
-            %   You might want to consider lowering the minimum correlation for
-            %   the resulting fit as will refer to the full data range.
+            %   You might want to consider chaning the minimum correlation for
+            %   the full data range.
             %
             % Requirements
             %   As a prerequisite, the first x of the PDF must match the segment
@@ -873,7 +885,7 @@ classdef GmaResults < GammaDist
         % Can be overridden! :)
 
         function [r, rmat, pmat, rlo, rup] = r(obj, alpha)
-            %R Pearson product-moment correlation coefficient betw. pdf and data
+            %R Pearson product-moment correlation coefficient btw. pdf and data
             %
             %   Considers only complete rows (i.e., omits rows containing NaN
             %   values).
@@ -1143,11 +1155,11 @@ classdef GmaResults < GammaDist
             if isempty(obj.eegInfo)
                 rf = 1;
                 % Empty EEG info
-                eegValues = {'n/a', NaN, '', 0, 0, 1, '', ''};
+                eegValues = {'n/a', '', 0, 0, 1, '', ''};
             else
                 info = obj.eegInfo;
                 rf = 1000 / info.srate;
-                eegValues = {info.setname, info.dataCh, info.chLabel, ...
+                eegValues = {info.setname, info.chLabel, ...
                     info.srate, info.filename, info.filepath};
             end
 
@@ -1355,12 +1367,12 @@ classdef GmaResults < GammaDist
 
             if nargin < 1, rows = 0; end
 
-            eegFlds = {'eegName', 'eegCh', 'eegChLabel', ...
+            eegFlds = {'eegName', 'eegChLabel', ...
                 'eegRate', 'eegFile', 'eegPath'};
-            eegTypes = {'string', 'double', 'string', ...
+            eegTypes = {'string', 'string', ...
                 'double', 'string', 'string'};
 
-            eegUnits = ["", "", "", "samples", "samples", "Hz", "", ""];
+            eegUnits = ["", "", "Hz", "", ""];
 
 
             gmaFlds = {'inverted', 'fit', 'win1', 'win2', ...
