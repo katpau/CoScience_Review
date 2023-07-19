@@ -203,7 +203,7 @@ try
             % Count Epochs
             EpochCount_RewP(:,i_Cond,:) = size(Data_RewP,3);
             EpochCount_P3(:,i_Cond,:) = size(Data_P3,3);
-            if size(Data_RewP,3) < str2double(INPUT.StepHistory.Trials_MinNumber)
+           if size(Data_RewP,3) < str2double(INPUT.StepHistory.Trials_MinNumber)
                 ERP_RewP(:,i_Cond,:) = NaN;
                 SME_RewP(:,i_Cond,:) = NaN;
                 ERP_P3(:,i_Cond,:) = NaN;

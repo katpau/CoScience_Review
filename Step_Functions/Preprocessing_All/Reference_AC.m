@@ -67,7 +67,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
 
             % Chanloc information on reference electrode
             if strcmp(EEG.Info_Lab.Reference,'FCZ')
-                RefInfo = {'FCZ',	 -0,	0.127,	0.388,	  0, 0.922,	  0	67.2,  1,	'EEG'};
+                RefInfo = {'FCZ',	 -0,	0.127,	0.388,	  0, 0.922,	  0,	67.2,  1,	'EEG'};
             elseif  strcmp(EEG.Info_Lab.Reference, 'CZ')
                 RefInfo = {'CZ',	 -0,     0,	    6.12e-17,  0,  1,	  0,  90,  1,	'EEG'};
             end

@@ -32,9 +32,9 @@ function  OUTPUT = TimeWindow(INPUT, Choice)
 % saved on the harddrive (in order to be loaded and forked from there).
 % Order determines when it should be run.
 StepName = "TimeWindow";
-Choices = ["200,400", "240,340", "150,350", "Relative_Group_wide", "Relative_Group_narrow", "Relative_Subject"];
+Choices = ["Relative_Subject", "200,400", "240,340", "150,350", "Relative_Group_wide", "Relative_Group_narrow"];
 Conditional = ["NaN", "NaN", "NaN", "NaN", "NaN", "NaN"];
-SaveInterim = logical([1]);
+SaveInterim = logical([0]);
 Order = [21];
 
 

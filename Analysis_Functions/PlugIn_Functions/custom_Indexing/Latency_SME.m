@@ -1,6 +1,6 @@
 
 % SME of Peaks
-    function SME = Peaks_SME(Subset, Component)
+    function SME = Latency_SME(Subset, Component)
         % similiar to ERPlab toolbox
         % Initate some variables
         n_boots = 100;
@@ -13,7 +13,7 @@
             rng(i_bs, 'twister')
             bs_trialidx = sort(randsample(1:trials,trials,replacement));
             bs_ERP = squeeze(mean(Subset(:,:,bs_trialidx),3));
-            Peak_perTrial(:,i_bs) = Peaks_Detection(bs_ERP, Component);
+            [~, Peak_perTrial(:,i_bs)] = Peaks_Detection(bs_ERP, Component);     
         end
         % use sd of this distribution for SME
         SME = std(Peak_perTrial, [], 2);

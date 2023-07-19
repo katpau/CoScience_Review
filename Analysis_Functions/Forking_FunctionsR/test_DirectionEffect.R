@@ -73,8 +73,10 @@ test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResu
  if (isFALSE(Test)) {
    
    ModelResult$value_EffectSize = ModelResult$value_EffectSize * -1
-   ModelResult$CI_low = ModelResult$CI_low * -1
-   ModelResult$CI90_high = ModelResult$CI90_high * -1
+   Low = ModelResult$CI_low
+   High = ModelResult$CI90_high
+   ModelResult$CI_low = High * -1
+   ModelResult$CI90_high = Low * -1
  } }
   return(ModelResult)
 }

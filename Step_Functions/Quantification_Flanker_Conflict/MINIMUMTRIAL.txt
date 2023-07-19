@@ -1,0 +1,3 @@
+MINIMUM TRIAL NUMBER NEEDS TO BE DONE IN R IF SINGLE TRIAL ["20", "32"]
+
+calculate SME also in R (easier with grouping) through SD()/SQRT(length())
