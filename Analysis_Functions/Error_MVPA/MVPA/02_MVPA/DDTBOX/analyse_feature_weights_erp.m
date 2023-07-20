@@ -29,9 +29,11 @@ FW_ANALYSIS.fw_disp = input('Enter the consecutive time steps for which a featur
 %% load in channel information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %__________________________________________________________________________
 
-channel_file = [ANALYSIS.channellocs ANALYSIS.channel_names_file];
-load(channel_file);
+% channel_file = [ANALYSIS.channellocs ANALYSIS.channel_names_file];
+% load(channel_file);
 
+%[elisa] modified to fit input structure
+chanlocs = ANALYSIS.channellocs;
 
 %% GET INDIVIDUAL DATA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %__________________________________________________________________________
@@ -456,9 +458,8 @@ if ANALYSIS.fw.display_average_zmap == 1
     to_plot = FW_ANALYSIS.AVERAGESTEPS_SELECT_FW_Z_MEAN';
     
     figure;
-    topoplot_decoding(to_plot,...
-        chanlocs,'style','both','electrodes','labelpoint','maplimits','minmax','chaninfo',chaninfo); % or: [MIN MAX]
-    
+    topoplot_decoding(to_plot,chanlocs,'style','both','electrodes','labelpoint','maplimits','minmax','chaninfo',chaninfo); % or: [MIN MAX]
+
     hold on;
     title('Z-standardised absolute feature weights averaged across time-steps','FontSize',10,'FontWeight','b');
     
@@ -475,6 +476,7 @@ if ANALYSIS.fw.display_average_uncorr_threshmap == 1
     to_plot = FW_ANALYSIS.h_matrix_z_averagestep_uncorr;
     
     figure;
+
     topoplot_decoding(to_plot,...
         chanlocs,'style','fill','electrodes','labelpoint','numcontour',1,'conv','off','maplimits',[0 1],'ccolor',[0 0 0],'ecolor',[1 1 1],'chaninfo',chaninfo);
     
