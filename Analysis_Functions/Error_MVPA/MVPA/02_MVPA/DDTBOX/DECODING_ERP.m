@@ -38,10 +38,13 @@ function DECODING_ERP(study_name,vconf,input_mode,sbj,dcg_todo,cross)
 
 %% SECTION 1: PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %__________________________________________________________________________
+global STUDY
+global RESULTS
 
 global SBJTODO;
-SBJTODO = sbj;
+SBJTODO = sbj ;
 STUDY.sbj = sbj;
+global eeg_sorted_cond
 
 global DCGTODO;
 DCGTODO = dcg_todo;
@@ -54,7 +57,6 @@ global CALL_MODE
 CALL_MODE = 2;
 
 % get subject parameters
-% sbj_list = input('Enter subject list: ','s');
 STUDY.study_name = study_name;
 STUDY.vconf = vconf;
 STUDY.sbj_list = [study_name '_config_v' num2str(vconf)]; % use latest slist-function!
@@ -78,7 +80,7 @@ if input_mode == 0 % Hard-coded input
     
     STUDY.perm_test = 1; % run the permutation-decoding? 0=no / 1=yes
     STUDY.perm_disp = 1; % display the permutation results in figure? 0=no / 1=yes
-    STUDY.display_on = 1; % 1=figure displayed, 0=no figure
+    STUDY.display_on = 0; % 1=figure displayed, 0=no figure
     
     STUDY.rt_match = 0; % Use RT-matching algorithm to select trials? 0=no / 1=yes
     STUDY.zscore_convert = 0; % Convert data into z-scores before decoding? 0 = no / 1 = yes
@@ -231,11 +233,6 @@ STUDY.backend_flags.all_flags = [STUDY.backend_flags.all_flags ' ' STUDY.backend
 % basic data in: eeg_sorted_cond{run,cond}(timepoints,channels,trials)
 % *** converted into work_data{run,cond}(timepoints,channels,trials)
 
-fprintf('Reading in data. Please wait... \n');
-open_name = (SLIST.data_open_name);
-load(open_name);
-fprintf('Data loading complete.\n');
-
 % read in regression labels if performing continuous regression
 if STUDY.analysis_mode == 4 %i.e. if we are performing continuous regression
     
@@ -281,12 +278,8 @@ if STUDY.equal_n == 1
     % [elisa] ADDED to stop analyses when trials < 10
     if n_trials_min < 10
         fprintf('The minimum trial number is %d. At least 10 trials are needed. Ending analyses.', n_trials_min);
-        ErrorMessage = "Not enough trials.";
-        FileName = strcat(SLIST.output_dir, 'logs/', "Error_", info.participant, ".txt");
-        fid = fopen(FileName, 'wt');
-        fprintf(fid, ErrorMessage);
-        fclose(fid);
-        return
+        e.message = "Not enough trials.";
+        error(e.message);
     end
     eeg_sorted_cond_new = eeg_sorted_cond;
     
@@ -347,10 +340,6 @@ if isstruct(work_data)
     end
 end
 %__________________________________________________________________________
-
-%clear wd;
-%clear eeg_sorted_cond;  % I don't know where this came from so I removed
-%it because it prevents the analysis from running correctly.
 
 %% SECTION 3: REDUCE TO SPECIFIED DCG / conditions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % STUDY_slist defines all DCG with their respective relevant conditions. In
@@ -731,27 +720,8 @@ end % na
 
 fprintf('Results are computed and averaged for participant %d. \n',STUDY.sbj);
 
-%% SECTION 10: SAVE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Saves decoding results to a .mat file in the output directory. Some analysis
-% settings (e.g. window_width_ms) are included in the file name.
-%__________________________________________________________________________
 
-if STUDY.cross == 0
-    savename = [(SLIST.output_dir) STUDY.study_name '_SBJ' num2str(STUDY.sbj) '_win' num2str(STUDY.window_width_ms) '_steps' num2str(STUDY.step_width_ms)...
-        '_av' num2str(STUDY.avmode) '_st' num2str(STUDY.stmode) '_DCG' SLIST.dcg_labels{STUDY.dcg_todo} '.mat'];
-elseif STUDY.cross == 1
-    savename = [(SLIST.output_dir) STUDY.study_name '_SBJ' num2str(STUDY.sbj) '_win' num2str(STUDY.window_width_ms) '_steps' num2str(STUDY.step_width_ms)...
-        '_av' num2str(STUDY.avmode) '_st' num2str(STUDY.stmode) '_DCG' SLIST.dcg_labels{STUDY.dcg_todo(1)} 'toDCG' SLIST.dcg_labels{STUDY.dcg_todo(2)} '.mat'];
-elseif STUDY.cross == 2
-        savename = [(SLIST.output_dir) STUDY.study_name '_SBJ' num2str(STUDY.sbj) '_win' num2str(STUDY.window_width_ms) '_steps' num2str(STUDY.step_width_ms)...
-        '_av' num2str(STUDY.avmode) '_st' num2str(STUDY.stmode) '_DCG' SLIST.dcg_labels{STUDY.dcg_todo(2)} 'toDCG' SLIST.dcg_labels{STUDY.dcg_todo(1)} '.mat'];
-end
-    
-save(savename,'STUDY','RESULTS'); % Save STUDY and RESULTS structures into a .mat file
-
-fprintf('Results are saved for participant %d in directory: %s. \n',STUDY.sbj,(SLIST.output_dir));
-
-%% SECTION 11: DISPLAY INDIVIDUAL RESULTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SECTION 10: DISPLAY INDIVIDUAL RESULTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Displays decoding results for each individual subject dataset.
 %__________________________________________________________________________
 
