@@ -90,40 +90,35 @@ combine_Choices = function(design, PreviousStep) {
   # Get Indexes of Nones
   outlier_collumns = names(design)[grepl("Outliers_", names(design))]
   outlier_collumns = outlier_collumns[!grepl("Personality", outlier_collumns)]
-  Idx_None = Forking_List1[outlier_collumns] == "None"
+  outlier_collumns_variable = outlier_collumns[!grepl("_Threshold|_Treatment", outlier_collumns)]
+  
+  # All Fields related to Thresholds are None
+  Idx_None = Forking_List1[outlier_collumns_variable] == "None"
   All_None = apply(Idx_None, 1, all)
   
-  # If all selected to None, then Threshold and Treatment must be none
-  Idx_To_Drop = c(which(Forking_List1$Outliers_Threshold != "None" & All_None),
-                  which(Forking_List1$Treat_Outliers != "None" & All_None))
   
-  # If Threshold/Treatment are None, all others must be None 
-  Idx_To_Drop = c(Idx_To_Drop,
-                  which(Forking_List1$Outliers_Threshold == "None" & !All_None),
-                  which(Forking_List1$Treat_Outliers == "None" & !All_None))
+  # When all Decisions are None, then Treatment and Threshold must be None
+  Forking_List1$Outliers_Threshold[All_None] = "None"
+  Forking_List1$Outliers_Treatment[All_None] = "None"
   
+  # When Treatment/Threshold are None, then the other one must be none 
+  Forking_List1$Outliers_Threshold[Forking_List1$Outliers_Treatment == "None"] = "None"
+  Forking_List1$Outliers_Treatment[Forking_List1$Outliers_Threshold == "None"] = "None"
   
-  # If Threshold is None, Treatment must be none and vice versa
-  Idx_To_Drop = c(Idx_To_Drop,
-                  which(Forking_List1$Outliers_Threshold == "None" & !Forking_List1$Treat_Outliers == "None"),
-                  which(!Forking_List1$Outliers_Threshold == "None" & Forking_List1$Treat_Outliers == "None"))
+  # When Treatment/Threshold are None, then all other collumns must be None
+  Forking_List1[which(Forking_List1$Outliers_Treatment == "None"), outlier_collumns_variable] = "None"
   
-  Idx_To_Drop = c(Idx_To_Drop,
-                  which(Forking_List1$Outliers_EEG == "None" & Forking_List1$Treat_Outliers == "Replace"))
+  # When EEG not applied, then it must be replaced?
   
-  
-  Idx_To_Drop = unique(Idx_To_Drop)
-  
-  # Drop these from combination
-  Forking_List1 = Forking_List1[-Idx_To_Drop,]
-  
-  
+  # Drop Duplicates
+  Forking_List1 = Forking_List1[!duplicated(Forking_List1),]
+  Forking_List1 
   
   # Fork second part and merge
   Forking_List2 = do.call(expand.grid, design[(highest_outlier+1):length(design)])
   Forking_List = tidyr::crossing(Forking_List1, Forking_List2)
   
-
+  
   # Change Structure
   fac_cols = sapply(Forking_List, is.factor)
   Forking_List[fac_cols] <-
@@ -204,7 +199,7 @@ create_ForkingLists = function(CombinedForks,
   
   # Shuffle again (in case it was multiplied this is important)
   if (length(TotalCombinationsIndex)> 0) {
-  TotalCombinationsIndex = sample(TotalCombinationsIndex) }
+    TotalCombinationsIndex = sample(TotalCombinationsIndex) }
   
   # How many Files will be created
   nr_Files = ceiling(NrCombinations_PreProc / sizeSubsets)
@@ -236,20 +231,20 @@ create_ForkingLists = function(CombinedForks,
       names(MainPath)[1:2] = c("InputNumber", "CombinationNumber")
       
       OUTPUT = rbind(MainPath, OUTPUT)
-
-    # Write MainPath
-    filename = paste0(Path_To_Export, "/OUTPUT_MAIN.txt")
-    write.table(
-      MainPath,
-      filename,
-      sep = ";",
-      row.names = FALSE,
-      col.names = TRUE
-    )
-
+      
+      # Write MainPath
+      filename = paste0(Path_To_Export, "/OUTPUT_MAIN.txt")
+      write.table(
+        MainPath,
+        filename,
+        sep = ";",
+        row.names = FALSE,
+        col.names = TRUE
+      )
+      
     }
-
-   # Write all Output
+    
+    # Write all Output
     filename = paste0(Path_To_Export, "/OUTPUT_", as.character(iSubset), ".txt")
     write.table(
       OUTPUT,
@@ -290,8 +285,8 @@ run_Steps = function( OUTPUT_File,
   Protocol = NA
   start_time <- Sys.time() 
   Protocol = invisible(foreach(i_Fork = 1:nrow(OUTPUT),
-                    .errorhandling = 'pass',
-                    .combine = 'c') %dopar% run_Steps_parallel(i_Fork, OUTPUT, Path_to_Merged_Files,  Path_to_Export, RootPath))
+                               .errorhandling = 'pass',
+                               .combine = 'c') %dopar% run_Steps_parallel(i_Fork, OUTPUT, Path_to_Merged_Files,  Path_to_Export, RootPath))
   # just for Troubleshooting
   # for (i_Fork in 1:nrow(OUTPUT)) {
   #  Ex =  run_Steps_parallel(i_Fork, OUTPUT, Path_to_Merged_Files,  Path_to_Export)
@@ -343,8 +338,8 @@ run_Steps_parallel = function (i_Fork, OUTPUT, Path_to_Merged_Files, Path_to_Exp
                            OUTPUT[i_Fork, 2],
                            ".txt")
   
-  print(paste("filename_input", filename_input))
-  print(paste("filename_output", filename_output))
+  #print(paste("filename_input", filename_input))
+  #print(paste("filename_output", filename_output))
   
   # Only Run if not already Run before
   if (file.exists(filename_output)) {
