@@ -49,16 +49,15 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
     # (2) Identify Outliers 
     #########################################################
     # for ACC, only one value per Task and Subject should be used [checked across conditions]
-    # select only relevant columns and drop duplicates
-    output_ACC = output[,c("ID", "ACC")]
-    output_ACC = output_ACC[!duplicated(output_ACC),]
-    output_ACC = output_ACC %>%
-      summarise(Outliers_ACC = outlierfunction(Threshold, ACC),
-                ID = ID) %>%
-      ungroup()
-    
-    
-    
+    # Calculate Global Task Accuracy based on BehavData
+    output_Behav = output[output$Component == "Behav",] 
+    output_ACC = output_Behav %>%
+      group_by(ID) %>%
+      summarise(ACC_Task = sum(ACC)/length(ACC)*100) %>% 
+      ungroup %>%
+      summarise(ID = ID,
+                Outliers_ACC = outlierfunction(Threshold, ACC_Task))
+        
     # merge with full dataset
     output =  merge(    output, 
                         output_ACC,
@@ -66,13 +65,12 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
                         all.x = TRUE,    all.y = FALSE )
     
     # Remove ACC, RT, and EEG data if overall Accuracy is too low
-    output$ACC[as.logical(output$Outliers_ACC)] = NA
     output$EEG_Signal[as.logical(output$Outliers_ACC)] = NA
-    output$Behav_RT[as.logical(output$Outliers_ACC)] = NA
-    
+    output$RT[as.logical(output$Outliers_ACC)] = NA
+    output$ACC[as.logical(output$Outliers_ACC)] = NA    
     
     # Remove columns
-    output = output[,!names(output) %in% c("Outliers_ACC",  "Min", "Max")]
+    output = output[,!names(output) %in% c("Outliers_ACC")]
     
   }
   

@@ -60,7 +60,7 @@ Outliers_IQ = function(input = NULL, choice = NULL) {
     # (2) Identify Outliers 
     #########################################################
     
-    outliers_IQ = output_IQ %>%
+    output_IQ = output_IQ %>%
       mutate(Outliers_IQ = outlierfunction(Threshold, IST, 0)) %>%
       ungroup()
     
@@ -75,6 +75,8 @@ Outliers_IQ = function(input = NULL, choice = NULL) {
         do(outlierfunction(Threshold, .$IST, 1))%>%
         ungroup()
       
+      # IST only integers:
+      MinMax = round(MinMax)
       
       # merge with data
       output_IQ =  merge(output_IQ,    
@@ -100,14 +102,14 @@ Outliers_IQ = function(input = NULL, choice = NULL) {
   # (4) Merge with Data
   #########################################################
   # Merge with data
-  output =  merge(
-    output,
+  Personality =  merge(
+    input$stephistory$output_Personality ,
     output_IQ[,c("ID", "IST")],
     by = "ID",
     all.x = TRUE,
     all.y = FALSE
   )
-  
+  input$stephistory$output_Personality = Personality
   
   
   
@@ -116,7 +118,7 @@ Outliers_IQ = function(input = NULL, choice = NULL) {
   stephistory = input$stephistory
   stephistory[StepName] = choice
   return(list(
-    data = output,
+    data = input$data,
     stephistory = stephistory
   ))
 }

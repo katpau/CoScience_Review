@@ -27,13 +27,13 @@ Do_PCA = 0
 ################
 # For this Check with Corinna and ask her to send her analysis script and add condition in Common then referring to TaskName
 # Corinna says that we do not use PCA but CFA-factor scores from the CEI model that is not forked
-CEI.fac.scores = CEI.fac.scores # TODO @Kat needs to be adjusted depending how it is handles in common
+CEI.fac.scores = c("NFC_NeedForCognition", "ATQ_EffortfulControl", "BSCS_SelfControl" , "TIF_Intellect")
 
 
 # Merge all Scales for Indexing
 Maha_Subscales = unique(c(Scored_Subscales, Covariates_Subscales, CEI.fac.scores)) # For exclusions, must be non-colinear!
 Allrelevant_Subscales = unique(c(Scored_Subscales, Covariates_Subscales, Maha_Subscales,
-                                 CEI.fac.scores, unlist(Z_Scores_Sum), unlist(Z_Scores_Average))) # For indexing # CK: what is saved within the unlist-variables - is it still needed? 
+                                 CEI.fac.scores)) # For indexing 
 
 
 # which Factors should be kept from Factor Analysis?
