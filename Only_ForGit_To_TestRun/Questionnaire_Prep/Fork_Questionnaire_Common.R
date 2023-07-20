@@ -1,6 +1,6 @@
+################################################################################
+# 0. Prepare Files #############################################################
 
-###################################################################################################
-## Prepare Files
 FolderQuestData = paste0(Root, "/Raw/")
 OutputFolder = paste0(Root,"/Test-",
                       TaskName, "/")
@@ -10,13 +10,11 @@ dir.create(OutputFolder)
 Helperfile = paste0(Root, "/Raw/Fragebogen_OutputÜbersicht.csv")
 
 
-
-##########################################################
-### Get Information on Item Level (for Reliability!)
-##########################################################
+# 1. Get Information on Item Level (for Reliability!) ##########################
 
 # Load HelperFile
 Helperfile = read.csv(Helperfile, header = TRUE, sep = ";")
+
 # Restructrue Helperfile so that it is long format
 Add = Helperfile[Helperfile$Subskala2 != "", ]
 Add$Subskala1 = Add$Subskala2
@@ -25,7 +23,6 @@ Add = Helperfile[Helperfile$Subskala3 != "", ]
 Add$Subskala1 = Add$Subskala3
 Helperfile = rbind(Helperfile, Add)
 Helperfile$Fragebogenkürzel = as.character(Helperfile$Fragebogenkürzel)
-
 
 # Determine Items of all Scales
 Idx_Scales = sapply(Allrelevant_Subscales, grep, as.character(Helperfile$Subskala1))
@@ -40,11 +37,7 @@ weight_Items = lengths(Idx_Scales[Allrelevant_Subscales])
 
 
 
-##########################################################
-### Adjust Raw Data (reverse coding, outliers)
-##########################################################
-
-
+# 2. Adjust Raw Data (reverse coding, outliers) ################################
 
 # Depending on Combination (Attention Checks + Outliers based on RT), load the different 
 # files with the Scores (for each subscale)
@@ -56,17 +49,9 @@ for (CutOff_Applied in 0:1) {
     if (CutOff_Applied == 1) {
       Scores_File = paste0(FolderQuestData, "Questionnaire_Scores-filtered.csv")
       Items_File = paste0(FolderQuestData, "Questionnaire_Items-filtered.csv")
-      Export_File_Name = "Personality-Scores-filtered"
     } else {
       Scores_File = paste0(FolderQuestData, "Questionnaire_Scores-unfiltered.csv")
       Items_File = paste0(FolderQuestData, "Questionnaire_Items-unfiltered.csv")
-      Export_File_Name = "Personality-Scores-unfiltered"
-    }
-    
-    if (Outliers_Applied == 1) {
-      Export_File_Name = paste0(Export_File_Name, '_outliers-removed.csv')
-    } else {
-      Export_File_Name = paste0(Export_File_Name, '_outliers-notremoved.csv')
     }
     
     # Load Scores and select only relevant Scales
@@ -85,10 +70,21 @@ for (CutOff_Applied in 0:1) {
     
     Items_Data = Items_Data[,c("ID", unlist(Names_Items))]
     
+    # For Exporting the Data Later
+    if (CutOff_Applied == 1) {
+      Export_File_Name = "/Personality-Scores-filtered"
+    } else {
+      Export_File_Name = "/Personality-Scores-unfiltered"
+    }
+    if (Outliers_Applied == 1) {
+      Export_File_Name = paste0(Export_File_Name, '_outliers-removed.csv')
+    } else {
+      Export_File_Name = paste0(Export_File_Name, '_outliers-notremoved.csv')
+    }
     
-    ###################################################
-    # Check for Outliers in Personality Data based on Mahlanobis Distance
-    ###################################################
+    
+    ## 2.1 Check for Outliers in Personality Data based on Mahalanobis Distance ####
+    
     if (Outliers_Applied == 1){
       # Determine Outliers based on all (possibly) relevant Subscales
       ToTestforOutliers = Score_Data[,Maha_Subscales]
@@ -114,19 +110,20 @@ for (CutOff_Applied in 0:1) {
     
     
     if (Do_ZScores == 1) {
-      ##########################################################
-      ### Calculate Cronbach Alpha for each Subscale
-      ##########################################################
+      
+      
+      ## 2.2 Calculate Cronbach Alpha for each Subscale ##########################
+      
       z_ScoreCollumns = unique(c(unlist(Z_Scores_Average), unlist(Z_Scores_Sum)))
       weight_Reliability = weight_Items
       for (iSubscale in 1:length(z_ScoreCollumns)) {
         Test_Alpha = alpha(Items_Data[, Names_Items[[z_ScoreCollumns[[iSubscale]]]]])
-        weight_Reliability[z_ScoreCollumns[[iSubscale]]] = Test_Alpha$total$raw_alpha
+        weight_Reliability[iSubscale] = Test_Alpha$total$raw_alpha
       }
       
-      ##########################################################
-      ### Calculate Z Scores of Personality Variable
-      ##########################################################
+      
+      ## 2.3 Calculate Z Scores of Personality Variable ##########################
+      
       Z_Score_Data = data.frame( Score_Data$ID)
       colnames(Z_Score_Data) = "ID"
       
@@ -163,18 +160,20 @@ for (CutOff_Applied in 0:1) {
       
     }
     if (Do_PCA == 1) {
-      ##########################################################
-      ### Calculate PCA across Subscales
-      ##########################################################
+      
+      
+      ## 2.4 Calculate PCA across Subscales ######################################
+      
       PCA_Subset = na.omit(Score_Data[,c("ID", PCA_Subscales)])
       
       PCA_FirstFactor = prcomp(PCA_Subset[,2:ncol(PCA_Subset)])$x[, 1] # scale = TRUE???
       PCA_FirstFactor = cbind(PCA_Subset$ID, PCA_FirstFactor)
       colnames(PCA_FirstFactor) = c("ID", "Personality_PCA")
       
-      ##########################################################
-      ### Calculate Factor Analysis across Subscales
-      ##########################################################
+      
+      
+      ### 2.4.1 Calculate Factor Analysis across Subscales #######################
+      
       ## An oblique rotation and analysis of all factors from a factor analysis (including all relevant subscales).
       # The factor analysis is estimated using a PCA, a promax rotation (with Kappa=4) is applied.
       # Parallel Analysis is used as a method for the number of factors to extract. Component scores are computed
@@ -193,6 +192,8 @@ for (CutOff_Applied in 0:1) {
       
       # Select Factors that explain more than random and which Eigenvalue are larger than 1
       nr_factors = sum(FactAn$AdjEv>1 & FactAn$AdjEv>FactAn$RndEv )
+      # With test this was sometimes 0 (with real data did not happen yet)
+      if (nr_factors == 0) {nr_factors = 1}
       
       # run Factor analysis with correct number of factors
       FactAn = factanal(
@@ -211,20 +212,14 @@ for (CutOff_Applied in 0:1) {
         iFactor = FactorsToKeep[4] }
       
       Factor_Analysis = cbind(PCA_Subset$ID, FactAn$scores[,iFactor])
-      colnames(Factor_Analysis) = c("ID", "Personality_Factor_Analysis")
+      colnames(Factor_Analysis) = c("ID", "Personality_FactorAnalysis")
       
       
       
+      ### 2.4.2 Second PCA/Factor Analysis #######################################
       
       
-      
-      
-      
-      
-      
-      
-      
-      ### If second PCA should be run
+      ### If second PCA should be run (only selected Analysis)
       if (TaskName == "Alpha_Resting") {
         colnames(PCA_FirstFactor) = c("ID", "Personality_PCA_BAS")
         PCA_Subset = na.omit(Score_Data[,c("ID", PCA_Subscales2)])
@@ -238,14 +233,6 @@ for (CutOff_Applied in 0:1) {
                                 all.x = TRUE,
                                 all.y = FALSE)
         
-        
-        ##########################################################
-        ### Calculate Factor Analysis across Subscales
-        ##########################################################
-        ## An oblique rotation and analysis of all factors from a factor analysis (including all relevant subscales).
-        # The factor analysis is estimated using a PCA, a promax rotation (with Kappa=4) is applied.
-        # Parallel Analysis is used as a method for the number of factors to extract. Component scores are computed
-        # from the rotated solution
         
         # Create initial factor analysis to determine number of factors
         FactAn2 = paran(
@@ -283,16 +270,11 @@ for (CutOff_Applied in 0:1) {
       }}
     
     
-    
-    ## Calculate CFA for Cognitive Effort Investment #######################
+    ## 2.5 Calculate CFA for Cognitive Effort Investment #######################
     
     if (TaskName == "Flanker_Conflict") {
-      # 1. requirements: 
-      # as sum score for each participant
-      # Transform TIF and ATQ to SUM (not mean!)
-      Score_Data_AllScores$TIF_Intellect = Score_Data_AllScores$TIF_Intellect *24
-      Score_Data_AllScores$ATQ_EffortfulControl =  Score_Data_AllScores$ATQ_EffortfulControl * 19
-      
+      # source personalized Functions
+      source(paste0(Root, "/CEI_Functions.R"))
       
       # 2. determine deviation from univariate normality using Shapiro Wilk test
       shapiro.summary = rbind(cbind("NFC", sw(Score_Data_AllScores$NFC_NeedForCognition)), 
@@ -301,24 +283,21 @@ for (CutOff_Applied in 0:1) {
                               cbind("TIF",sw(Score_Data_AllScores$TIF_Intellect)))
       
       
-      # 3. normalize and standardize sum scores by Blom's formula (1954)
-      # calculate normalized sum scores, rename (for easier use) and save in separate object in one step
+      # 4. calculate normalized sum scores, rename (for easier use) and save in separate object in one step
       nfc = data.frame(normalize.gen(data.frame(Score_Data_AllScores$NFC_NeedForCognition)))
       scs = data.frame(normalize.gen(data.frame(Score_Data_AllScores$BSCS_SelfControl)))
       int = data.frame(normalize.gen(data.frame(Score_Data_AllScores$TIF_Intellect)))
       eco = data.frame(normalize.gen(data.frame(Score_Data_AllScores$ATQ_EffortfulControl)))
       
       
-      # 4. determine deviation from univariate normality using Shapiro Wilk test
+      # 5. determine deviation from univariate normality using Shapiro Wilk test
       shapiro.summary = rbind(shapiro.summary, 
                               cbind("NFC.normal", sw(nfc)), 
                               cbind("BSCS.normal",sw(scs)),
                               cbind("EC.normal", sw(eco)),
                               cbind("TIF.normal",sw(int)))
-      # 5. save results 
-      write.csv2(shapiro.summary, 
-                 file = paste0(OutputFolder, "/CEI_Infos/CEI_shapiro.test.summary_", Export_File_Name )) 
-      
+      # save results
+      write.csv2(shapiro.summary, file = paste0(OutputFolder, "/CEI_Infos/CEI_shapiro.test.summary_", gsub( "/", "", Export_File_Name))) 
       
       
       # 6. perform Mardia test in order to check for deviation from multivariate normality
@@ -349,36 +328,22 @@ for (CutOff_Applied in 0:1) {
       f1 = cfa(m1, data = d.1, estimator = "MLR")   # TODo @ Kat, adjust according to mardia results
       summary(f1, standardized = T, fit.measures = T, nd = 3)
       
-      
       fm.report(f1, scaled = F)
       # [1] "chi2 = 32.66, df = 4, p < .001, CFI = .67, RMSEA = .27 with 90% CI [.19, .36], SRMR = .14"
       
       # reliability (McDonald's Omega)
-      # CEI_omegas = round(reliability(f1)['omega3', ], 2)[c(3, 1, 2)] # === THROWS ERROR=====?????
-      
+      # CEI_omegas = round(reliability(f1)['omega3', ], 2)[c(3, 1, 2)]
+      # Gives an Error message? Error in keys[[scales]] : this S4 class is not subsettable
       
       ## extract factor scores from cfa
       CEI.fac.scores <- data.frame(lavPredict(f1, type = "lv"))
-      
-      # if NA in input, values are missing! Add NAs
-      missingVal = which(is.na(c(nfc[,1], scs[,1], int[,1], eco[,1])))
-      if (length(missingVal)>0) {
-        CEI.fac.scores$ID = Score_Data$ID[!is.na(nfc)]
-        CEI.fac.scores = merge(CEI.fac.scores, 
-                               Score_Data[,c("ID", "NFC_NeedForCognition")],
-                               by = "ID",
-                               all.y = TRUE)
-        CEI.fac.scores = CEI.fac.scores[,-c(1,5)]
-        
-      }
       
       
     }
     
     
-    ##########################################################
-    ### Get Scores for the Personality Variable
-    ##########################################################  
+    ## 2.6 Get Scores for the Personality Variable #############################
+    
     # Scores from Subscales
     if (length(Scored_Subscales) > 0) {
       Score_Subscales = Score_Data[, Scored_Subscales]
@@ -387,9 +352,9 @@ for (CutOff_Applied in 0:1) {
     }
     
     
-    ##########################################################
-    ### Get Scores for the Covariates
-    ##########################################################  
+    
+    ## 2.7 Get Scores for the Covariates #######################################
+    
     # Scores from Subscales
     if (length(Covariates_Subscales) > 0) {
       Covariates = Score_Data[, Covariates_Subscales]
@@ -398,22 +363,19 @@ for (CutOff_Applied in 0:1) {
     }
     
     
-    # Some Special Concepts
+    ## 2.8 Some Special Concepts ###############################################
+    
+    
     if (TaskName == "Ultimatum_Offer") {
       Score_Subscales$AVBIS = rowMeans(Score_Data[,c("BISBAS_BIS", "RSTPQ_BIS")])
+      
+    } else if (TaskName == "Flanker_Conflict") {
+      Score_Subscales$ESC[complete.cases(d.1)] = CEI.fac.scores$ESC
+      Score_Subscales$COM[complete.cases(d.1)] = CEI.fac.scores$COM
+      Score_Subscales$CEI[complete.cases(d.1)] = CEI.fac.scores$CEI
     }
+    ## 3. Merge and export Data ####################################################
     
-    
-    if (TaskName == "Flanker_Conflict") {
-      Score_Subscales[missingVal,1]
-      Score_Subscales = cbind(Score_Subscales, CEI.fac.scores)
-    }
-    
-    
-    
-    ##########################################################
-    ### Merge and export Data
-    ##########################################################  
     ## Merge Data
     colnames(Score_Subscales) = paste0("Personality_", colnames(Score_Subscales))
     colnames(Covariates) = paste0("Covariate_", colnames(Covariates))
@@ -446,20 +408,20 @@ for (CutOff_Applied in 0:1) {
     
     
     
-    
-    
     # Export Data
     write.csv(OUTPUT,
-              paste0(OutputFolder, "/", Export_File_Name),
+              paste0(OutputFolder, Export_File_Name),
               row.names = FALSE)
     
     if (Do_PCA == 1) { 
-      capture.output(FactAn, file = paste0(OutputFolder, "/Results_Factor_Analysis_",  Export_File_Name))
+      capture.output(FactAn, file = paste0(OutputFolder, "/Results_Factor_Analysis_", gsub("/", "", Export_File_Name)))
       if (TaskName == "Alpha_Resting") {
-        capture.output(FactAn2, file = paste0(OutputFolder, "/Results_Factor_Analysis_BIS",  Export_File_Name))
+        capture.output(FactAn2, file = paste0(OutputFolder, "/Results_Factor_Analysis_BIS", gsub("/", "", Export_File_Name)))
         
       }
     }
     
     
   }}
+
+################################################################################

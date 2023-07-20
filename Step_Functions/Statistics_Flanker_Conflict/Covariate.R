@@ -6,9 +6,7 @@ Covariate = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
-  
-  # CS 01/23
+  # Planned/Completed Review by: CK 5/23
 
   # Handles all Choices listed above as well as choices from previous Steps 
   # (Attention Checks Personality, Outliers_Personality, Personality_Variable)
@@ -62,12 +60,7 @@ Covariate = function(input = NULL, choice = NULL) {
   #########################################################
   # (3) Extract Personality  (not forked)  + Covariates
   #########################################################
-  Personality_Variable_choice = c("Personality_NFC_NeedForCognition","Personality_LE_Positiv", "Personality_FactorAnalysis")
-  PersonalityData = ScoreData[, c("ID", Personality_Variable_choice)]
- 
-  # Rename 
-  colnames(PersonalityData)[colnames(PersonalityData) == "Personality_FactorAnalysis"] = "Personality_CEI"
-  
+  PersonalityData = ScoreData[, c("ID", colnames(ScoreData)[grepl("Personality_", colnames(ScoreData))])]
 
   # Select only Relevant Covariate
   if (Covariate_choice != "None") {
@@ -98,35 +91,54 @@ Covariate = function(input = NULL, choice = NULL) {
   #########################################################
   # (4) Prepare Output
   #########################################################
-  # Merge Data with EEG Data
-  output = merge(
-    output,
-    PersonalityData,
-    by = c("ID"),
-    all.x = TRUE,
-    all.y = FALSE
-  )
-  
+  # Keep Data Types Separate, do not merge (Personality, Behav/EEG)
+  output_Personality = PersonalityData
   if (!AddCovariate == 0) {
-    output = merge(
-      output,
+    output_Personality = merge(
+      output_Personality,
       CovariateData,
       by = c("ID"),
       all.x = TRUE,
       all.y = FALSE
     )}
-  
+  input$stephistory$output_Personality = output_Personality
 
 
   # Make sure everything is in correct format
-  NumericVariables = c("EEG_Signal", "SME", "Epochs", names(output)[grepl("Personality_|Covariate_|Behav_|ACC", names(output))])
-  FactorVariables = c("ID", "Congruency", "Electrode", 
-                      names(output)[grepl("Covariate_Gender", names(output))],
-                      "Component")
+  # Since this is now Single Trial Data, the EEG Signal is not yet in the correct (long) Format
+  columnstoChange1 = colnames(output)[8]
+  columnstoChange2 = colnames(output)[length(colnames(output))]
   
+  # Rename Subject Variable
+  colnames(output)[5] = "ID"
   
-  output[NumericVariables] = lapply(output[NumericVariables], as.numeric)
-  output[FactorVariables] = lapply(output[FactorVariables], as.factor)
+  output = output %>%
+    gather(Component_Electrode, EEG_Signal, !!as.character(columnstoChange1):!!as.character(columnstoChange2)) %>%
+    separate(Component_Electrode, into=c("Component", "Electrode"), sep="_")
+  
+  # Data is missing SME and total Epoch Number, calculate and add here
+  output = output %>%
+    group_by(ID, Congruency, Component, Electrode) %>%
+    mutate(SME = sd(EEG_Signal)/sqrt(length(EEG_Signal)),
+           Epochs = length(EEG_Signal))
+  
+
+  ##
+  NumericVariables = c("EEG_Signal", "SME", "Epochs", "Congruency", "Trial")
+  FactorVariables = c("ID",  "Electrode", "Component")
+  
+  NumericPersonalityVariables = c(names(output_Personality)[grepl("Personality_|Covariate_", names(output_Personality))])
+  FactorPersonalityVariables = c("ID",  names(output)[grepl("Covariate_Gender", names(output_Personality))])
+
+  output[,NumericVariables] = lapply(output[,NumericVariables], as.numeric)
+  output[,FactorVariables] = lapply(output[,FactorVariables], as.factor)
+  output_Personality[,NumericPersonalityVariables] = lapply(output_Personality[,NumericPersonalityVariables], as.numeric)
+  if (!AddCovariate == 0) {
+  output_Personality[,FactorPersonalityVariables] = lapply(output_Personality[,FactorPersonalityVariables], as.factor) 
+  } else {
+    output_Personality[,FactorPersonalityVariables] = as.factor(output_Personality[,FactorPersonalityVariables])
+  }
+  
   
   # Unclear and still needs to be checked: Sometimes SME and EEG_Signal is Inf
   # Unclear why, but some EEG_Signal scores are -Inf
@@ -140,7 +152,7 @@ Covariate = function(input = NULL, choice = NULL) {
   # Get possible additional factors to be included in the GLM
   
   if (length(unlist(unique(output$Electrode)))>1) {additional_Factors_Name = c("Electrode")
-  additional_Factor_Formula = paste("* Electrode") 
+  additional_Factor_Formula = paste("+ Electrode") 
   } else {
     additional_Factors_Name = vector()
     additional_Factor_Formula = vector()
@@ -152,7 +164,7 @@ Covariate = function(input = NULL, choice = NULL) {
   input$stephistory$GroupingVariables = GroupingVariables
   input$stephistory$additional_Factors_Name = additional_Factors_Name
   input$stephistory$additional_Factor_Formula = additional_Factor_Formula
-  
+  input$stephistory$output_Personality = output_Personality
   
   #No change needed below here - just for bookkeeping
   stephistory = input$stephistory
