@@ -70,14 +70,14 @@ try
     % Create vector containing the response types
     events = struct2table(EEG.event);
     
+    empty = find(cellfun(@isempty,events.Event));
+    for i = 1:length(empty)
+        events.Event(i) = {"NaN"};
+    end
+    
+    events.Event(cellfun(@isempty,events.Event)) = "NaN";
     if iscell(events.Event)
-        empty = find(cellfun(@isempty,events.Event));
-        for i = 1:length(empty)
-            events.Event(empty(i)) = {"NaN"};
-        end
         events.Event = string(events.Event);
-    else 
-         events.Event(cellfun(@isempty,events.Event)) = "NaN";
     end
     
     events_response = events(strcmp(events.Event, 'Response'),:);
