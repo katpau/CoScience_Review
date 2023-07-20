@@ -1,4 +1,4 @@
-function ANALYSE_DECODING_ERP(study_name,vconf,input_mode,sbjs_todo,dcg_todo)
+function ANALYSE_DECODING_ERP(study_name, input_mode,sbjs_todo,dcg_todo)
 %__________________________________________________________________________
 % DDTBOX script written by Stefan Bode 01/03/2013
 %
@@ -36,12 +36,17 @@ CALL_MODE = 3;
 global DCGTODO;
 DCGTODO = dcg_todo;
 
-sbj_list = [study_name '_config_v' num2str(vconf)]; % use latest slist-function!
+global AnalysisName
 
-% define which subjects enter the second-level analysis
-ANALYSIS.nsbj = size(sbjs_todo,2);
-ANALYSIS.sbjs = sbjs_todo;
-ANALYSIS.dcg_todo = dcg_todo;
+if strcmp(AnalysisName, "Flanker_MVPA")
+    input_dir = [pwd '\Only_ForGit_To_TestRun\Preproc_forked\Error_MVPA\task-Flanker\1.1_2.1_3.1_4.1_5.1_6.1_7.1_8.1_9.1_10.1_11.1_12.1_13.1_14.1_15.1_16.1\']; % Directory in which the decoding results will be saved
+    output_dir_group = [pwd '\Analysis_Functions\Error_MVPA\MVPA\02_MVPA\DECODING_RESULTS\level_2\flanker\']; % Directory in which the group level results will be saved
+elseif strcmp(AnalysisName, "GoNoGo_MVPA") 
+    input_dir = [pwd '\Only_ForGit_To_TestRun\Preproc_forked\Error_MVPA\task-GoNogo\1.1_2.1_3.1_4.1_5.1_6.1_7.1_8.1_9.1_10.1_11.1_12.1_13.1_14.1_15.1_16.1\']; % Directory in which the decoding results will be saved
+    output_dir_group = [pwd '\Analysis_Functions\Error_MVPA\MVPA\02_MVPA\DECODING_RESULTS\level_2\go_nogo\']; % Directory in which the group level results will be saved
+end
+
+sbj_code = get_participant_codes(input_dir);
 
 %% specify details about analysis & plotting
 
@@ -201,13 +206,18 @@ fprintf('Group-level statistics will now be computed and displayed. \n');
 %% OPEN FILES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %__________________________________________________________________________
 
-% Added by André on 19 August 2019
-if isstr(sbjs_todo)
+% [elisa] modified to fit input structure
+if ischar(sbjs_todo)
     if sbjs_todo == 'all'
-        get_all_participant_ids;
+       ANALYSIS.nsbj = length(sbj_code);
+       ANALYSIS.sbjs = sbj_code(1:length(sbj_code));
     end
+else
+   ANALYSIS.nsbj = length(sbjs_todo);
+   ANALYSIS.sbjs = sbj_code(sbjs_todo);
 end
 
+ANALYSIS.dcg_todo = dcg_todo;
 
 for s = 1:ANALYSIS.nsbj
     
@@ -217,30 +227,21 @@ for s = 1:ANALYSIS.nsbj
     sbj = ANALYSIS.sbjs(SBJTODO);
     
     global SLIST;
-    eval(sbj_list);
     
     % open subject's decoding results       
-    if size(dcg_todo,2) == 1
-        
-        fprintf('Loading results for subject %d in DCG %s.\n',sbj,SLIST.dcg_labels{dcg_todo});
-        
-        open_name = [(SLIST.output_dir) study_name '_SBJ' num2str(sbj) '_win' num2str(ANALYSIS.window_width_ms) '_steps' num2str(ANALYSIS.step_width_ms)...
-            '_av' num2str(ANALYSIS.avmode) '_st' num2str(ANALYSIS.stmode) '_DCG' SLIST.dcg_labels{ANALYSIS.dcg_todo} '.mat'];
 
-    elseif size(dcg_todo,2) == 2
-        
-        fprintf('Loading results for subject %d for cross decoding DCG %s => DCG %s.\n',sbj,SLIST.dcg_labels{dcg_todo(1)},SLIST.dcg_labels{dcg_todo(2)});
-        
-        open_name=[(SLIST.output_dir) study_name '_SBJ' num2str(sbj) '_win' num2str(ANALYSIS.window_width_ms) '_steps' num2str(ANALYSIS.step_width_ms)...
-            '_av' num2str(ANALYSIS.avmode) '_st' num2str(ANALYSIS.stmode) '_DCG' SLIST.dcg_labels{ANALYSIS.dcg_todo(1)}...
-            'toDCG' SLIST.dcg_labels{ANALYSIS.dcg_todo(2)} '.mat'];
-    end   
-   
-    load(open_name);
-    fprintf('Done.\n');
+% [elisa] modified to fit input structure
+    sbj_file = append(input_dir, string(sbj), '.mat');    
+    load(sbj_file);
+
+    STUDY = Data.MVPA.STUDY;
+    SLIST = Data.MVPA.SLIST;
+    RESULTS = Data.MVPA.RESULTS;
+
+%     fprintf('Done.\n');
     
-    %[elisa] save otuput file for all participants with part_code and decoding
-    %accuracies to jackknife decoding onset later
+%     %[elisa] save otuput file for all participants with part_code and decoding
+%     %accuracies to jackknife decoding onset later
     part_accuracies = zeros(length(RESULTS.subj_acc),2);
     part_accuracies(:,1) = RESULTS.subj_acc;
     part_accuracies(:,2) = RESULTS.subj_perm_acc;
@@ -250,19 +251,19 @@ for s = 1:ANALYSIS.nsbj
     colNames={'id', 'timestep', 'subj_acc', 'subj_perm_acc'};
     part_accuracies.Properties.VariableNames = colNames;
     
-    if ~isfile([SLIST.output_dir 'all_part_acc.mat'])
+    if ~isfile([output_dir_group 'all_part_acc.mat'])
              all_part_accuracies = part_accuracies; 
     else 
-        load([SLIST.output_dir 'all_part_acc.mat']);
+        load([output_dir_group 'all_part_acc.mat']);
         if ~any(strcmp(STUDY.part_code, all_part_accuracies.id)) %only append when current part has not been appended 
              all_part_accuracies = vertcat(all_part_accuracies, part_accuracies); 
          end
     end
     
-    save([SLIST.output_dir 'all_part_acc.mat'], 'all_part_accuracies'); % Save into a .mat file
+    save([output_dir_group 'all_part_acc.mat'], 'all_part_accuracies'); % Save into a .mat file
 
-    ANALYSIS.analysis_mode=STUDY.analysis_mode;
-    ANALYSIS.pointzero=SLIST.pointzero;
+    ANALYSIS.analysis_mode = STUDY.analysis_mode;
+    ANALYSIS.pointzero = SLIST.pointzero;
     
         
     %% fill in parameters and extract results 
@@ -307,13 +308,13 @@ for s = 1:ANALYSIS.nsbj
         % copy parameters from the config file
         ANALYSIS.step_width = STUDY.step_width;
         ANALYSIS.window_width = STUDY.window_width;
-        ANALYSIS.sampling_rate = STUDY.sampling_rate;
+
         ANALYSIS.feat_weights_mode = STUDY.feat_weights_mode;
         
         ANALYSIS.nchannels = SLIST.nchannels;
-                
-        ANALYSIS.channellocs = SLIST.channellocs;
-        ANALYSIS.channel_names_file = SLIST.channel_names_file;     
+        
+%         ANALYSIS.channellocs = SLIST.channellocs;
+%         ANALYSIS.channel_names_file = SLIST.channel_names_file;     
                 
         % extract Tick/Labels for x-axis
         for datastep = 1:ANALYSIS.laststep
@@ -357,6 +358,20 @@ for s = 1:ANALYSIS.nsbj
         
                 
     end % of if s == 1 statement
+
+    % [elisa] added to acommodate different channellocs
+%     ANALYSIS.channellocs(s) = SLIST.channellocs;
+%     ANALYSIS.sampling_rate(s) = STUDY.sampling_rate;
+%         if STUDY.sampling_rate == 512
+%             ANALYSIS.channellocs.Biosemi = SLIST.channellocs;
+%             ANALYSIS.sampling_rate.Biosemi = STUDY.sampling_rate;    
+%         end
+% 
+%         for lab = 1:ANALYSIS.allna
+%             ANALYSIS.channellocs(s,lab,ANALYSIS.firststep:ANALYSIS.laststep) = RESULTS.subj_acc(na,ANALYSIS.firststep:ANALYSIS.laststep);       
+%         end
+
+
     
     %% extract results data from specified time-steps / channels
     %______________________________________________________________________
@@ -671,12 +686,12 @@ end
 
 if size(dcg_todo,2) == 1 % Standard decoding analyses
 
-    savename = [(SLIST.output_dir_group) study_name '_GROUPRES_NSBJ' num2str(ANALYSIS.nsbj) '_win' num2str(ANALYSIS.window_width_ms) '_steps' num2str(ANALYSIS.step_width_ms)...
+    savename = [(output_dir_group) study_name '_GROUPRES_NSBJ' num2str(ANALYSIS.nsbj) '_win' num2str(ANALYSIS.window_width_ms) '_steps' num2str(ANALYSIS.step_width_ms)...
         '_av' num2str(ANALYSIS.avmode) '_st' num2str(ANALYSIS.stmode) '_DCG' SLIST.dcg_labels{ANALYSIS.dcg_todo} '.mat'];
     
 elseif size(dcg_todo,2) == 2 % Cross-condition decoding analyses
     
-    savename = [(SLIST.output_dir_group) study_name '_GROUPRES_NSBJ' num2str(ANALYSIS.nsbj) '_win' num2str(ANALYSIS.window_width_ms) '_steps' num2str(ANALYSIS.step_width_ms)...
+    savename = [(output_dir_group) study_name '_GROUPRES_NSBJ' num2str(ANALYSIS.nsbj) '_win' num2str(ANALYSIS.window_width_ms) '_steps' num2str(ANALYSIS.step_width_ms)...
         '_av' num2str(ANALYSIS.avmode) '_st' num2str(ANALYSIS.stmode) '_DCG' SLIST.dcg_labels{ANALYSIS.dcg_todo(1)}...
         'toDCG' SLIST.dcg_labels{ANALYSIS.dcg_todo(2)} '.mat'];
 
