@@ -21,55 +21,25 @@ function coscience_config_v1
 global SLIST;
 global SBJTODO;
 global CALL_MODE;
-global AnalysisName;
-global bdir;
-
-%% ABOUT THIS SCRIPT
-%Normal classification
-
-%% GENERAL STUDY PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%__________________________________________________________________________
-
-% Decide whether to save the SLIST structure and EEG data in a .mat file
-savemode = 0; % 1 = Save the SLIST as a mat file; 0 = Don't save the SLIST
-
-if strcmp(AnalysisName, "Flanker_MVPA")
-    input_dir = [bdir '\Analysis_Functions\Error_MVPA\MVPA\01_Preprocessing\PreprocessedData\flanker\']; % Directory in which the decoding results will be saved
-    output_dir = [bdir '\Analysis_Functions\Error_MVPA\MVPA\02_MVPA\DECODING_RESULTS\level_1\flanker\']; % Directory in which the decoding results will be saved
-    output_dir_group = [bdir '\Analysis_Functions\Error_MVPA\MVPA\02_MVPA\DECODING_RESULTS\level_2\flanker\']; % Directory in which the group level results will be saved
-elseif strcmp(AnalysisName, "GoNoGo_MVPA") 
-    input_dir = [bdir '\Analysis_Functions\Error_MVPA\MVPA\01_Preprocessing\PreprocessedData\go_nogo\']; % Directory in which the decoding results will be saved
-    output_dir = [bdir '\Analysis_Functions\Error_MVPA\MVPA\02_MVPA\DECODING_RESULTS\level_1\go_nogo\']; % Directory in which the decoding results will be saved
-    output_dir_group = [bdir '\Analysis_Functions\Error_MVPA\MVPA\02_MVPA\DECODING_RESULTS\level_2\go_nogo\']; % Directory in which the group level results will be saved
-end
-
-sbj_code = get_participant_codes(input_dir);
-
+global EEG_mvpa
+global eeg_sorted_cond
 
 %% CREATE SLIST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %__________________________________________________________________________
 
 SLIST = []; 
-sn = SBJTODO;
 
-   
     % subject parameters
-    SLIST.number = sn;
-    SLIST.sbj_code = sbj_code{sn};    
-    SLIST.output_dir = output_dir;
-    SLIST.output_dir_group = output_dir_group;
+    SLIST.sbj_code = EEG_mvpa.subject;    
     SLIST.data_struct_name = 'eeg_sorted_cond';
     
     % channels    
     SLIST.nchannels = 59; % Number of channels in the dataset
-    SLIST.channels = 'ChannelLabels'; 
-    SLIST.channel_names_file = 'channel_inf.mat'; % Name of the .mat file containing channel information
-    SLIST.channellocs = [bdir '\Analysis_Functions\Error_MVPA\MVPA\02_MVPA\locations\']; % Directory of the .mat file containing channel information
+    SLIST.channellocs = EEG_mvpa.chanlocs; % Directory of the .mat file containing channel information
     SLIST.eyes = []; % Channel indices of ocular electrodes
     SLIST.extra = []; % Channel indices of electrodes to exclude from the classification analyses
     
-    % sampling rate and baseline
-    % [elisa ]for sampling rate see lines 103-112 
+    % baseline
     SLIST.pointzero = 300; % Corresponds to time zero, for example stimulus onset (in ms, from the beginning of the epoch)
      
         
@@ -94,28 +64,10 @@ sn = SBJTODO;
     %SLIST.ndcg = size(SLIST.dcg,2);
     SLIST.nclasses = size(SLIST.dcg{1},2);      
  
-    %SLIST.ncond = size(SLIST.cond_labels,2);
+    SLIST.ncond = size(SLIST.cond_labels,2);
     SLIST.nruns = 1;
-    
-    SLIST.data_open_name = [input_dir (sbj_code{sn}) '.mat'];
-    SLIST.data_save_name = [input_dir (sbj_code{sn}) '_data.mat'];
 
-    % [elisa] read files to extract sampling rate from info
-    open_file = (SLIST.data_open_name);
-    load(open_file);
-    SLIST.sampling_rate = info.sampling_rate;
-
-%% SAVE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%__________________________________________________________________________
-
-% Save the SLIST structure and eeg_sorted_cond to a .mat file
-if savemode == 1
-    
-    % DF NOTE: I have changed the second argument from 'eeg_sorted_cond' to
-    % SLIST.data_struct_name so that it will still save the EEG data file
-    % if the user decides to use a different variable name than
-    % 'eeg_sorted_cond'
-    save(SLIST.data_save_name, SLIST.data_struct_name, 'SLIST');
+    SLIST.sampling_rate = EEG_mvpa.srate;
     
 end  
 
