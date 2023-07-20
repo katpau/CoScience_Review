@@ -83,11 +83,15 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         
         % ****** Apply new reference ******
         if strcmpi(Choice,"CAV")
+            % drop EOGs 
+            EEG = pop_select( EEG, 'nochannel',{'VOGabove','VOGbelow','HOGr','HOGl'}); 
             EEG = pop_reref(EEG, []);
         elseif strcmpi(Choice, "Mastoids")
             Mastoids = find(contains({EEG.chanlocs.labels}, {'MAST'}));
             EEG = pop_reref(EEG, {EEG.chanlocs(Mastoids).labels}, 'keepref', 'on');
         elseif strcmpi(Choice, "CSD")
+            % drop EOGs 
+            EEG = pop_select( EEG, 'nochannel',{'VOGabove','VOGbelow','HOGr','HOGl'}); 
             EEG.data = laplacian_perrinX(EEG.data, [EEG.chanlocs.X],[EEG.chanlocs.Y],[EEG.chanlocs.Z]);
         end
         

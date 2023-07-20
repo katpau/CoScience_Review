@@ -36,7 +36,7 @@ function  OUTPUT = LineNoise_Filter(INPUT, Choice)
 StepName = "LineNoise_Filter";
 Choices = ["PREP", "No_LineNoiseFilter"];
 Conditional = ["NaN", "NaN"];
-SaveInterim = logical([1]);
+SaveInterim = logical([0]);
 Order = [6];
 
 % ****** Updating the OUTPUT structure ******

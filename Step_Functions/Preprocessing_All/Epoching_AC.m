@@ -53,6 +53,15 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
     % Get EEGlab EEG structure from the provided Input Structure
     EEG = INPUT.data.EEG;
     
+
+     % ****** for Resting Tasks remove 2s after change in instruction
+     if contains(INPUT.AnalysisName,  "Resting") 
+        % remove 2s after Change in instruction
+        changeInstr = [EEG.event(find(ismember({EEG.event.type}, ['11'; '12'; '22'; '21'; '31'; '32']))).latency];
+        changeInstr = [changeInstr', changeInstr'+EEG.srate*2];
+        EEG = pop_select(EEG, 'nopoint', changeInstr);
+     end      
+            
     if strcmpi(Choice , "epoched")
         % ****** Define Triggers and Window based on Analysis ******
         if ~(contains(INPUT.AnalysisName, 'Resting')) && ~(contains(INPUT.AnalysisName, 'Alpha'))           
@@ -131,7 +140,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             Condition = {'Gambling_Anticipation', 'Gambling_Consumption'};
             
             % ****** Resting Tasks are epoched in consecutive epochs ******
-        elseif contains(INPUT.AnalysisName,  "Resting") || INPUT.AnalysisName == "Alpha_Context"           
+        elseif contains(INPUT.AnalysisName,  "Resting") || INPUT.AnalysisName == "Alpha_Context"                       
             % Epoch Data in 1s intervals
             EEG = eeg_regepochs(EEG, 1,[0 1], 0, 'X', 'on');
             % Keep Collumn with urepochs to check continuity later

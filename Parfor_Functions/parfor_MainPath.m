@@ -31,10 +31,9 @@ function  parfor_MainPath(IndexSubjects, SubjectListFile, DESIGN, OUTPUT, Output
 
 tic
 
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â° Preparations Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+% °°°°°°° Preparations °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 %% Load Design
 RetryLoad = 0; SuccessfulLoad = 0;
 while RetryLoad <200 & SuccessfulLoad == 0% Parfor sometimes has problems with loading
@@ -47,6 +46,7 @@ while RetryLoad <200 & SuccessfulLoad == 0% Parfor sometimes has problems with l
     end
 end
 
+
 % Correct Design if Steps are not in correct order
 % Get all Steps and all Choices from the Design Structure (important for
 % indexing the Combination)
@@ -57,6 +57,7 @@ for iStep = 1:length(Steps)
 end
 Order = sortrows(Order,2);
 Steps = Steps(Order(:,1));
+
 
 %% Load OUTPUT File with List of Forks
 OUTPUT_Name = OUTPUT;
@@ -114,22 +115,25 @@ SubsetSize = str2double(SubsetSize);
 Subjects = table2cell(readtable( SubjectListFile, 'ReadVariableNames', false));  % read csv file with subject Ids to be run
 %% To parallelize across nodes, subsets of Subjects are created
 IndexSubjectsIN = IndexSubjects;
+
 IndexSubjects = ((IndexSubjects-1)*SubsetSize+1): IndexSubjects*SubsetSize;
+
 if max(IndexSubjects) > length(Subjects)
     IndexSubjects = IndexSubjects(ismember(IndexSubjects, 1:length(Subjects)));
 end
 
 if length(IndexSubjects) == 0
-    fprintf('Index for Subset %d does not contain any subjects.\n', IndexSubset);
+    fprintf('Index for Subset %d does not contain any subjects.\n', IndexSubjects);
     return
 end
 
 % Finalize Information on Subjects
 Subjects = Subjects(IndexSubjects);
 
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â° Translate Choices into numeric ForkCombinations Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
+
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+% °°°°°°° Translate Choices into numeric ForkCombinations °°°°°°
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 %% PREPARE Step COMBINATION and test if to run
 % Loop throgh each Step and get the Index of that Step/Choice
 % combination. Concatenate all of them together to create the
@@ -138,7 +142,7 @@ Subjects = Subjects(IndexSubjects);
 % numeric indices (as Filepaths would be too long otherwise)
 
 % Get Name of Choice for each Step from Forking List
-OUTPUT_Choices = split(OUTPUT, '%')';
+OUTPUT_Choices = split(OUTPUT(1,1), '%')';
 
 % Initate Name of Folder
 OUTPUT_FolderName = repmat("FF", size(OUTPUT_Choices));
@@ -150,7 +154,6 @@ for iStep = 1:length(Steps)
 end
 
 if PrintLocation == 1; fprintf('Line 158\n'); end
-
 
 %%% Initate Summary Tables printed at the end
 CountErrors = 0;
@@ -166,9 +169,9 @@ parpool(ParPools);
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â° Run Forking Path Combination Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+% °°°°°°° Run Forking Path Combination °°°°°°°°°°°°°°°°°°°°°°°°°
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 % This was put into a function to reduce the output text printed to the logfiles
 % Since some combinations might in in progress at the first time of trying
 % to run it, a note is created to retry it again (RetryFork). However, the
@@ -198,7 +201,7 @@ if ~exist(CompletionFolderSave, 'dir'); mkdir(CompletionFolderSave); end
 % Make Note how long it took to run this combination
 ElapsedTime_Hours = round((toc/60/60), 2);
 fprintf('\n ************************ \n Summary on Achievements. \n  Running took %0.3f hours. \n Newly Completed Paths: %d. \n Previously Completed Paths: %d. \n Encounted Errors: %d. \n \n ************************ \n ',  ...
-    IndexSubjects, ElapsedTime_Hours, CountCompleted,  CountPreviouslyCompleted, CountErrors)
+   IndexSubjectsIN, ElapsedTime_Hours, CountCompleted,  CountPreviouslyCompleted, CountErrors)
 
 
 
@@ -317,6 +320,7 @@ parfor iSubject = 1:length(Subjects)
             %% RUN REMAINING Steps
             % Carry out remaining steps. Each Step is run after each other.
             % File is kept in memory until new Combination is done (completed or error).
+           fprintf("running")
             for iStep = (steps_already_done+1): MaxStep
                 Choice = OUTPUT_Choices(iPath, iStep);
                 if PrintLocation == 1; fprintf('Line 309\n'); end

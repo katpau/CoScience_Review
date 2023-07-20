@@ -105,7 +105,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     # Create Subset
     Subset = Data[Data$Component %in% Component ,
-                  names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", collumns_to_keep)]
+                  names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", "Lab", collumns_to_keep)]
     
     # Run Test
     ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)

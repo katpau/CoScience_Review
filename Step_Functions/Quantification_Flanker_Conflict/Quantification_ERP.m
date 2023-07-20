@@ -74,10 +74,11 @@ try
     % **** Prepare ERP  ***************************************************************
     % ********************************************************************************************
     % For saving ERP, select only relevant channels
-    Electrodes_ERP = {'FCZ', 'CZ', 'FZ', 'PZ', 'CPZ'};
+    Electrodes_ERP = {'FCZ', 'CZ', 'FZ', 'PZ', 'CPZ'}; % includes N2 and P3 channels
     EEG_for_ERP = pop_select(EEG_epoched, 'channel',Electrodes_ERP);
     % For saving ERP, downsample!
-    EEG_for_ERP =  pop_resample(EEG_for_ERP, 100);
+    % EEG_for_ERP =  pop_resample(EEG_for_ERP, 100);
+    EEG_for_ERP =  pop_resample(EEG_for_ERP, fix(EEG_for_ERP.srate/100)*100);
     for i_Cond = 1:NrConditions
         try
             ERP_N2 = pop_epoch( EEG_for_ERP, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');
@@ -193,6 +194,7 @@ try
         
         For_Relative.RecordingLab = EEG.Info_Lab.RecordingLab;
         For_Relative.Experimenter = EEG.Info_Lab.Experimenter;
+        For_Relative.ACC = EEG.ACC;
         
     else
         % ****** Extract Amplitude, SME, Epoch Count ******
@@ -236,7 +238,7 @@ try
             end
         end
     end
-    
+       
     
     % ********************************************************************************************
     % **** Prepare Output Table    ***************************************************************
@@ -437,6 +439,33 @@ try
             OUTPUT.data.Export = Export_FMT;
         end
     end
+    
+    
+    % ********************************************************************************************
+    % ****  Single Trial Data ********************************************************************
+    % ********************************************************************************************
+%     EEGData = EEG_epoched;
+%     % Calc Mean per Trial
+%     N2_SingleTrial = squeeze(mean(EEGData.data(ElectrodeIdx_N2, TimeIdx_N2,:),2));
+%     P3_SingleTrial = squeeze(mean(EEGData.data(ElectrodeIdx_P3, TimeIdx_P3,:),2));
+%     % Get Behavior Info (one per Trial, Targetlocked)
+%     if length(EEGData.event) > length([EEGData.event.Event])
+%         for ievent = 1:length(EEGData.event)
+%             if isempty(EEGData.event(ievent).Event)
+%                 EEGData.event(ievent).Event = NaN;
+%             end
+%         end
+%     end
+%     Targets = EEGData.event([EEGData.event.Event] == "Target");
+%     % above doesnt work if an Event is empty?
+%     % Merge Data
+%     Single_TrialData = [num2cell([N2_SingleTrial;P3_SingleTrial]'),  ...
+%         num2cell([[Targets.Trial]', [Targets.Congruency]', [Targets.ACC]', [Targets.RT]']), ...
+%         cellstr(repmat(INPUT.Subject, length(N2_SingleTrial), 1))]
+%     % Add Collum Names
+%     colNames =[strcat("N2_", Electrodes_N2')', strcat("P3_", Electrodes_P3')', "Trial",  "Congruency", "ACC", "RT", "Subject"];
+%     Single_TrialData = [colNames;Single_TrialData];
+%     OUTPUT.data.SingleTrialData = Single_TrialData;
     
     
     % ****** Error Management ******

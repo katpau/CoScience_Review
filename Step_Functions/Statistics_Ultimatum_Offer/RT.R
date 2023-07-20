@@ -27,7 +27,7 @@ RT = function(input = NULL, choice = NULL) {
   # Read Behavioural Data
   BehavFile = paste0(input$stephistory["Root_Behavior"], "task_UltimatumGame_beh.csv")
   BehavData = read.csv(BehavFile, header = TRUE)
-  
+  BehavData$RT = as.numeric(BehavData$RT)
   
   #########################################################
   # (2) Drop Trials 
@@ -45,7 +45,7 @@ RT = function(input = NULL, choice = NULL) {
   if (choice == "AV") {
   RT_Data = BehavData %>%
     group_by(ID, Offer, Response) %>%
-    summarise(Behav_RT = mean(RT)) %>%
+    summarise(Behav_RT = mean(RT, na.rm =TRUE)) %>%
     ungroup() %>%
     filter(!is.na(Response))%>%
     complete(ID, Offer, Response, fill = list(NA))
@@ -53,7 +53,7 @@ RT = function(input = NULL, choice = NULL) {
   } else if (choice == "trimmedAV") {
     RT_Data = BehavData %>%
       group_by(ID, Offer, Response) %>%
-      summarise(Behav_RT = mean(RT, trim = 0.05))%>%# lowest and highest 5 %
+      summarise(Behav_RT = mean(RT, trim = 0.05, na.rm =TRUE))%>%# lowest and highest 5 %
       ungroup() %>%
       filter(!is.na(Response))%>%
       complete(ID, Offer, Response, fill = list(NA))
