@@ -150,8 +150,8 @@ Covariate = function(input = NULL, choice = NULL) {
   # (5) Prepare Grouping Variables
   #########################################################
   # Get possible additional factors to be included in the GLM
-  
-  if (length(unlist(unique(output$Electrode)))>1) {additional_Factors_Name = c("Electrode")
+  nEl = output %>% group_by(Component) %>% summarise(nEl = length(unique(Electrode))) %>% ungroup %>% summarise(nEl = max(nEl))
+  if (nEl>1) {additional_Factors_Name = c("Electrode")
   additional_Factor_Formula = paste("+ Electrode") 
   } else {
     additional_Factors_Name = vector()

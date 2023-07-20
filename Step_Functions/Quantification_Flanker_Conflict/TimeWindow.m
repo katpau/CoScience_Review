@@ -337,7 +337,7 @@ try
         % Single_TrialData_Theta = squeeze(mean(Power_DB,2));
         Single_TrialData_Theta = 10*log10(mean(Power_DB,2)); % LOG10??
         
-        colNames_Theta =[strcat("N2_", Electrodes_N2')'];
+        colNames_Theta =[strcat("FMT_", Electrodes_N2')'];
         % Reshape to drop Time and make electrodes first
         Single_TrialData_Theta = reshape(Single_TrialData_Theta,[size(Single_TrialData_Theta,3),size(Single_TrialData_Theta,1)]);
         

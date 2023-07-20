@@ -51,8 +51,8 @@ input_init$stephistory["Final_File_Name"] = paste0(Root, "/Only_ForGit_To_TestRu
 input_init$stephistory["Root_Behavior"] = paste0(Root, "/Only_ForGit_To_TestRun/BehaviouralData/")
 input_init$stephistory["Root_Personality"] =  paste0(Root, "/Only_ForGit_To_TestRun/QuestionnaireData/", AnalysisName, "/")
 
-input_init$data = read.csv(input_init$stephistory[["Inputfile"]],  sep = ",", header = FALSE)
-colnames(input_init$data) = collumnNamesEEGData 
+input_init$data = read.csv(input_init$stephistory[["Inputfile"]],  sep = ",", header = TRUE)
+
 
 
 ########################################################
@@ -79,6 +79,9 @@ input = do.call(Attention_Checks_Personality, list(input_init, choice))
 choice = "None" # "None"     "Excluded"
 input = do.call(Outliers_Personality, list(input, choice)) 
 
+choice = "10"
+input = do.call(Trials_MinNumber, list(input, choice)) 
+
 choice = "None" # "None","Age_MF","Age","AGG_Anger","BDI_Depression", "BFI_Anxiety" ,
 # "BFI_OpenMindedness"       "BFI_Conscientiousness"    "BFI_Agreeableness"        "BFI_Extraversion"         "BFI_NegativeEmotionality"  "Big5_OCEAN"    
 # "BFI_Extraversion" "Big5_OCAE"  
@@ -99,8 +102,6 @@ input = do.call(Outliers_EEG, list(input, choice))
 choice = "RT_ACC" #"RT_ACC" "ACC"   
 input = do.call(Select_Trials_RT, list(input, choice)) 
 
-choice = "AV" #"AV"        "trimmedAV" "Median"  
-input = do.call(RT, list(input, choice)) 
 
 choice = "Applied" # "Applied" "None"
 input = do.call(Outliers_RT, list(input, choice)) 
