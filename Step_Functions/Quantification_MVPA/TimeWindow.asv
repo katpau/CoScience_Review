@@ -51,7 +51,7 @@ try
         Condition_Names = ["Flanker_Correct", "Flanker_Error"];
         
     elseif INPUT.AnalysisName == "GoNoGo_MVPA"
-        Condition_Triggers = [211; 220 ]; %Responses Speed/Acc emphasis
+        Condition_Triggers = {211; 220}; %Responses Speed/Acc emphasis
         Condition_Names = ["GoNoGo_Correct", "GoNoGo_Error"];
     end
     
@@ -70,14 +70,14 @@ try
     % Create vector containing the response types
     events = struct2table(EEG.event);
     
-    empty = find(cellfun(@isempty,events.Event));
-    for i = 1:length(empty)
-        events.Event(i) = {"NaN"};
-    end
-    
-    events.Event(cellfun(@isempty,events.Event)) = "NaN";
     if iscell(events.Event)
+        empty = find(cellfun(@isempty,events.Event));
+        for i = 1:length(empty)
+            events.Event(empty(i)) = {"NaN"};
+        end
         events.Event = string(events.Event);
+    else 
+         events.Event(cellfun(@isempty,events.Event)) = "NaN";
     end
     
     events_response = events(strcmp(events.Event, 'Response'),:);
@@ -121,6 +121,9 @@ try
     EEG_lrp = pop_select(EEG, 'channel', lrp_chanlocs); %remove other channels from EEG structure
     
     clear chanlocs lrp_chanlocs
+    
+    %select response types (correct and error)
+    EEG_lrp.data = EEG_lrp.data(:,:,events_response.responsetype ~= 0);
     
     %find indices from left and right hemisphere electrodes to ensure that 
     %right hemisphere electrode acitivty is substracted from the left later on
@@ -292,7 +295,7 @@ try
      % EEG_correct(:,:, (find(empty_rows_correct == 1))) = [];
      % EEG_error(:,:, (find(empty_rows_error == 1))) = [];
 
-     clear all_empty_correct all_empty_error empty_rows_correct empty_rows_error
+    clear all_empty_correct all_empty_error empty_rows_correct empty_rows_error
 
     global eeg_sorted_cond
 

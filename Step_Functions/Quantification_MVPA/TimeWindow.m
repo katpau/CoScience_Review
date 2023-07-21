@@ -51,7 +51,7 @@ try
         Condition_Names = ["Flanker_Correct", "Flanker_Error"];
         
     elseif INPUT.AnalysisName == "GoNoGo_MVPA"
-        Condition_Triggers = [211; 220 ]; %Responses Speed/Acc emphasis
+        Condition_Triggers = {211; 220}; %Responses Speed/Acc emphasis
         Condition_Names = ["GoNoGo_Correct", "GoNoGo_Error"];
     end
     
@@ -121,6 +121,9 @@ try
     EEG_lrp = pop_select(EEG, 'channel', lrp_chanlocs); %remove other channels from EEG structure
     
     clear chanlocs lrp_chanlocs
+    
+    %select response types (correct and error)
+    EEG_lrp.data = EEG_lrp.data(:,:,events_response.responsetype ~= 0);
     
     %find indices from left and right hemisphere electrodes to ensure that 
     %right hemisphere electrode acitivty is substracted from the left later on
@@ -292,7 +295,7 @@ try
      % EEG_correct(:,:, (find(empty_rows_correct == 1))) = [];
      % EEG_error(:,:, (find(empty_rows_error == 1))) = [];
 
-     clear all_empty_correct all_empty_error empty_rows_correct empty_rows_error
+    clear all_empty_correct all_empty_error empty_rows_correct empty_rows_error
 
     global eeg_sorted_cond
 
@@ -319,11 +322,7 @@ try
     %MVPA
     OUTPUT.MVPA.chanlocs = EEG_mvpa.chanlocs;
     OUTPUT.MVPA.event = EEG_mvpa.event;
-    OUTPUT.MVPA.urevent = EEG_mvpa.urevent;
     OUTPUT.MVPA.epoch = EEG_mvpa.epoch;
-    OUTPUT.MVPA.data_restruct = EEG_mvpa.data_restruct;
-    OUTPUT.MVPA.data_correct = EEG_mvpa.data_correct;
-    OUTPUT.MVPA.data_error = EEG_mvpa.data_error;
     OUTPUT.MVPA.SLIST = SLIST;
     OUTPUT.MVPA.STUDY = STUDY;
     OUTPUT.MVPA.RESULTS = RESULTS;
