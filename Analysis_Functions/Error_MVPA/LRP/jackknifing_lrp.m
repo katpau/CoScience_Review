@@ -67,14 +67,20 @@ for i = 1:length(part)
             jack_lrp = vertcat(jack_lrp, data_new); %append to existing data frame
          end
     end
-    clear remove_part data_subset data_new id 
+    clear remove_part data_subset data_new id colNames
 end
 
 clear part i 
 
 % determine amplitude threshold for lrp onset (50% of max amplitude) 
 max_amp = groupsummary(jack_lrp, "id", "min", "amplitude"); % min because lrp peak is negative
-max_amp.criterion = max_amp.min_amplitude*0.5; % 50% of max amplitude as criterion
+for i = 1:length(max_amp.id)
+    if max_amp.min_amplitude(i) < 0
+        max_amp.criterion(i) = max_amp.min_amplitude(i)*0.5; % 50% of max amplitude as criterion
+    elseif max_amp.min_amplitude(i) > 0
+        max_amp.criterion(i) = max_amp.min_amplitude(i)*1.5; % 50% of max amplitude as criterion
+    end
+end
 
 for i = 1:length(jack_lrp.ms)
     for ii = 1:length(max_amp.id)
