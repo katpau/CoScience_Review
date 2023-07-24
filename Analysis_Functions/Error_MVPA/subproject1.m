@@ -59,7 +59,7 @@ for i = 1:length(part)
             jack_all_part_acc = vertcat(jack_all_part_acc, data_new); %append to existing data frame
          end
     end
-    clear remove_part data_subset data_new id 
+    clear remove_part data_subset data_new id colNames
 end
 
 clear part i 
@@ -101,6 +101,8 @@ mean_acc.mvpa_smulders = zeros([length(mean_acc.id), 1]);
 for i = 1:length(mean_acc.id)
     mean_acc.mvpa_smulders(i) = length(mean_acc.mvpa_onset)*mean(mean_acc.mvpa_onset)-(length(mean_acc.mvpa_onset)-1)*mean_acc.mvpa_onset(i);
 end
+
+clear i
 
 %merge datasets
 mvpa_onsets = [mean_acc(:,1)  mean_acc(:,7)];
