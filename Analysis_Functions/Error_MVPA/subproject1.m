@@ -2,7 +2,7 @@
 
 %% Specifications 
 global AnalysisName
-AnalysisName = "Flanker_MVPA"; %or "GoNoGo_MVPA" 
+AnalysisName = "Flanker_MVPA"; % "GoNoGo_MVPA" or "Flanker_MVPA" 
 
 %% Add Relevant Paths 
 global bdir;
