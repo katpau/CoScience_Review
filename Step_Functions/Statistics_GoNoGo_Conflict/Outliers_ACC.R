@@ -70,6 +70,9 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
     output$EEG_Signal[as.logical(output$Outliers_ACC)] = NA
     output$Behav_RT[as.logical(output$Outliers_ACC)] = NA
     
+    # Remove collumn
+    output = output[,-which(colnames(output) == "Outliers_ACC")]
+    
   }
   
   

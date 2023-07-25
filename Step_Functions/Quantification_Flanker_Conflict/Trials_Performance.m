@@ -59,6 +59,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         % keep only Correct Trials
        IdxKeep = cellfun(@(x)~isempty(x) && ismember(x, 1), {EEG.event.ACC});
 
+       EEG.trials
         if strcmpi(Choice,"RTs_accuracy")
             IdxRT =  cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {EEG.event.RT});
             IdxKeep = and(IdxKeep, IdxRT);        

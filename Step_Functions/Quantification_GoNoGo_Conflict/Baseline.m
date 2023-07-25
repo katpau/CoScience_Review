@@ -34,7 +34,7 @@ function  OUTPUT = Baseline(INPUT, Choice)
 % Order determines when it should be run.
 StepName = "Baseline";
 Choices = ["-100 0", "-200 0"];
-Conditional = ["NaN", "NaN", "NaN", "NaN", "NaN"];
+Conditional = ["NaN", "NaN"];
 SaveInterim = logical([0]);
 Order = [15];
 

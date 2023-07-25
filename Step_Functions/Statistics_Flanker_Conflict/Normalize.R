@@ -6,7 +6,7 @@ Normalize = function(input = NULL, choice = NULL) {
 
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: CK 5/23
   
   # Handles all Choices listed above 
   # Tests if Data should be normalized or not (is grouped for Analyses, Tasks, Condition, etc.)
@@ -40,7 +40,7 @@ Normalize = function(input = NULL, choice = NULL) {
         
         # Apply Log
       } else if (choice == "Log")  {
-        # Add Constant to each collum to make all values > 0
+        # Add Constant to each column to make all values > 0
         Min = min(data, na.rm = TRUE)
         if (Min<=0) { data = data + abs(Min) +1 }
         normal = log(data)
@@ -51,22 +51,12 @@ Normalize = function(input = NULL, choice = NULL) {
     #########################################################
     # (2) Normalize Personality Variables + IQ
     #########################################################
-    
-    # this is done across subjects and there should be only one value per Subject when normalizing
-    Relevant_Collumns =  colnames(output)[grep(c("Personality_|Covariate_|IST"), names(output))]
-    Relevant_Collumns = Relevant_Collumns[!grepl("Covariate_Gender",Relevant_Collumns)]
-    Personality = unique(output[,c("ID", Relevant_Collumns )])
-    # Remove from output file
-    output = output[,-which(names(output) %in% Relevant_Collumns)]
-    
-    # Check Which ones need to be normalized
-    if (length(Relevant_Collumns)>1) {
-      Not_Normal = sapply(Personality[,Relevant_Collumns], function(col) check_normality(col)) 
-      Not_Normal_CollumnNames = Relevant_Collumns[as.logical(Not_Normal)]
-    } else {
-      Not_Normal = check_normality(Personality[,Relevant_Collumns])
-      Not_Normal_CollumnNames = Relevant_Collumns[as.logical(Not_Normal)]
-    }
+    Personality = input$stephistory$output_Personality 
+    Relevant_Collumns =  colnames(Personality)[grep(c("Personality_|Covariate_|IST"), names(Personality))] 
+
+    Not_Normal = sapply(Personality[,Relevant_Collumns], function(col) check_normality(col)) 
+    Not_Normal_CollumnNames = Relevant_Collumns[as.logical(Not_Normal)]
+
     
     
     # Apply Normalization
@@ -76,9 +66,8 @@ Normalize = function(input = NULL, choice = NULL) {
       Personality[,Not_Normal_CollumnNames] = normalize_data(Personality[,Not_Normal_CollumnNames], choice)
     }
     
-    # Merge again with output
-    output =  merge(output,  Personality, by = c("ID"),
-                    all.x = TRUE,  all.y = FALSE )
+    # Save for next Step
+    input$stephistory$output_Personality = Personality
     
     
     #########################################################
@@ -100,27 +89,24 @@ Normalize = function(input = NULL, choice = NULL) {
 
     
     #########################################################
-    # (4) Normalize RTs
+    # (4) Normalize RTs (not ACC?)
     #########################################################
-    RTs = output[,c("ID", "Behav_RT", "Congruency" )]
-    RTs = RTs[!duplicated(RTs),]
-    # Remove from output file
-    output = output[,-which(names(output) %in% "Behav_RT")]
-    
+    output_RT = output[output$Component == "Behav",] 
+    output_RT = output_RT[!is.na(output_RT$RT), ]    
     
     # Check if cells are not normally distributed
-    ChecknotNormal =   RTs %>%
-      filter(!is.na("Behav_RT")) %>%
+    ChecknotNormal =   output_RT %>%
+      filter(!is.na("RT")) %>%
       group_by_at(c("Congruency")) %>%
-      summarise(notNormal = check_normality(Behav_RT))
+      summarise(notNormal = check_normality(RT))
     
     if (any (ChecknotNormal$notNormal)){ 
-      RTs$Behav_RT = normalize_data(RTs$Behav_RT, choice)
+      output_RT$RT = normalize_data(output_RT$RT, choice)
     }
     
-    # Merge again with output
-    output =  merge(output,  RTs, by = c("ID", "Congruency"),
-                    all.x = TRUE,  all.y = FALSE )
+    # merge (LONG FORMAT) with full dataset
+    output = bind_rows(output[!output$Component == "Behav",],
+                       output_RT)  
     
 
     

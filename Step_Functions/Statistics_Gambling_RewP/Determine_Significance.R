@@ -1,6 +1,6 @@
 Determine_Significance = function(input = NULL, choice = NULL) {
   StepName = "Determine_Significance"
-  Choices = c("Holm", "Bonferroni", "None")
+  Choices = c( "None")
   Order = 13
   output = input$data
   
@@ -101,7 +101,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     # Create Subset
     Subset = Data[Data$Component %in% Component ,
-                  names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", collumns_to_keep)]
+                  names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", "Lab", collumns_to_keep)]
     
     # Run Test
     ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)
@@ -237,7 +237,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   print(paste("Test Effect of State Sadness on ", Component))
   DirectionEffectIA$Personality = Depression
   DirectionEffectMain$Personality = Depression
-  collumns_to_keep = c(collumns_to_keep, "Behav_StateSadness)")
+  collumns_to_keep = c(collumns_to_keep, "Behav_StateSadness")
   lm_formula =   paste( "EEG_Signal ~ (( FB * Magnitude *", Depression,  "* Behav_StateSadness)", 
                         additional_Factor_Formula, ")" ) # what about covariate???
   

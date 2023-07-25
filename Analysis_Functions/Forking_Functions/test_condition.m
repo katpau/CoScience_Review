@@ -49,6 +49,9 @@ elseif Conditional_Strings ~= "NaN"
         end
         
         ToTest = strsplit(Combination, "%");
+        if length(ToTest) <        iCondition
+            1
+        end
         ToTest = ToTest(iCondition);
         
         if Operation == "Equal"

@@ -6,7 +6,7 @@ Outliers_RT = function(input = NULL, choice = NULL) {
   
   ## Contributors
   # Last checked by KP 12/22
-  # Planned/Completed Review by:
+  # Planned/Completed Review by: CK 5/23
 
   # if RT is used as a predictor/DV, scan for outliers
   # identifies and removes outliers based on previous criteria (thresholds)
@@ -50,57 +50,50 @@ Outliers_RT = function(input = NULL, choice = NULL) {
     #########################################################
     # (2) Identify Outliers 
     #########################################################
-    # for RT, only one value per Task and Subject should be used
+    # for RT, only one value per Task and Subject should be used  # CK: for LMM we would need RT trialwise
     # select only relevant columns and drop duplicates
-    output_RT = output[,c("ID", "Congruency", "Behav_RT")] 
-    output_RT = output_RT[!is.na(output_RT$Behav_RT), ]
-    output_RT = output_RT[!duplicated(output_RT), ]
-    
-    
-    outliers_RT = output_RT %>%
+    output_RT = output[output$Component == "Behav",] 
+    output_RT = output_RT[!is.na(output_RT$RT), ]
+
+    output_RT = output_RT %>%
       group_by(Congruency)%>%
-      summarise(Outliers_RT = outlierfunction(Threshold, Behav_RT, 0),
-                ID = ID) %>%
+      mutate(Outliers_RT = outlierfunction(Threshold, RT, 0)) %>%
       ungroup()
     
-    
-    # merge with full dataset
-    output =  merge(    output, 
-                        outliers_RT,
-                        by = c("ID", "Congruency" ),
-                        all.x = TRUE,    all.y = FALSE )
-    
-    
-    
+ 
     #########################################################
     # (3) Treat Outliers RT
     #########################################################
     if (Treatment == "Replace" ){
-      # Save Min/Max in collumn for later
+      # Save Min/Max in column for later
       MinMax = output_RT %>%
         group_by(Congruency)%>%
-        do(outlierfunction(Threshold, .$Behav_RT, 1))%>%
+        do(outlierfunction(Threshold, .$RT, 1))%>%
         ungroup()
       
       
-      # merge with output
-      output =  merge(output,    
+      # merge with output_RT
+      output_RT =  merge(output_RT,    
                       MinMax,
                       by = c("Congruency"),   
                       all.x = TRUE,    all.y = FALSE )
       
-      ExceedMin = which(output$Behav_RT<output$Min)
-      ExceedMax = which(output$Behav_RT>output$Max)
-      output$Behav_RT[ExceedMin] =   output$Min[ExceedMin]
-      output$Behav_RT[ExceedMax] =   output$Max[ExceedMax]
+      ExceedMin = which(output_RT$RT<output_RT$Min)
+      ExceedMax = which(output_RT$RT>output_RT$Max)
+      output_RT$RT[ExceedMin] =   output_RT$Min[ExceedMin]
+      output_RT$RT[ExceedMax] =   output_RT$Max[ExceedMax]
       
       # Exclude Value
     } else {
-      output$Behav_RT[as.logical(output$Outliers_RT)] = NA  }
+      output_RT$RT[as.logical(output_RT$Outliers_RT)] = NA  }
     
     
-    # Remove collumns
-    output = output[,!names(output) %in% c("Outliers_RT",  "Min", "Max")]
+    # Remove columns
+    output_RT = output_RT[,!names(output_RT) %in% c("Outliers_RT",  "Min", "Max")]
+    
+    # merge (LONG FORMAT) with full dataset
+    output = bind_rows(output[!output$Component == "Behav",],
+                        output_RT)  
     
   }
   
@@ -108,7 +101,7 @@ Outliers_RT = function(input = NULL, choice = NULL) {
   
   
   
-  #No change needed below here - just for bookkeeping
+  # No change needed below here - just for bookkeeping
   stephistory = input$stephistory
   stephistory[StepName] = choice
   return(list(

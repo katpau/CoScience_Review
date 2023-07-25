@@ -112,94 +112,97 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     # Create Subset
     Subset = Data[Data$Task %in% Task & Data$AnalysisPhase %in% AnalysisPhase ,
-                  names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", collumns_to_keep)]
+                  names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", collumns_to_keep, "Lab")]
     
     # Run Test
     ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)
     
     # Test Direction
     if (!SaveUseModel == "exportModel") {
+      if(!is.character(ModelResult) &&  any(!grepl( "Error", ModelResult))) {
+        if(!is.na(ModelResult$value_EffectSize)){
       ModelResult = test_DirectionEffect(DirectionEffect, Subset, ModelResult) 
-    }
+    }}}
     
     return(ModelResult)
   }
   
   #########################################################
-  # (3) Prepare Averages across Condition1s and Correlations
+  # (3.0) Recode Gambling Consumption, so that First Condition is Valence (The more important one!)
   #########################################################
+  # For Consumption make Condition1 Valence, not Magnitude!
+  BU = output
+  output$Condition1[output$Task == "Gambling" &
+                      output$AnalysisPhase == "Consumption"] = 
+    BU$Condition2[output$Task == "Gambling"&
+                    output$AnalysisPhase == "Consumption"]
+  output$Condition2[output$Task == "Gambling" &
+                                      output$AnalysisPhase == "Consumption"] = 
+    BU$Condition1[output$Task == "Gambling"&
+                    output$AnalysisPhase == "Consumption"]
+  rm(BU)  
   
-  # For Hypotheses 1.5 and 2 Average across Condition1s and calculate Correlations per Condition1
+  #########################################################
+  # (3.1) Prepare Averages across Conditions [for comparing to Resting]
+  #########################################################
   GroupingVariables1 = c("Task", "AnalysisPhase", "ID", additional_Factors_Name)
-  GroupingVariables2 = c("Task", "AnalysisPhase", "Condition1", additional_Factors_Name)
-  GroupingVariables3 = c("Task", "AnalysisPhase", "Condition1", "Condition2", additional_Factors_Name)  
   
   Average_Across_Conditions = output %>%
     group_by(across(all_of(GroupingVariables1))) %>%
     summarize(EEG_Signal = mean(EEG_Signal, na.rm = TRUE),
               SME = mean(SME, na.rm = TRUE),
-              Epochs = mean(Epochs, na.rm = TRUE)) %>%
+              Epochs = mean(Epochs, na.rm = TRUE),
+              Lab = Lab[1],
+              ) %>%
     ungroup()
   
-  # Add Covariates back
-  # this is done across subjects and there should be only one value per Subject when normalizing
+  # Add Covariates to Averages_Across (as there could be many to none, do it like that)
   Relevant_Collumns =  names(output)[grep(c("Personality_|Covariate_"), names(output))]
   Personality = unique(output[,c("ID", Relevant_Collumns )])
-  
   Average_Across_Conditions = merge(Average_Across_Conditions,  Personality, by = c("ID"),
                                     all.x = TRUE,  all.y = FALSE )
   
-  # if for any Condition1 there are no subjects, do not run it for that one
-  output_to_AV = output[!is.na(output$EEG_Signal),]
-  output_to_AV = as.data.frame(output_to_AV[!is.na(output_to_AV[,Personality_Name]),])
+  #########################################################
+  # (3.2) Prepare Correlations for each Condition (if significant in lmer, then take the largest later)
+  #########################################################
+  GroupingVariables2 = c("Task", "AnalysisPhase", "Condition1")
   
-  Count_Subs = output_to_AV %>%
-    group_by(across(all_of(c(GroupingVariables2, "Localisation", "FrequencyBand")))) %>%
-    count(!is.na(EEG_Signal))
+  output_for_Correlation = output %>%
+                         filter(!is.na(EEG_Signal),
+                                !is.na(Personality_Name[1]), # Get only first in case there are multiple in Factor Analysis
+                                Localisation == "Frontal") %>% # Get only Frontal Ones
+                         group_by(Task, AnalysisPhase, Condition1,Condition2, Hemisphere, ID) %>%
+                         summarise(EEG_Signal = mean(EEG_Signal, na.rm =TRUE),
+                                   Personality = .data[[Personality_Name[1]]][1])  # Get average across different electrodes?
   
-  Errors = as.data.frame(Count_Subs[which(Count_Subs$n<3),])
-  
-  if (nrow(Errors)>0) {
-    for (iError in 1:nrow(Errors)){
-      idx = rep(TRUE, nrow(output_to_AV))
-      for (iGroupingV in GroupingVariables2) {
-        idx = cbind(idx, as.character(output_to_AV[,iGroupingV]) == as.character(Errors[iError,iGroupingV]))
-      }
-      idx= which(apply(idx,1, all))
-      output_to_AV = output_to_AV[-idx,]
-    }}
-  
+  # If not Diff, calculate Diff
+  if (length(unique(output_for_Correlation$Hemisphere))>1) {
+    output_for_Correlation = spread(output_for_Correlation, Hemisphere, EEG_Signal)
+    output_for_Correlation$EEG_Signal = output_for_Correlation$right - output_for_Correlation$left
+  }
+ 
   # Calculate Correlations with Personality Variables
-  Correlations_Within_Conditions = output_to_AV %>%
+  Correlations_Within_Conditions = output_for_Correlation %>%
     group_by(across(all_of(GroupingVariables2)), .drop = TRUE) %>%
-    summarize(Correlation_with_Personality = cor.test(EEG_Signal, get(Personality_Name))$estimate) %>%
+    filter(length(unique(ID))>3)%>% 
+    summarize(Correlation_with_Personality = cor.test(EEG_Signal, Personality)$estimate) %>%
     ungroup()  
   
-  Count_Subs = output_to_AV %>%
-    group_by(across(all_of(c(GroupingVariables3, "Localisation", "FrequencyBand")))) %>%
-    count(!is.na(EEG_Signal))
+  # Calculate Correlations with Personality Variables for two Conditions (for Gambling)
+  Correlations_Within_Both_Conditions = output_for_Correlation %>%
+    filter(Task == "Gambling",
+           AnalysisPhase == "Consumption") %>%
+    unite(Condition1, Condition1, Condition2, sep = "_", remove = TRUE) %>%
+    group_by(across(all_of(GroupingVariables2))) %>%
+    filter(length(unique(ID))>3)%>% 
+    summarize(Correlation_with_Personality = cor.test(EEG_Signal, Personality)$estimate) %>%
+    ungroup() 
   
-  Errors = as.data.frame(Count_Subs[which(Count_Subs$n<3),])
-  
-  if (nrow(Errors)>0) {
-    for (iError in 1:nrow(Errors)){
-      idx = rep(TRUE, nrow(output_to_AV))
-      for (iGroupingV in GroupingVariables3) {
-        idx = cbind(idx, as.character(output_to_AV[,iGroupingV]) == as.character(Errors[iError,iGroupingV]))
-      }
-      idx= which(apply(idx,1, all))
-      output_to_AV = output_to_AV[-idx,]
-    }}
-  
-  Correlations_Within_Both_Conditions = output_to_AV %>%
-    group_by(across(all_of(GroupingVariables3))) %>%
-    summarize(Correlation_with_Personality = cor.test(EEG_Signal, get(Personality_Name))$estimate) %>%
-    ungroup()  %>% 
-    unite(Condition1, Condition1, Condition2, sep = "_", remove = TRUE)
-  
+
+ 
   
   #########################################################
-  # (4) Test State Hypothesis
+  # (4) Test State Hypothesis 
   #########################################################
   print("Test State Hypotheses")
   # Hypothesis 1.1 ASY Gambling Anticipation ~ Reward Magnitude
@@ -215,7 +218,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                          "Larger" = c("Condition1", "0"),
                          "Smaller" = c("Condition1", "50"))
   
-  H1.1 = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+  H1.1_Mag = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
                                DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
   
 
@@ -235,51 +238,49 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # In the gambling task, ASY during the consumption of feedback will be larger immediately after
   # rewards compared to losses
   # Test for Valence
-  Effect_of_Interest = "Condition2"
+  Effect_of_Interest = "Condition1"
   Name_Test = c("State_Gambling_Consumption-Valence")
   DirectionEffect = list("Effect" = "main",
-                         "Larger" = c("Condition2", "Win"),
-                         "Smaller" = c("Condition2", "Loss"))
+                         "Larger" = c("Condition1", "Win"),
+                         "Smaller" = c("Condition1", "Loss"))
   
-  H1.2.1 = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+  H1.2_Val = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
                               DirectionEffect, collumns_to_keep, Task, AnalysisPhase,
                               "previousModel", H1.2_Model)
   
   # and for rewards of high magnitude (50 points) compared to rewards of low magnitude (10 points)
   # Test for Magnitude
   Name_Test = c("State_Gambling_Consumption-Magnitude")
-  Effect_of_Interest = "Condition1"
+  Effect_of_Interest = "Condition2"
   DirectionEffect = list("Effect" = "main",
-                         "Larger" = c("Condition1", "0"),
-                         "Smaller" = c("Condition1", "50"))
+                         "Larger" = c("Condition2", "0"),
+                         "Smaller" = c("Condition2", "50"))
   
-  H1.2.2_prepA = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+  H1.2_prepMag = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
                                 DirectionEffect, collumns_to_keep, Task, AnalysisPhase,
                                 "previousModel", H1.2_Model)
   
   
-   # Test for Interaction  
+  # Test for Interaction  
   Effect_of_Interest = c("Condition1", "Condition2")
   DirectionEffect = list("Effect" = "interaction",
-                         "Larger" = c("Condition2", "Win"),
-                         "Smaller" = c("Condition2", "Loss"),
-                         "Interaction" = c("Condition1", "0", "50"))
-  H1.2.2_prepB = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                         "Larger" = c("Condition1", "Win"),
+                         "Smaller" = c("Condition1", "Loss"),
+                         "Interaction" = c("Condition2", "0", "50"))
+  H1.2_prepMagVal = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
                                       DirectionEffect, collumns_to_keep, Task, AnalysisPhase,
                                       "previousModel", H1.2_Model)
   
-  
- 
   # Take the larger effects of the two (interaction or main effect of magnitude)
-  if (!is.na(H1.2.2_prepA[3])) {
-    if (H1.2.2_prepA[3]>H1.2.2_prepB[3]) {
-      H1.2.2 = H1.2.2_prepA
-    } else {
-      H1.2.2 = H1.2.2_prepB
-    } } else {
-      H1.2.2 = H1.2.2_prepB
-    }
+  ToCompare = rbind(H1.2_prepMag,H1.2_prepMagVal)
+  ToCompare = ToCompare[which(!is.na(ToCompare$value_EffectSize)),]
+  if (nrow(ToCompare)>0) {
+    H1.2_Mag = ToCompare[which.max(ToCompare$value_EffectSize),] 
+  } else {
+    H1.2_Mag = H1.2_prepMag
+  }
   
+
   # Hypothesis 1.3 ASY Stroop Anticipation ~ Picture category (before)
   # In the emotional stroop task, ASY during the anticipation of a picture will be larger when followed by
   # positive (and erotic) pictures compared to neutral pictures
@@ -294,7 +295,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                          "Larger" = c("Condition1", "EroticCouple"),
                          "Smaller" = c("Condition1", "Tree"))
   
-  H1.3 = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+  H1.3_Pic = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
                               DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
 
   
@@ -322,13 +323,13 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   Name_Test = c("State_Stroop_Consumption")
   Effect_of_Interest = "Condition1"
   if (!(input$stephistory[["BehavCovariate"]]== "pleasant_arousal_av")) {
-    H1.4.1 = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+    H1.4_Pic = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
                                         DirectionEffect, collumns_to_keep, Task, AnalysisPhase,
                                         "previousModel", H1.4_Model)
     
   } else {
     # if Rating's averages across subjects are used to model, then there is no Condition1 predictor!
-    H1.4.1 = c(Name_Test, "notRundueToSetUp", NA, NA, NA, NA, NA, NA, NA)
+    H1.4_Pic = c(Name_Test, "notRundueToSetUp", NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
   }
   
   
@@ -340,11 +341,28 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     Effect_of_Interest = c( Behavior_Name[idx_Valence = which(grepl("Pleasure", Behavior_Name))]) 
   }
   
-  H1.4.2 = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+  H1.4_prepRatingIA = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
                                 DirectionEffect, collumns_to_keep, Task, AnalysisPhase,
                                 "previousModel", H1.4_Model)
 
+  Effect_of_Interest = c( Behavior_Name[idx_Valence = which(grepl("Pleasure", Behavior_Name))]) 
+  H1.4_prepRatingMF = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                                       DirectionEffect, collumns_to_keep, Task, AnalysisPhase,
+                                       "previousModel", H1.4_Model)
   
+  # Take the larger effects of the two (interaction or main effect)
+  ToCompare = rbind(H1.4_prepRatingMF,H1.4_prepRatingIA)
+  ToCompare = ToCompare[which(!is.na(ToCompare$value_EffectSize)),]
+  if (nrow(ToCompare)>0) {
+    H1.4_Rating = ToCompare[which.max(ToCompare$value_EffectSize),] 
+  } else {
+    H1.4_Rating = H1.4_prepRatingMF
+  }
+  
+  
+  #########################################################
+  # (5) Test Phases against each other
+  #########################################################
   # Hypothesis 1.5 ASY ~ Stroop Anticipation and Rest
   # Test Anticipation AV between Resting and other Task
   # In the emotional stroop task, ASY during anticipation of a picture will be larger than during rest.
@@ -358,54 +376,41 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   DirectionEffect = list("Effect" = "main",
                          "Larger" = c("Task", "Stroop"),
                          "Smaller" = c("Task", "Resting"))
-  H1.5.1 = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions, Effect_of_Interest,
+  H1.5_SR = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions, Effect_of_Interest,
                               DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
   
-  # Add also for Gambling, even if not a hypothesis?
+  # Add also for Gambling, even if not a hypothesis
   Name_Test = c("State_Gambling-Rest_Anticipation")
   Task = c("Gambling", "Resting")
   DirectionEffect = list("Effect" = "main",
                          "Larger" = c("Task", "Gambling"),
                          "Smaller" = c("Task", "Resting"))
-  H1.5.2 = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions, Effect_of_Interest,
+  H1.5_GR = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions, Effect_of_Interest,
                                 DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
   
-  ############
-  # Not a Hypothesis, but comparing Anticipation vs Consumption
+  
+  ##############################################################
+  #Not a Hypothesis, but comparing Anticipation vs Consumption
   AnalysisPhase = c("Anticipation", "Consumption")
   collumns_to_keep = c("AnalysisPhase", Covariate_Name, additional_Factors_Name)  
   Effect_of_Interest = "AnalysisPhase"
   DirectionEffect = list("Effect" = "main",
                          "Larger" = c("AnalysisPhase", "Anticipation"),
                          "Smaller" = c("AnalysisPhase", "Consumption"))
-  
   lm_formula =   paste( "EEG_Signal ~ (AnalysisPhase", additional_Factor_Formula, ")", Covariate_Formula)
+  
+  # For Gambling
   Name_Test = c("State_Gambling_Ant-Consum")
   Task = c("Gambling")
-  
-  H1.6.1 = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions, Effect_of_Interest,
+  H1.6_Gam = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions, Effect_of_Interest,
                                 DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
   
-  
+  # For Stroop
   Name_Test = c("State_Stroop_Ant-Consum")
   Task = c("Stroop")
-  H1.6.2 = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions, Effect_of_Interest,
+  H1.6_Str = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions, Effect_of_Interest,
                                 DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
  
-  
-  Average_Across_Conditions2 = Average_Across_Conditions
-  Average_Across_Conditions2$Task_Phase = as.factor(paste0(as.character(Average_Across_Conditions2$Task), as.character(Average_Across_Conditions$AnalysisPhase)))
-  Name_Test = c("State_AllTasks_Ant-Consum")
-  AnalysisPhase = c("Anticipation", "Consumption", "NA")
-  collumns_to_keep = c("Task_Phase", "AnalysisPhase", Covariate_Name, additional_Factors_Name)  
-  Effect_of_Interest = "Task_Phase"
-  lm_formula =   paste( "EEG_Signal ~ (Task_Phase", additional_Factor_Formula, ")", Covariate_Formula)
-  Task = c("Gambling", "Stroop", "Resting")
-  DirectionEffect = list("Effect" = "main",
-                         "Larger" = c("Task_Phase", "GamblingAnticipation"),
-                         "Smaller" = c("Task_Phase", "RestingNA"))
-  H1.6.3 = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions2, Effect_of_Interest,
-                                DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
   
   
   #########################################################
@@ -423,74 +428,114 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   AnalysisPhase = "Anticipation"
   collumns_to_keep = c("Condition1", Covariate_Name, additional_Factors_Name, Personality_Name) 
   lm_formula =   paste( "EEG_Signal ~ (Condition1", Personality_Formula, additional_Factor_Formula, ")", Covariate_Formula)
+  H2.1_Model = wrap_test_Hypothesis( "",lm_formula, output, "", 
+                                     "", collumns_to_keep, Task, AnalysisPhase, "exportModel", "")
+  
+  Name_Test = "Personality_Gambling_Anticipation-IA"
   Effect_of_Interest = c("Condition1", Personality_Name)
   DirectionEffect = list("Effect" = "interaction_correlation",
                          "Larger" = c("Condition1", "50"),
                          "Smaller" = c("Condition1", "0"),
                          "Personality" = Personality_Name)
-  Name_Test = "Personality_Gambling_Anticipation-IA"
-  H2.1_prep = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
-                                    DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
- 
+  H2.1_IA = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+                                    DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.1_Model)
   
+  Name_Test = "Personality_Gambling_Anticipation-MF"
+  Effect_of_Interest = c(Personality_Name)
+  DirectionEffect = list("Effect" = "correlation",
+                         "Personality" = Personality_Name)
+  H2.1_MF = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+                                  DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.1_Model) 
   
+  ############################################################################
   # Hypothesis 2.2 ASY Gambling Consumption ~ Reward Magnitude * Feedback Type
-  lm_formula =   paste( "EEG_Signal ~ (Condition1 * Condition2", Personality_Formula, additional_Factor_Formula, ")", Covariate_Formula)
   AnalysisPhase = "Consumption"
   collumns_to_keep = c("Condition1", "Condition2", Covariate_Name, additional_Factors_Name, Personality_Name) 
+  lm_formula =   paste( "EEG_Signal ~ (Condition1 * Condition2", Personality_Formula, additional_Factor_Formula, ")", Covariate_Formula)
   H2.2_Model = wrap_test_Hypothesis( "",lm_formula, output, "", 
                                 "", collumns_to_keep, Task, AnalysisPhase, "exportModel", "")
 
   
-  # Test for Valence
+  # Test for Valence * Personality
   Name_Test = c("Personality_Gambling_Consumption-ValIA")
-  Effect_of_Interest = c("Condition2", Personality_Name)
-  DirectionEffect = list("Effect" = "interaction",
-                         "Larger" = c("Condition2", "Win"),
-                         "Smaller" = c("Condition2", "Loss"),
-                         "Interaction" = c("Condition1", "0", "50"))
-  H2.2.1_prep = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
-                                 DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.2_Model)
-  
-  # Test for Magnitude
-  Name_Test = c("Personality_Gambling_Consumption-MagIA")
   Effect_of_Interest = c("Condition1", Personality_Name)
   DirectionEffect = list("Effect" = "interaction_correlation",
-                         "Larger" = c("Condition1", "50"),
-                         "Smaller" = c("Condition1", "0"),
+                         "Larger" = c("Condition1", "Win"),
+                         "Smaller" = c("Condition1", "Loss"),
                          "Personality" = Personality_Name)
-  H2.2.2_prepA = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+  H2.2_IAv = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+                                     DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.2_Model)
+  
+  # Test for Magnitude * Personality
+  Name_Test = c("Personality_Gambling_Consumption-MagIA")
+  Effect_of_Interest = c("Condition2", Personality_Name)
+  DirectionEffect = list("Effect" = "interaction_correlation",
+                         "Larger" = c("Condition2", "50"),
+                         "Smaller" = c("Condition2", "0"),
+                         "Personality" = Personality_Name)
+  H2.2_prepMag = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
                                   DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.2_Model)
   
-  # Test for Interaction  
+  # Test for Interaction  Valence*Magnitude * Personality
   Effect_of_Interest = c("Condition1", "Condition2", Personality_Name)
   DirectionEffect = list("Effect" = "interaction2_correlation",
-                         "Larger" = c("Condition2", "Win"),
-                         "Smaller" = c("Condition2", "Loss"),
-                         "Interaction" = c("Condition1", "0", "50"),
+                         "Larger" = c("Condition1", "Win"),
+                         "Smaller" = c("Condition1", "Loss"),
+                         "Interaction" = c("Condition2", "0", "50"),
                          "Personality" = Personality_Name)
-  H2.2.2_prepB = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+  H2.2_prepMagVal = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
                                        DirectionEffect, collumns_to_keep, Task, AnalysisPhase,"previousModel", H2.2_Model)
   
+  # Take the larger effects of the two (interaction or main effect of magnitude)
+  ToCompare = rbind(H2.2_prepMag,H2.2_prepMagVal)
+  ToCompare = ToCompare[which(!is.na(ToCompare$value_EffectSize)),]
+  if (nrow(ToCompare)>0) {
+    H2.2_IAm = ToCompare[which.max(ToCompare$value_EffectSize),] 
+  } else {
+    H2.2_IAm = H2.2_prepMag
+  }
   
+  
+  # Test for Main Effect of Personality
+  Name_Test = "Personality_Gambling_Consumption-MF"
+  Effect_of_Interest = c(Personality_Name)
+  DirectionEffect = list("Effect" = "correlation",
+                         "Personality" = Personality_Name)
+  H2.2_MF = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+                                  DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.2_Model) 
+  
+  
+  #######################################################################
   # Hypothesis 2.3 ASY Stroop Anticipation ~ Picture category (before) * Personality 
-  Name_Test = c("Personality_Stroop_Anticipation-IA")
   lm_formula =   paste( "EEG_Signal ~ (Condition1", Personality_Formula, additional_Factor_Formula, ")", Covariate_Formula)
   Task = "Stroop"
   AnalysisPhase = "Anticipation"
   collumns_to_keep = c("Condition1", Covariate_Name, additional_Factors_Name, Personality_Name)
+  H2.3_Model = wrap_test_Hypothesis( "",lm_formula, output, "", 
+                                     "", collumns_to_keep, Task, AnalysisPhase, "exportModel", "")
+  
+  # Test IA Condition*Personality
+  Name_Test = c("Personality_Stroop_Anticipation-IA")
   Effect_of_Interest = c("Condition1", Personality_Name)
   DirectionEffect = list("Effect" = "interaction_correlation",
                          "Larger" = c("Condition1", "EroticCouple"),
                          "Smaller" = c("Condition1", "Tree"),
                          "Personality" = Personality_Name)
-
-  H2.3_prep  = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
-                                DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
+  H2.3_IA = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+                                  DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.3_Model) 
+  
+  # Test for Main Effect of Personality
+  Name_Test = "Personality_Stroop_Anticipation-MF"
+  Effect_of_Interest = c(Personality_Name)
+  DirectionEffect = list("Effect" = "correlation",
+                         "Personality" = Personality_Name)
+  H2.3_MF = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+                                  DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.3_Model) 
   
   
-  # # Hypothesis 2.4 ASY Stroop Consumption ~ Picture category * Personality (*Behaviour)
-  Name_Test = c("Personality_Stroop_Consumption-RatingIA")
+  
+  #######################################################################
+  # # Hypothesis 2.4 ASY Stroop Consumption ~ Picture category * Personality (* Rating)
   Task = "Stroop"
   AnalysisPhase = "Consumption"
   collumns_to_keep = c("Condition1", Covariate_Name, additional_Factors_Name, Personality_Name, Behavior_Name)
@@ -503,17 +548,75 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   H2.4_Model = wrap_test_Hypothesis( "",lm_formula, output, "", 
                                 "", collumns_to_keep, Task, AnalysisPhase, "exportModel")
   
-  # Take main effect of Condition1 
-  Effect_of_Interest = c("Condition1", Personality_Name)
   
-  if (!(input$stephistory[["BehavCovariate"]]== "pleasant_arousal_av")) { 
-    Effect_of_Interest = c("Condition1",Personality_Name) 
+  # Test for Main Effect of Personality
+  Name_Test = "Personality_Stroop_Consumption-MF"
+  Effect_of_Interest = c(Personality_Name)
+  DirectionEffect = list("Effect" = "correlation",
+                         "Personality" = Personality_Name)
+  H2.4_MF = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+                                  DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.4_Model) 
+  
+  
+  # Test for Condition only
+  Name_Test = "Personality_Stroop_Consumption-IA"
+  Effect_of_Interest = c("Condition1", Personality_Name)
+  DirectionEffect = list("Effect" = "interaction_correlation",
+                         "Larger" = c("Condition1", "EroticCouple"),
+                         "Smaller" = c("Condition1", "Tree"),
+                         "Personality" = Personality_Name)
+  H2.4_prepCond = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+                                  DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.4_Model) 
+  
+  # Test for Rating only
+  Effect_of_Interest = c(Behavior_Name[grepl("Pleasure", Behavior_Name)], Personality_Name)
+  DirectionEffect = "notdirected"
+  H2.4_prepRating = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+                                        DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.4_Model) 
+  
+  # Test for Condition * Rating
+  # Test for Rating only
+  Effect_of_Interest = c(Behavior_Name[grepl("Pleasure", Behavior_Name)], Personality_Name, "Condition1")
+  DirectionEffect = "notdirected"
+  H2.4_prepRatingCond = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
+                                          DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.4_Model) 
+  
+  
+  # Pick the largest from above
+  ToCompare = rbind(H2.4_prepCond,H2.4_prepRating,H2.4_prepRatingCond )
+  ToCompare = ToCompare[which(!is.na(ToCompare$value_EffectSize)),]
+  if (nrow(ToCompare)>0) {
+  H2.4_IA = ToCompare[which.max(ToCompare$value_EffectSize),] 
   } else {
-    # if Rating's averages across subjects are used to model, then there is no Condition1 predictor!
-    Effect_of_Interest = c( Behavior_Name[idx_Valence = which(grepl("Pleasure", Behavior_Name))], Personality_Name) 
+    H2.4_IA = H2.4_prepCond
   }
-  H2.4_prep  = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
-                                DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.4_Model)
+  
+
+  ##############################################################
+  #Not a Hypothesis, but comparing Anticipation vs Consumption and Add Personality
+  AnalysisPhase = c("Anticipation", "Consumption")
+  collumns_to_keep = c("AnalysisPhase", Covariate_Name, Personality_Name, additional_Factors_Name)  
+  Effect_of_Interest = c("AnalysisPhase", Personality_Name)
+  DirectionEffect = list("Effect" = "interaction_correlation",
+                         "Larger" = c("AnalysisPhase", "Anticipation"),
+                         "Smaller" = c("AnalysisPhase", "Consumption"),
+                         "Personality" = Personality_Name)
+  lm_formula =   paste( "EEG_Signal ~ (AnalysisPhase", Personality_Formula, additional_Factor_Formula, ")", Covariate_Formula)
+  
+  
+  
+  # For Gambling
+  Name_Test = c("Personality_Gambling_Ant-Consum")
+  Task = c("Gambling")
+  H1.6_GamIA = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions, Effect_of_Interest,
+                                DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
+  
+  # For Stroop
+  Name_Test = c("Personality_Stroop_Ant-Consum")
+  Task = c("Stroop")
+  H1.6_StrIA = wrap_test_Hypothesis(Name_Test,lm_formula, Average_Across_Conditions, Effect_of_Interest,
+                                DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
+  
   
   
   
@@ -528,125 +631,63 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # Hypothesis 2.1 ASY Gambling Anticipation ~ Reward Magnitude * Personality
   Task = "Gambling"
   AnalysisPhase = "Anticipation"
-  SignTest = H2.1_prep[7]
-  Extracted_Data =  extract_StrongestCorrelation(SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Conditions, Average_Across_Conditions)
+  SignTest = H2.1_IA$p_Value
+  Extracted_Data =  extract_StrongestCorrelation(SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Conditions, Average_Across_Conditions, output)
   
   # Hypothesis 2.2 ASY Gambling Consumption ~ Reward Magnitude * Feedback
   Task = "Gambling"
   AnalysisPhase = "Consumption"
-  # Take the larger effects of the two (interaction or main effect of magnitude)
-  
-  if (all(is.na(c(H2.2.2_prepA[4], H2.2.2_prepB[4])))) {
-    # Use Main Effect even if not meaningful
-    ToExtract = "Main"
+  # if IA Magnitude*Valence significant, otherwise take only valence
+  if (is.na(H2.2_prepMagVal$p_Value)) {
+    Take = "Main"
   } else {
-    if (any(is.na(c(H2.2.2_prepA[4], H2.2.2_prepB[4])))) {
-      if (!is.na(H2.2.2_prepA[4])) {
-        ToExtract = "Main"
-      }
-      else {
-        ToExtract = "IA"
-      }
-    } else {
-      if (H2.2.2_prepA[4] > H2.2.2_prepB[4]) {
-        ToExtract = "Main"
-      }
-      else {
-        ToExtract = "IA"
-      }
-    }
-  }
-  if (ToExtract == "Main") { 
-    SignTest = H2.2.2_prepA[7]
-    Extracted_Data =  extract_StrongestCorrelation(SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Conditions, Average_Across_Conditions)
-  } else { # Interaction
-    SignTest = H2.2.2_prepB[7]
-    Extracted_Data =  extract_StrongestCorrelation(SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Both_Conditions , Average_Across_Conditions)
+  if (H2.2_prepMagVal$p_Value <0.05) {
+    Take = "Interaction"
+   } else { # If not, test only Valence Effect
+     Take = "Main"   
+   }}
+  
+  if (Take == "Interaction") {
+    SignTest = H2.2_prepMagVal$p_Value
+    output2 = output %>%
+      filter(Task == "Gambling",
+             AnalysisPhase == "Consumption") %>%
+      unite(Condition1, Condition1, Condition2, sep = "_", remove = TRUE) 
+    Extracted_Data =  extract_StrongestCorrelation(SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Both_Conditions , Average_Across_Conditions , output2)
+  } else { # Main
+    SignTest = H2.2_IAv$p_Value
+    Extracted_Data =  extract_StrongestCorrelation(SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Conditions, Average_Across_Conditions, output)
   }
   
   # Hypothesis 2.3 ASY Stroop Anticipation ~ Picture category (before) * Personality
   Task = "Stroop"
   AnalysisPhase = "Anticipation"
-  SignTest = H2.3_prep[7]
-  Extracted_Data =  extract_StrongestCorrelation(SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Conditions, Average_Across_Conditions)
+  SignTest = H2.3_IA$p_Value
+  Extracted_Data =  extract_StrongestCorrelation(SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Conditions, Average_Across_Conditions, output)
   
   
   # Hypothesis 2.4 ASY Stroop Consumption ~ Picture category * Personality
   Task = "Stroop"
   AnalysisPhase = "Consumption"
-  SignTest = H2.4_prep[7]
-  Extracted_Data =  extract_StrongestCorrelation(SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Conditions, Average_Across_Conditions)
+  SignTest = H2.4_prepCond$p_Value
+  Extracted_Data =  extract_StrongestCorrelation(SignTest, Task, AnalysisPhase, additional_Factors_Name, Extracted_Data, Correlations_Within_Conditions, Average_Across_Conditions, output)
   
   
-  #########################################################
-  # (7) Compare Association to Personality for different Phases
-  #########################################################
+  
+  # #########################################################
+  # # (7) Compare Association to Personality to Resting for different Phases
+  # #########################################################
   print("Test Associations")
-  lm_formula =   paste( Personality_Name, " ~ ((Task * EEG_Signal)",additional_Factor_Formula, ")", Covariate_Formula)
-  collumns_to_keep = c("Task", Covariate_Name, additional_Factors_Name, Personality_Name)
-  Effect_of_Interest = c("Task", "EEG_Signal")
+  lm_formula =   paste( "EEG_Signal ~ ((Task * ", Personality_Name, ")",additional_Factor_Formula, ")", Covariate_Formula)
+  collumns_to_keep = c("Task", AnalysisPhase, Covariate_Name, additional_Factors_Name, Personality_Name)
+  Effect_of_Interest = c("Task", Personality_Name)
 
   
-  # Hypothesis 2.1 ASY Gambling Anticipation ~ Reward Magnitude * Personality
+  
+  # Hypothesis 2.1 ASY Gambling Anticipation ~ Task * Personality
   Task = c("Gambling", "Resting")
   AnalysisPhase = c("Anticipation", "NA")
-  Name_Test = c("Personality_RestGambling_Anticipation-EEG")
-  DirectionEffect = list("Effect" = "interaction_correlation",
-                         "Larger" = c("Task", "Gambling"),
-                         "Smaller" = c("Task", "Resting"),
-                         "Personality" = Personality_Name)
-  H2.1 = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, 
-                          DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
-  
-  
-  # Hypothesis 2.2 ASY Gambling Consumption ~ Reward Magnitude * Feedback  
-  Task = c("Gambling", "Resting")
-  AnalysisPhase = c("Consumption", "NA")
-  Name_Test = c("Personality_RestGambling_Consumption-EEG")
-  DirectionEffect = list("Effect" = "interaction_correlation",
-                         "Larger" = c("Task", "Gambling"),
-                         "Smaller" = c("Task", "Resting"),
-                         "Personality" = Personality_Name)
-  H2.2 = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, 
-                          DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
-  
-  
-  # Hypothesis 2.3 ASY Stroop Anticipation ~ Picture category (before) * Personality
-  Task = c("Stroop", "Resting")
-  AnalysisPhase = c("Anticipation", "NA")
-  Name_Test = c("Personality_RestStroop_Anticipation-EEG")
-  DirectionEffect = list("Effect" = "interaction_correlation",
-                         "Larger" = c("Task", "Stroop"),
-                         "Smaller" = c("Task", "Resting"),
-                         "Personality" = Personality_Name)
-  H2.3 = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, 
-                          DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
-  
-  # Hypothesis 2.4 ASY Stroop Consumption ~ Picture category * Personality
-  Task = c("Stroop", "Resting")
-  AnalysisPhase = c("Consumption", "NA")
-  Name_Test = c("Personality_RestStroop_Consumption-EEG")
-  DirectionEffect = list("Effect" = "interaction_correlation",
-                         "Larger" = c("Task", "Stroop"),
-                         "Smaller" = c("Task", "Resting"),
-                         "Personality" = Personality_Name)
-  H2.4 = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, 
-                          DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
-  
-  
-  #########################################################
-  # (7B) Compare Association to Personality for different Phases
-  # Above one often results in unestimatable Models, change DV
-  #########################################################
-  print("Test Associations other way round")
-  lm_formula =   paste( "EEG_Signal ~ ((Task * ", Personality_Name, ")",additional_Factor_Formula, ")", Covariate_Formula)
-  collumns_to_keep = c("Task", Covariate_Name, additional_Factors_Name, Personality_Name)
-  Effect_of_Interest = c("Task", Personality_Name)
-  
-  # Hypothesis 2.1 ASY Gambling Anticipation ~ Reward Magnitude * Personality
-  Task = c("Gambling", "Resting")
-  AnalysisPhase = c("Anticipation", "NA")
-  Name_Test = c("Personality_RestGambling_Anticipation-EEG-OW")
+  Name_Test = c("Personality_RestGambling_Anticipation")
   DirectionEffect = list("Effect" = "interaction_correlation",
                          "Larger" = c("Task", "Gambling"),
                          "Smaller" = c("Task", "Resting"),
@@ -655,10 +696,10 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                            DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
   
   
-  # Hypothesis 2.2 ASY Gambling Consumption ~ Reward Magnitude * Feedback  
+  # Hypothesis 2.2 ASY Gambling Consumption ~ Task * Personality
   Task = c("Gambling", "Resting")
   AnalysisPhase = c("Consumption", "NA")
-  Name_Test = c("Personality_RestGambling_Consumption-EEG-OW")
+  Name_Test = c("Personality_RestGambling_Consumption")
   DirectionEffect = list("Effect" = "interaction_correlation",
                          "Larger" = c("Task", "Gambling"),
                          "Smaller" = c("Task", "Resting"),
@@ -667,10 +708,10 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                            DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
   
   
-  # Hypothesis 2.3 ASY Stroop Anticipation ~ Picture category (before) * Personality
+  # Hypothesis 2.3 ASY Stroop Anticipation ~ Task * Personality
   Task = c("Stroop", "Resting")
   AnalysisPhase = c("Anticipation", "NA")
-  Name_Test = c("Personality_RestStroop_Anticipation-EEG-OW")
+  Name_Test = c("Personality_RestStroop_Anticipation")
   DirectionEffect = list("Effect" = "interaction_correlation",
                          "Larger" = c("Task", "Stroop"),
                          "Smaller" = c("Task", "Resting"),
@@ -678,10 +719,10 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   H2.3B = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest,
                            DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
   
-  # Hypothesis 2.4 ASY Stroop Consumption ~ Picture category * Personality
+  # Hypothesis 2.4 ASY Stroop Consumption ~ Task * Personality
   Task = c("Stroop", "Resting")
   AnalysisPhase = c("Consumption", "NA")
-  Name_Test = c("Personality_RestStroop_Consumption-EEG-OW")
+  Name_Test = c("Personality_RestStroop_Consumption")
   DirectionEffect = list("Effect" = "interaction_correlation",
                          "Larger" = c("Task", "Stroop"),
                          "Smaller" = c("Task", "Resting"),
@@ -690,166 +731,38 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                            DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
   
   
-  #########################################################
-  # (7) "Simple" Assoications
-  #########################################################
-  print("Test simple associations")
   
-  # Not a hypothesis but still add Association with Resting
-  Task = c("Resting")
-  AnalysisPhase = c("NA")
-  collumns_to_keep = c("Task", Covariate_Name, additional_Factors_Name, Personality_Name)
-  lm_formula =   paste( Personality_Name, " ~ ((EEG_Signal)",additional_Factor_Formula, ")", Covariate_Formula)
-  Name_Test = c("Personality_Resting-EEG")
-  Effect_of_Interest = "EEG_Signal"
-  DirectionEffect = list("Effect" = "correlation",
-                         "Personality" = Personality_Name)
-  H2.5x = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest,
-                           DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
-  
-  
-  # Not a hypothesis but still add Association with just for different Phases 
+  # Test also Resting and BAS
   Effect_of_Interest = Personality_Name
   DirectionEffect = list("Effect" = "correlation",
                          "Personality" = Personality_Name)
   lm_formula =   paste( "EEG_Signal ~ ((", Personality_Name, ")",additional_Factor_Formula, ")", Covariate_Formula)
   Task = c("Resting")
   AnalysisPhase = c("NA")
-  Name_Test = c("Personality_Resting-EEG-OW")
-  H2.5Bx = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, 
-                            DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
-  
-  # Not a hypothesis but still add Association with Resting
-  Task = c("Gambling")
-  AnalysisPhase = c("Anticipation")
-  Name_Test = c("Personality_Gambling_Anticipation-EEG-OW")
-  H2.5B1x = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, 
-                             DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
-  
-  AnalysisPhase = c("Consumption")
-  Name_Test = c("Personality_Gambling_Consumption-EEG-OW")
-  H2.5B2x = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest,
-                             DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
-  
-  # Not a hypothesis but still add Association with Resting
-  Task = c("Stroop")
-  AnalysisPhase = c("Anticipation")
-  Name_Test = c("Personality_Stroop_Anticipation-EEG-OW")
-  H2.5B3x = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, 
-                             DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
-  
-  AnalysisPhase = c("Consumption")
-  Name_Test = c("Personality_Stroop_Consumption-EEG-OW")
-  H2.5B4x = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, 
-                             DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
-  
-  
+  Name_Test = c("Personality_Resting")
+  H2.xB = wrap_test_Hypothesis( Name_Test,lm_formula, Extracted_Data, Effect_of_Interest, 
+                                 DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
   
   #########################################################
-  # (7) Run correlation on Averages
-  #########################################################
-  print("Only Corrrelations")
-  output_AV = output[as.character(output$Localisation) == "Frontal",] %>%
-    group_by(ID, Task, AnalysisPhase, Hemisphere) %>%
-    dplyr::summarize(EEG_Signal = mean(EEG_Signal, na.rm = TRUE),
-                     Personality =  mean(!!sym(Personality_Name), na.rm=TRUE))
-  
-  if (length(unique(output_AV$Hemisphere))>1) {
-    output_AV$Hemisphere = as.factor(output_AV$Hemisphere)
-    output_AV = spread(output_AV, key = Hemisphere, value = EEG_Signal)
-    output_AV$EEG_Signal = output_AV$right - output_AV$left
-    output_AV = output_AV[,-which(names(output_AV) %in% c("left", "right"))]
-  }
-  
-  output_AV_wide = output_AV %>% 
-              unite("Task_AnalysisPhase",Task:AnalysisPhase ) %>%
-              spread(Task_AnalysisPhase, EEG_Signal)
-
-  
-  
-  
-  # Calculate correlations
-  for (iTask in c("Resting", "Stroop", "Gambling")) {
-    if (iTask == "Resting") {
-      Subset = output_AV[output_AV$Task==iTask,]
-      Subset = Subset[!is.na(Subset$EEG_Signal),]
-      Subset = Subset[!is.na(Subset$Personality),]
-      if (nrow(Subset)>10) {
-        Test = cor.test(Subset$EEG_Signal, Subset$Personality)
-        Estimate = cbind("Correlation_AVMax_Resting", "Pearson", "R", 
-                         Test$estimate, Test$conf.int[1], Test$conf.int[2], Test$p.value,  
-                         length(unique(Subset$ID)), NA, NA, NA)
-      }else {
-        Estimate = cbind("Correlation_AVMax_Resting", "R", 
-                         NA,NA,NA,NA, NA, 
-                         length(unique(Subset$ID)), NA, NA, NA)
-      }
-    } else {
-      for (iPhase in c("Anticipation", "Consumption")) {
-        
-        Subset = output_AV[output_AV$Task==iTask & output_AV$AnalysisPhase == iPhase,]
-        Subset = Subset[!is.na(Subset$EEG_Signal),]
-        Subset = Subset[!is.na(Subset$Personality),]
-        if (nrow(Subset)>10) {
-          Test = cor.test(Subset$EEG_Signal, Subset$Personality) 
-          
-          Estimate = rbind(Estimate,
-                           cbind(paste0("Correlation_AVMax_", iTask, "_", iPhase), "Pearson",  "R", 
-                                 Test$estimate, Test$conf.int[1], Test$conf.int[2], Test$p.value, 
-                                 length(unique(Subset$ID)), NA, NA, NA)   ) 
-          
-          # Statistically Test Difference of Correlation with rest
-          CorComp = tryCatch({
-               CompCorr = cocor(as.formula(paste0("~ Personality + Resting_NA | Personality + ", iTask, "_", iPhase)), 
-                             data = as.data.frame(output_AV_wide), 
-                             test = c("zou2007", "hittner2003" ),
-                             conf.level = 0.90)
-            
-               Estimate = rbind(Estimate,
-                                cbind(paste0("Difference_CorrAVMax_", iTask, "_", iPhase), "HittnerFischer",  "Diff", 
-                                CompCorr@diff, CompCorr@zou2007$conf.int[1], CompCorr@zou2007$conf.int[2], CompCorr@hittner2003$p.value,
-                                length(unique(Subset$ID)), NA, NA, NA))
-            
-            
-          }, error = function(e) {
-            return(NA)
-          })
-          
-    }  else {
-          Estimate = rbind(Estimate,
-                           cbind(paste0("Correlation_AVMax_", iTask, "_", iPhase), "R", 
-                                 NA, NA, NA, NA, NA,
-                                 length(unique(Subset$ID)), NA, NA, NA)   )
-          
-          
-        }
-        
-      }  }  }
-  colnames(Estimate) = c("Effect_of_Interest", "Statistical_Test", "EffectSizeType" ,"value_EffectSize", "CI_low", "CI90_high", "p_Value",  "n_participants", "av_epochs", "sd_epochs", "Singularity")
-  
-  
-  
-  #########################################################
-  # (8) Correct for Multiple Comparisons for Hypothesis 1
+  # (7) Correct for Multiple Comparisons for Hypothesis 1
   #########################################################
   
-  Estimates_H1 = as.data.frame(rbind(H1.1, H1.2.1, H1.2.2,  H1.3, H1.4.1,  H1.4.2))
+  Estimates_H1 = as.data.frame(rbind(H1.1_Mag, H1.2_Val, H1.2_Mag,  H1.3_Pic, H1.4_Pic,  H1.4_Rating))
   comparisons = sum(!is.na(Estimates_H1$p_Value))
   
-  if (choice == "Holmes"){
+  if (choice == "Holm"){
     Estimates_H1$p_Value = p.adjust(Estimates_H1$p_Value, method = "holm", n = comparisons)
   }  else if (choice == "Bonferroni"){
     Estimates_H1$p_Value = p.adjust(Estimates_H1$p_Value, method = "bonferroni", n = comparisons)
   }
   
   Estimates = rbind(Estimates_H1, 
-                    H1.5.1, H1.5.2, H1.6.1, H1.6.2, H1.6.3,
-                    H2.1,H2.2, H2.3, H2.4, H2.5x, 
-                    H2.1B,H2.2B, H2.3B, H2.4B, H2.5Bx,
-                    H2.5B1x, H2.5B2x , H2.5B3x , H2.5B4x,
-                    H2.1_prep, H2.2.2_prepA, H2.2.2_prepB, H2.3_prep, H2.4_prep,
-                    Estimate)
-  
+                    H1.5_SR, H1.5_GR, H1.6_Gam, H1.6_Str,
+                    H2.1_IA, H2.1_MF, H2.2_IAv, H2.2_IAm, H2.2_MF,
+                    H2.3_IA, H2.3_MF, H2.4_MF, H2.4_IA,
+                    H2.1B, H2.2B, H2.3B, H2.4B,
+                    H2.xB)
+  Estimates$av_epochs[which(Estimates$av_epochs == "NaN")] = NA
   
   #########################################################
   # (9) Export as CSV file

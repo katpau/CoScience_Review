@@ -104,19 +104,6 @@ try
         % select all relevant epochs
         EEG_for_Relative_Pos = pop_epoch(EEG,  Pos_Triggers, Event_Window, 'epochinfo', 'yes');
         EEG_for_Relative_Neg = pop_epoch(EEG,  Neg_Triggers, Event_Window, 'epochinfo', 'yes');
-        if contains(INPUT.StepHistory.TimeWindow, "Relative_Group")
-            % Due to different recording setup, Biosemi needs to be resampled
-            EEG_for_Relative_Export_Pos =  pop_resample(EEG_for_Relative_Pos, fix(EEG_for_Relative_Pos.srate/100)*100);
-            EEG_for_Relative_Export_Neg =  pop_resample(EEG_for_Relative_Neg, fix(EEG_for_Relative_Neg.srate/100)*100);
-            AV_RewP = mean(EEG_for_Relative_Export_Pos.data,3) - mean(EEG_for_Relative_Export_Neg.data,3);
-            % Get index of Data that should be exported (= used to find peaks)
-            ElectrodeIdxRel = [ElectrodeIdx_RewP, ElectrodeIdx_P3];
-            TimeIdxRel = findTimeIdx(EEG_for_Relative_Export_Pos.times, 200, 600);
-            % Get only relevant Data
-            For_Relative.ERP.AV = AV_RewP(ElectrodeIdxRel,TimeIdxRel,:);
-            For_Relative.ERP.times = EEG_for_Relative_Export_Pos.times(TimeIdxRel);
-            For_Relative.ERP.chanlocs = EEG_for_Relative_Export_Pos.chanlocs(ElectrodeIdxRel);
-        end
     end
     
     % ********************************************************************************************
@@ -140,9 +127,10 @@ try
         TimeIdx_RewP = findTimeIdx(EEG_for_Relative_Pos.times, 150, 400);
         TimeIdx_P3 = findTimeIdx(EEG_for_Relative_Pos.times, 250, 600);
         AV_RewP = mean(EEG_for_Relative_Pos.data, 3) - mean(EEG_for_Relative_Neg.data, 3);
+        AV_P3 = mean(cat(3,EEG_for_Relative_Pos.data, EEG_for_Relative_Neg.data), 3);
         % Find Peak in this Subset
         [~, Latency_RewP] = Peaks_Detection(mean(AV_RewP(ElectrodeIdx_RewP,TimeIdx_RewP,:),1), "POS");
-        [~, Latency_P3] = Peaks_Detection(mean(AV_RewP(ElectrodeIdx_P3,TimeIdx_P3,:),1), "POS");
+        [~, Latency_P3] = Peaks_Detection(mean(AV_P3(ElectrodeIdx_P3,TimeIdx_P3,:),1), "POS");
         % Define Time Window Based on this
         TimeWindow_RewP = [EEG_for_Relative_Pos.times(Latency_RewP+(TimeIdx_RewP(1))) - 25, EEG_for_Relative_Pos.times(Latency_RewP+(TimeIdx_RewP(1))) + 25];
         TimeWindow_P3 = [EEG_for_Relative_Pos.times(Latency_P3+(TimeIdx_P3(1))) - 25, EEG_for_Relative_Pos.times(Latency_P3+(TimeIdx_P3(1))) + 25];
@@ -154,7 +142,8 @@ try
         TimeWindow_P3 = [200 650];
     end
     
-    % Get Index of TimeWindow N2 [in Sampling Points]
+    % Get Index of TimeWindow [in Sampling Points] after re-epoching
+    EEG = pop_epoch( EEG, num2cell(Condition_Triggers(:)), Event_Window, 'epochinfo', 'yes');
     TimeIdx_RewP = findTimeIdx(EEG.times, TimeWindow_RewP(1), TimeWindow_RewP(2));
     TimeIdx_P3 = findTimeIdx(EEG.times, TimeWindow_P3(1), TimeWindow_P3(2));
     
@@ -190,11 +179,11 @@ try
         For_Relative.Experimenter = EEG.Info_Lab.Experimenter;
         
         For_Relative.Data_RewP = ConditionData_RewP;
-        For_Relative.Times_RewP = EEGData.times(TimeIdx_RewP);
+        For_Relative.Times_RewP = EEG.times(TimeIdx_RewP);
         For_Relative.Electrodes_RewP = Electrodes_RewP;
         
         For_Relative.Data_P3 = ConditionData_P3;
-        For_Relative.Times_NP3 = EEGData.times(TimeIdx_P3);
+        For_Relative.Times_P3 = EEG.times(TimeIdx_P3);
         For_Relative.Electrodes_P3 = Electrodes_P3;
         
     else
@@ -214,7 +203,7 @@ try
             % Count Epochs
             EpochCount_RewP(:,i_Cond,:) = size(Data_RewP,3);
             EpochCount_P3(:,i_Cond,:) = size(Data_P3,3);
-            if size(Data_RewP,3) < str2double(INPUT.StepHistory.Trials_MinNumber)
+           if size(Data_RewP,3) < str2double(INPUT.StepHistory.Trials_MinNumber)
                 ERP_RewP(:,i_Cond,:) = NaN;
                 SME_RewP(:,i_Cond,:) = NaN;
                 ERP_P3(:,i_Cond,:) = NaN;

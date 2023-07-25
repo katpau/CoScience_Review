@@ -32,9 +32,9 @@ function  OUTPUT = Trials_MinNumber(INPUT, Choice)
 % saved on the harddrive (in order to be loaded and forked from there).
 % Order determines when it should be run.
 StepName = "Trials_MinNumber";
-Choices = ["25", "12"]; 
+Choices = ["12", "25"]; 
 Conditional = ["NaN", "NaN"]; 
-SaveInterim = logical([1]); 
+SaveInterim = logical([0]); 
 Order = [18]; 
 
 

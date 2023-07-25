@@ -7,7 +7,7 @@
         replacement = 1;
         trials = size(Subset,3);
         electrodes = size(Subset,1);
-        Peak_perTrial = NaN(electrodes,trials);
+        Peak_perTrial = NaN(electrodes,n_boots);
         % Bootstrap and create different ERPS, pick peaks
         for i_bs = 1:n_boots
             rng(i_bs, 'twister')

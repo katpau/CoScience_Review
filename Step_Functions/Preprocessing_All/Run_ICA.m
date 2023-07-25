@@ -62,7 +62,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             % not-interpolated channels
             rank_used = sum(INPUT.AC.EEG.Clean_Channel_Mask);
             % adjust rank based on reference
-            if strcmp(INPUT.StepHistory.Reference_AC, 'AV')
+            if strcmp(INPUT.StepHistory.Reference_AC, 'CAV')
                 rank_used = rank_used -1;
             end
             % Determine Rank (based on rank function or number of clean channels)

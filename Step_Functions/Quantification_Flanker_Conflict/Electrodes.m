@@ -33,7 +33,7 @@ function  OUTPUT = Electrodes(INPUT, Choice)
 % saved on the harddrive (in order to be loaded and forked from there).
 % Order determines when it should be run.
 StepName = "Electrodes";
-Choices = ["Fz, FCz, Cz",        "FCz, Cz",  "FCz",       "Cz",  "Fz"]; 
+Choices = ["Fz, FCz, Cz",        "FCz, Cz", "FCz",       "Cz", "Fz"]; 
 Conditional = ["NaN", "NaN",  "Cluster_Electrodes == ""no_cluster""", "Cluster_Electrodes == ""no_cluster""", "Cluster_Electrodes == ""no_cluster"""]; 
 SaveInterim = logical([0]); 
 Order = [20]; 

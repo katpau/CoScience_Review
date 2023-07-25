@@ -11,7 +11,7 @@ output = input$data
 
 
 # Handles how outliers in EEG, behavior, SME etc should be identified
-# No Action here, will be carried out in function "Treat_Outliers"
+# No Action here, will be carried out in function Outliers_EEG and Outliers_RT
 
 
 
