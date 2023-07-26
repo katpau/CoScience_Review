@@ -38,4 +38,73 @@
 **/Step_Functions/Quantification_Flanker_ERN/*
 
 
+# GMA project specific
+CoScience_Review.prj
+resources/
+_proj/
+xxx/
+**/Only_ForGit_To_TestRun/ForkingFiles/Error_GMA
+**/Only_ForGit_To_TestRun/Preproc_forked/Error_GMA
 
+
+# Some additions for MATLAB
+# Default autosave extension
+*.asv
+
+# OSX / *nix default autosave extension
+*.m~
+
+# ICA temp files
+*.fdt
+*.sc
+*.wts
+*.sph
+*.wgt
+
+# OS X generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Compiled MEX binaries (all platforms)
+*.mex*
+
+# Packaged app and toolbox files
+*.mlappinstall
+*.mltbx
+
+# Generated helpsearch folders
+helpsearch*/
+
+# Simulink code generation folders
+slprj/
+sccprj/
+
+# Matlab code generation folders
+codegen/
+
+# Simulink autosave extension
+*.autosave
+
+# Simulink cache files
+*.slxc
+
+# Octave session info
+octave-workspace
+
+# Logs
+*.log
+
+# Packages #
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
