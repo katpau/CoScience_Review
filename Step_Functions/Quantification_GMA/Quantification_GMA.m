@@ -332,10 +332,6 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
             % A table, which can easily be written to file (e.g., as csv)
             OUTPUT.data.ExportTbl = struct2table(tblStruct);
 
-            % In case, the exported data MUST be without a header… (having a
-            % table with proper variable names, this seems to be redundant).
-            OUTPUT.data.Export = struct2cell(tblStruct)';
-
 
             %% Extract struct for plotting and the GmaResults
             % including instance for further statistics.

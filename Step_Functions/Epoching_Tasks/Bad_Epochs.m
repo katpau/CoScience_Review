@@ -51,7 +51,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
     
     Conditions = fieldnames(INPUT.data);
     % [ocs] Analysis stored locally for brevity and faster access.
-    alysName = INPUT.AnalysisName;
+    AnalysisName = INPUT.AnalysisName;
     
     for i_cond = 1:length(Conditions)
         % Get EEGlab EEG structure from the provided Input Structure
@@ -60,45 +60,45 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         % only epoch if not already epoched
         if ~strcmp(INPUT.StepHistory.Epoching_AC, "epoched")
             % ****** Define Triggers and Window based on Analysis ******
-            if ~(contains(alysName, 'Resting')) && ~(contains(alysName, 'Alpha'))
+            if ~(contains(AnalysisName, 'Resting')) && ~(contains(AnalysisName, 'Alpha'))
                 
-                if alysName == "Flanker_Error"
+                if AnalysisName == "Flanker_Error"
                     Event_Window = [-0.500 0.800]; % Epoch length in seconds
                     Relevant_Triggers = [ 106, 116, 126,  136, 206, 216, 226, 236, ...
                         107, 117, 127, 137, 207, 217, 227, 237, 108, 118, 128, 138,  208, 218, ...
                         228, 238, 109, 119, 129, 139, 209, 219, 229, 239  ]; %Responses
                     
-                elseif alysName == "Flanker_MVPA" || alysName == "Flanker_GMA"
+                elseif AnalysisName == "Flanker_MVPA" || AnalysisName == "Flanker_GMA"
                     Event_Window = [-0.500 0.800]; % Epoch length in seconds
                     Relevant_Triggers = [ 106, 116, 126,  136, ...
                         107, 117, 127, 137, 108, 118, 128, 138, ...
                         109, 119, 129, 139  ]; %Responses Experimenter Absent
                     
-                elseif alysName == "GoNoGo_MVPA" || alysName == "GoNoGo_GMA"
+                elseif AnalysisName == "GoNoGo_MVPA" || AnalysisName == "GoNoGo_GMA"
                     Event_Window = [-0.500 0.800]; % Epoch length in seconds
                     Relevant_Triggers = [211, 220 ]; %Responses Speed/Acc emphasis
                     
-                elseif alysName == "Flanker_Conflict"
+                elseif AnalysisName == "Flanker_Conflict"
                     Event_Window = [-0.500 .650];
                     Relevant_Triggers = [ 104, 114, 124, 134]; % Target Onset experimenter absent
                     
-                elseif alysName == "GoNoGo_Conflict" 
+                elseif AnalysisName == "GoNoGo_Conflict" 
                     Event_Window = [-0.200 0.500];
                     Relevant_Triggers = [101, 102, 201, 202 ]; % Target Onset
                     
-                elseif alysName == "Ultimatum_Offer"
+                elseif AnalysisName == "Ultimatum_Offer"
                     Event_Window = [-0.500 1.000];
                     Relevant_Triggers = [1,2,3 ]; % Offer Onset
                     
-                elseif alysName == "Gambling_Theta" || alysName == "Gambling_RewP"
+                elseif AnalysisName == "Gambling_Theta" || AnalysisName == "Gambling_RewP"
                     Event_Window = [-0.500 1.000];
                     Relevant_Triggers = [100, 110, 150, 101, 111, 151, 200, 210, 250, 201, 211, 251]; % FB Onset
                     
-                elseif alysName == "Gambling_N300H"
+                elseif AnalysisName == "Gambling_N300H"
                     Event_Window = [-0.200 2.000];
                     Relevant_Triggers = [100, 110, 150, 101, 111, 151, 200, 210, 250, 201, 211, 251]; % FB Onset
                     
-                elseif alysName == "Stroop_LPP"
+                elseif AnalysisName == "Stroop_LPP"
                     Event_Window = [-0.300 1.000];
                     Relevant_Triggers = [ 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, ...
                         41, 42, 43, 44, 45, 46, 47, 48, 51, 52, 53, 54, 55, 56, 57, 58, 61, 62, 63, 64, 65, 66, 67, 68, ...
@@ -107,7 +107,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 % [ocs] CHANGE There should be an error condition for unknown
                 % analysis names… just in case.
                 else
-                    error("Unknown INPUT.AnalysisName '%s'", alysName);
+                    error("Unknown INPUT.AnalysisName '%s'", AnalysisName);
                 end
                 % ****** Epoch Data around predefined window ******
                 EEG = pop_epoch( EEG, num2cell(Relevant_Triggers), Event_Window, 'epochinfo', 'yes');
@@ -116,7 +116,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 
                 % ****** Alpha Tasks are split into different analytical
                 % procedures within the tasks (Anticipation and Consumption) ******
-            elseif alysName == "Stroop_Alpha"
+            elseif AnalysisName == "Stroop_Alpha"
                 Relevant_Triggers = [ 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, ...
                     41, 42, 43, 44, 45, 46, 47, 48, 51, 52, 53, 54, 55, 56, 57, 58, 61, 62, 63, 64, 65, 66, 67, 68, ...
                     71, 72, 73, 74, 75, 76, 77, 78]; % Picture Onset
@@ -129,7 +129,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 % Combine Conditions to Output: Name Conditions
                 Condition = {'Stroop_Anticipation', 'Stroop_Consumption'};
                 
-            elseif alysName == "Gambling_Alpha"
+            elseif AnalysisName == "Gambling_Alpha"
                 Relevant_Triggers = [100, 110, 150, 101, 111, 151, 200, 210, 250, 201, 211, 251]; % FB Onset
                 % Anticipation
                 EEG1 = pop_epoch( EEG, num2cell(Relevant_Triggers), [-2 0], 'epochinfo', 'yes');
@@ -141,12 +141,12 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             % [ocs] CHANGE There should be an error condition for unknown
             % analysis names… just in case.
             else
-                error("Unknown INPUT.AnalysisName '%s'", alysName);
+                error("Unknown INPUT.AnalysisName '%s'", AnalysisName);
             end
         end
         
         % ****** Resting Tasks are epoched in consecutive overlapping epochs ******
-        if contains(alysName,  "Resting") || alysName == "Alpha_Context"
+        if contains(AnalysisName,  "Resting") || AnalysisName == "Alpha_Context"
             % If Resting data was epoched before, concatenate the
             % non-overlapping epochs first.
             if strcmp(INPUT.StepHistory.Epoching_AC, "epoched")
