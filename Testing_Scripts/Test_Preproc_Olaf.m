@@ -86,9 +86,9 @@ INPUT = Bad_Epochs(INPUT, "FASTER"); %  "FASTER", "Threshold_100", "Threshold_12
 INPUT = Reference(INPUT, "CSD"); %  "CSD" "CAV"      "Mastoids"  
 INPUT = Baseline(INPUT, "-100 0"); %  ["-100 0","-500 -300","-400 -200","-200 -100","-200 0","-150 -50"]
 
-INPUT=INPUTBBU % = INPUT
+% INPUT=INPUTBBU  = INPUT
 INPUT = TimeWindow(INPUT, "0, 100"); %  ["0, 100","0, 50","0, 150"]
 INPUT = Trials_Performance(INPUT, "RTs"); %  ["RTs","NoPostError+RTs","None"]
 INPUT = Quantification_GMA(INPUT, "full"); % ["full","nonneg"]
 
-INPUT.data
+INPUT.data.ExportTbl
