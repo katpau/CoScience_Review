@@ -135,7 +135,7 @@ Covariate = function(input = NULL, choice = NULL) {
   # Get possible additional factors to be included in the GLM
   
   if (length(unlist(unique(output$Electrode)))>1) {additional_Factors_Name = c("Electrode")
-  additional_Factor_Formula = paste("* Electrode") 
+  additional_Factor_Formula = paste("+ Electrode") 
   } else {
     additional_Factors_Name = vector()
     additional_Factor_Formula = vector()

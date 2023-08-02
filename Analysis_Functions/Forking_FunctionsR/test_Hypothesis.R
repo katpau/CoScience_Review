@@ -82,6 +82,8 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       Predictors = Predictors[!grepl("Behav_", Predictors)]
       Predictors = Predictors[!grepl("EEG_Signal", Predictors)]
       Predictors = Predictors[!grepl("_Sex", Predictors)]
+      Predictors = Predictors[!grepl("StateAnxiety", Predictors)]
+      
       
       # Add Lab Predictor
       lm_formula = paste(lm_formula, "+ (1|Lab)")  
