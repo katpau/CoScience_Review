@@ -5,7 +5,7 @@ TaskName = "Flanker_Conflict"
 # Scores that are used without change
 Scored_Subscales = c("NFC_NeedForCognition",
                      "LE_Positiv")
-# Intelligence IST!
+# (fluide) Intelligence IST!
 
 # All Subscales that are added as Covariates
 Covariates_Subscales = c(
@@ -21,19 +21,19 @@ Covariates_Subscales = c(
 
 
 # For Handling Routine
-Do_ZScores = 0
-Do_PCA = 1
+Do_ZScores = 0 
+Do_PCA = 0
 
 ################
-# Create Lists for different operations, which are important for specific things
-PCA_Subscales = c("NFC_NeedForCognition", "ATQ_EffortfulControl", "BSCS_SelfControl" , "TIF_Intellect")
 # For this Check with Corinna and ask her to send her analysis script and add condition in Common then referring to TaskName
+# Corinna says that we do not use PCA but CFA-factor scores from the CEI model that is not forked
+CEI.fac.scores = c("NFC_NeedForCognition", "ATQ_EffortfulControl", "BSCS_SelfControl" , "TIF_Intellect")
 
 
 # Merge all Scales for Indexing
-Maha_Subscales = unique(c(Scored_Subscales, Covariates_Subscales, PCA_Subscales)) # For exclusions, must be non-colinear!
+Maha_Subscales = unique(c(Scored_Subscales, Covariates_Subscales, CEI.fac.scores)) # For exclusions, must be non-colinear!
 Allrelevant_Subscales = unique(c(Scored_Subscales, Covariates_Subscales, Maha_Subscales,
-                                 PCA_Subscales, unlist(Z_Scores_Sum), unlist(Z_Scores_Average))) # For indexing
+                                 CEI.fac.scores)) # For indexing 
 
 
 # which Factors should be kept from Factor Analysis?
@@ -43,11 +43,13 @@ FactorsToKeep = c(1,1,1,1)
 # Third Number is #Factor when no Cutoffs but Outliers were applied, 
 # Fourt Number is #Factor when no Cutoffs nor Outliers were applied
 
+# CK: we need the factor scores (CEI, COM, ESC) that might be exported by the Common script -> CEI.fac.scores
+
 
 ##########################################################
 # check Packages
 ##########################################################
-list.of.packages <- c("Hmisc", "psych", "stringr", "questionr", "matrixStats", "paran", "rstudioapi")
+list.of.packages <- c("Hmisc", "psych", "stringr", "questionr", "matrixStats", "paran", "rstudioapi", "lavaan")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages,  repos='http://cran.us.r-project.org')
 suppress = lapply(list.of.packages, require, character.only = TRUE)

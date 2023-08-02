@@ -60,7 +60,11 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             % ****** Adjust ICA Rank ******
             % For running ICA, adjust number of reliable components based on
             % not-interpolated channels
-            rank_used = sum(INPUT.AC.EEG.Clean_Channel_Mask);
+            if isfield(INPUT.AC.EEG, 'Clean_Channel_Mask') % for MVPA no correction!
+                rank_used = sum(INPUT.AC.EEG.Clean_Channel_Mask);
+            else
+                rank_used = EEG.nbchan;
+            end
             % adjust rank based on reference
             if strcmp(INPUT.StepHistory.Reference_AC, 'CAV')
                 rank_used = rank_used -1;

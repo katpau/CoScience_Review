@@ -34,7 +34,7 @@ function  OUTPUT = Trials_MinNumber(INPUT, Choice)
 StepName = "Trials_MinNumber";
 Choices = ["21", "42"];
 Conditional = ["NaN", "NaN"];
-SaveInterim = logical([1]);
+SaveInterim = logical([0]);
 Order = [17];
 
 

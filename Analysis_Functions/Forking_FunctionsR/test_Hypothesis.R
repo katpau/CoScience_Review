@@ -44,10 +44,15 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
   
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Prepare and Calculate LMer Model
+  
+  ## 1. change global coding in order to get meaningful results
+  # to orthogonal sum-to-zero contrast 
+  options(contrasts = c("contr.sum", "contr.poly"))
+  
   if (!SaveUseModel == "previousModel"){ 
     # check if data has been processed, otherwise don't proceed
-    if (length(unique(Subset$ID))<5) { # Change for final analysis!!
-      Model_Result = "Error_data_seems_incomplete"
+    if (length(unique(Subset$ID))<100) { # Change for final analysis!!
+      Model_Result = c("Error_data_seems_incomplete", lm_formula, length(unique(Subset$ID)))
       
     } else {
       
@@ -59,6 +64,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
             print("Dropped Factor")
             print(iCol)
             lm_formula = gsub(paste0("\\* ", iCol), "", lm_formula)
+            lm_formula = gsub(paste0("\\+ ", iCol), "", lm_formula)
           }}
       }
       
@@ -86,7 +92,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
         noRandomFactor = 0
         lm_formula_noAdd_Random = lm_formula
         lm_formula = paste(lm_formula, " + (1|ID)")  
-
+        
         
         # # check how many levels per predictor 
         # if (length(Predictors)>1) {
@@ -98,9 +104,9 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
         # 
       } else {
         noRandomFactor = 1
-	      AddPredictors = NULL
+        AddPredictors = NULL
       }
-     
+      
       
       # if (length(AddPredictors)>0) { 
       #     for  (iPredictor in AddPredictors) {
@@ -111,32 +117,45 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       #####################################################################################
       # Calculate LM Model
       if (noRandomFactor == 1) {
-        Model_Result = tryCatch({
-          if (is.factor(Subset$Lab)) {Subset$Lab = as.numeric(Subset$Lab)}
-          
-          Model_Result = lm(as.formula(lm_formula), 
-                            Subset)
-          Model_Result$formula = lm_formula
-          Model_Result
-          
-        }, error = function(e) {
-          print("Error with Model")
-          Model_Result = c("Error_when_computing_Model", lm_formula)
-          return(Model_Result)
-        })
+        if (length(unique(Subset$ID))<100) {
+          Model_Result = c("Error_not_enough_Subjects", lm_formula, length(unique(Subset$ID)))
+        } else {
+          Model_Result = tryCatch({
+            Subset$Lab = as.numeric(Subset$Lab)
+            Model_Result = lm(as.formula(lm_formula), 
+                              Subset)
+            Model_Result$formula = lm_formula
+            Model_Result$nrSubs = length(unique(Subset$ID))
+            Model_Result
+            
+          }, error = function(e) {
+            print("Error with Model")
+            Model_Result = c("Error_when_computing_Model", lm_formula, length(unique(Subset$ID)))
+            return(Model_Result)
+          })}
         
         
       } else {
-        Model_Result = tryCatch({
-          Model_Result = lmer(as.formula(lm_formula), 
-                              Subset) 
-          attributes(Model_Result)$formula = lm_formula
-          Model_Result
-        }, error = function(e) {
-          print("Error in Model")
-          Model_Result = c("Error_when_computing_Model", lm_formula)
-          return(Model_Result)
-        })
+        nrSubs = Subset %>% 
+          group_by_at(Predictors) %>%
+          summarise(Subs = length(unique(ID)))
+        nrSubs = min(nrSubs$Subs)
+        
+        if (nrSubs<100) {
+          Model_Result = c("Error_not_enough_Subjects", lm_formula, nrSubs)
+        } else {
+          Model_Result = tryCatch({
+            Model_Result = lmer(as.formula(lm_formula), 
+                                Subset,
+                                control = lmerControl(optimizer = "bobyqa")) 
+            attributes(Model_Result)$formula = lm_formula
+            attributes(Model_Result)$nrSubs = nrSubs
+            Model_Result
+          }, error = function(e) {
+            print("Error in Model")
+            Model_Result = c("Error_when_computing_Model", lm_formula, nrSubs)
+            return(Model_Result)
+          })}
         
         
         # only relevant if next to random ID also random IA with ID given 
@@ -158,24 +177,28 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
         # }
         
         
-        }
+      }
       
       
     } # If Model is provided, get it here
-    } else {  
-      print("Using existing LMER")
-      Model_Result = ModelProvided
-      if ((is.character(Model_Result) &&  grepl( "Error", Model_Result)) ) {
-        Model_Result = Model_Result[1]
-        lm_formula = Model_Result[2]
-        
-      } else {
+  } else {  
+    print("Using existing LMER")
+    Model_Result = ModelProvided
+    if ((is.character(Model_Result) &&  grepl( "Error", Model_Result)) ) {
+      Model_Result = Model_Result[1]
+      lm_formula = ModelProvided[2]
+      nrSubs = ModelProvided[3]
+      
+      
+    } else {
       if (class(Model_Result) == "lm") {
         lm_formula = Model_Result$formula
+        nrSubs = Model_Result$nrSubs
       } else {
-        lm_formula = Model_Result@formula}
+        lm_formula = Model_Result@formula
+        nrSubs = Model_Result@nrSubs}
       
-      }}
+    }}
   
   
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -191,10 +214,11 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
     #  If there were Problems with the Model, extract NAs
     if (is.character(Model_Result) &&  grepl( "Error", Model_Result)) {
       print("no Estimates since Error with Model ")
-      Estimates = cbind.data.frame(Name_Test, NA, NA, NA, NA, NA, NA, length(unique(as.character(Subset$ID))),mean(Subset$Epochs, na.rm=TRUE),
+      lm_formula = ModelProvided[2]
+      nrSubs = ModelProvided[3]
+      Estimates = cbind.data.frame(Name_Test, NA, NA, NA, NA, NA, NA, nrSubs,mean(Subset$Epochs, na.rm=TRUE),
                                    sd(Subset$Epochs, na.rm=TRUE), NA, lm_formula, NA, NA, NA)
-     # c("Effect_of_Interest", "Statistical_Test", "EffectSizeType" ,"value_EffectSize", "CI_low", "CI90_high", 
-     #   "p_Value",  "n_participants", "av_epochs", "sd_epochs", "Singularity", "formula", "F_value", "dfN", "dfD")
+      
     } else {
       # get Anova from model
       AnovaModel = anova(Model_Result)
@@ -203,12 +227,16 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       if(class(Model_Result) == "lm") {
         noRandomFactor = 1
         Singularity = NA
+        lm_formula = Model_Result$formula
+        nrSubs = Model_Result$nrSubs
       } else {
         noRandomFactor = 0
         Singularity = isSingular(Model_Result)
+        lm_formula = Model_Result@formula
+        nrSubs = Model_Result@nrSubs
       }
       
-
+      
       
       
       
@@ -240,13 +268,13 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       }
       
       
-    
+      
       # Get partial_Etas
       partial_Eta = effectsize::eta_squared(Model_Result,  alternative = "two.sided") # partial = FALSE does only partial
       partial_Eta = partial_Eta[Idx_Effect_of_Interest,]
       if (is.null(partial_Eta$Eta2_partial)) { partial_Eta$Eta2_partial = partial_Eta$Eta2} # For one-way between subjects designs, partial eta squared is equivalent to eta squared.
       partial_Eta = cbind( partial_Eta$Eta2_partial, partial_Eta$CI_low, partial_Eta$CI_high)
-
+      
       
       
       
@@ -262,29 +290,22 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       
       # Get FStatistics
       if (noRandomFactor == 0) { 
-      FStatInfo = anova(Model_Result)[Idx_Effect_of_Interest,c("F value", "NumDF", "DenDF")]
+        FStatInfo = anova(Model_Result)[Idx_Effect_of_Interest,c("F value", "NumDF", "DenDF")]
       } else {
         ForAccessing = anova(Model_Result)
         FStatInfo = c(ForAccessing$"F value"[Idx_Effect_of_Interest], 
                       ForAccessing$Df[Idx_Effect_of_Interest],
                       last(ForAccessing$Df))
       }
-
-      # get subject nr
-      if (noRandomFactor == 0) { 
-        Groups = summary(Model_Result)$ngrps
-        Nr_Subs = Groups[names(Groups)=="ID"]
-      } else { # if no within Subject design, that just number of unique IDs
-        Nr_Subs = length(unique(Subset$ID))
-        }
       
-     # prepare export
+      
+      # prepare export
       if (length(Idx_Effect_of_Interest)>0) {
-      Estimates = cbind.data.frame(Name_Test, StatTest, "partial_Eta", partial_Eta, p_Value,  Nr_Subs, mean(Subset$Epochs), sd(Subset$Epochs), 
-                                   Singularity, lm_formula, FStatInfo[1], FStatInfo[2], FStatInfo[3])
+        Estimates = cbind.data.frame(Name_Test, StatTest, "partial_Eta", partial_Eta, p_Value,  nrSubs, mean(Subset$Epochs), sd(Subset$Epochs), 
+                                     Singularity, lm_formula, FStatInfo[1], FStatInfo[2], FStatInfo[3])
       } else {
-      print("Effect not found in Model")
-      Estimates = cbind.data.frame(Name_Test, NA, "partial_Eta", NA, NA, NA, NA,  NA, NA, NA, NA, lm_formula, NA, NA, NA)
+        print("Effect not found in Model")
+        Estimates = cbind.data.frame(Name_Test, NA, "partial_Eta", NA, NA, NA, NA,  NA, NA, NA, NA, lm_formula, NA, NA, NA)
         
       }
       
@@ -296,7 +317,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
     colnames(Estimates) = c("Effect_of_Interest", "Statistical_Test", "EffectSizeType" ,"value_EffectSize", "CI_low", "CI90_high", 
                             "p_Value",  "n_participants", "av_epochs", "sd_epochs", "Singularity", "formula", "F_value", "dfN", "dfD")
     
-  
+    
     return (Estimates)
   }
 }
