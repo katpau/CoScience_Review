@@ -28,7 +28,7 @@ Covariate = function(input = NULL, choice = NULL) {
   
   Attention_Checks_Personality_choice = unlist(input$stephistory["Attention_Checks_Personality"])
   Outliers_Personality_choice = unlist(input$stephistory["Outliers_Personality"])
-  Personality_Variable_choice = unlist(input$stephistory["Personality_Variable"])
+  Personality_Variable_choice = c("Personality_MPS_PersonalStandards","Personality_MPS_ConcernOverMistakes")
   Covariate_choice = choice
   
   
@@ -90,6 +90,15 @@ Covariate = function(input = NULL, choice = NULL) {
   # (4) Prepare Output
   #########################################################
   # Merge Data with EEG Data
+  output = merge(
+    output,
+    ScoreData[,c("ID", Personality_Variable_choice)],
+    by = c("ID"),
+    all.x = TRUE,
+    all.y = FALSE
+  )
+  
+  
   if (!AddCovariate == 0) {
     output = merge(
       output,

@@ -209,6 +209,10 @@ parfor iFolder = 1:length(Folders)
             Single_TrialData_ERP = [colNames_ERP;Single_TrialData_ERP];
             
             OUTPUT.data.Export = [INPUT.data.For_Relative.Behav, Single_TrialData_ERP];
+
+            OUTPUT.data.ExportInfo = struct('TimeWindowN2', TimeWindow_N2, ...
+                'TimeWindowP3', TimeWindow_P3, ...
+               'TimeWindowFMT', TimeWindow_FMT );
             
             
             % ****** Error Management ******
@@ -373,6 +377,7 @@ parfor iFolder = 1:length(Folders)
             Single_TrialData_ERP = [colNames_ERP;Single_TrialData_ERP];
             
             OUTPUT.data.Export = [OUTPUT.data.Export, Single_TrialData_ERP];
+            OUTPUT.data.ExportInfo = struct('TimeWindowFMT', TimeWindow_FMT );
             
             
             % ****** Error Management ******
