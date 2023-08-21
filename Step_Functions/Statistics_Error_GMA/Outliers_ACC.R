@@ -20,22 +20,7 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
   #########################################################
   # Get ACC from Behaviour 
   # Read Behavioural Data Flanker
-  BehavFile = paste0(input$stephistory["Root_Behavior"], "task_Flanker_beh.csv")
-  BehavData = read.csv(BehavFile, header = TRUE)
-  BehavData = BehavData[BehavData$ExperimenterPresence %in% "absent",]
-  BehavData = BehavData[,c("ID","TaskPerf")]
-  BehavData = BehavData[!duplicated(BehavData),]
-  BehavData$Task = "Flanker"
-  
-  # Read Behavioural Data GoNoGo
-  BehavFile = paste0(input$stephistory["Root_Behavior"], "task_GoNoGo_beh.csv")
-  BehavData2 = read.csv(BehavFile, header = TRUE)
-  BehavData2 = BehavData[BehavData2$InstructionCondition %in% "Speed",]
-  BehavData2 = BehavData2[,c("ID",  "TaskPerf")]
-  BehavData2 = BehavData2[!duplicated(BehavData2),]
-  BehavData2$Task = "GoNoGo"
-  BehavData = rbind(BehavData, BehavData2)
-  colnames(BehavData)[2] = "ACC"
+  BehavData = output[,c("ID", "Task", "TaskPerf")] 
   
   
   # Get choices from Earlier
@@ -57,7 +42,7 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
       Distance = as.numeric(str_split(Threshold, " ")[[1]][1])
       
       Min = Center-Distance*Width
-      Max = Center+Distance*Width
+      Max = 100 # For Accuracy no upper limit
       Outliers = numeric(length(data))
       Outliers[!is.na(data) & (data < Min | data > Max)] = 1
       return(Outliers)
@@ -68,8 +53,9 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
     # (2) Identify Outliers 
     #########################################################
     BehavData = BehavData %>%
+      distinct %>%
       group_by(Task) %>%
-      summarise(Outliers_ACC = outlierfunction(Threshold, ACC),
+      summarise(Outliers_TaskPerf = outlierfunction(Threshold, TaskPerf),
                 ID = ID) %>%
       ungroup()
     
@@ -81,20 +67,13 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
                         all.x = TRUE,    all.y = FALSE )
     
     # Remove ACC, RT, and EEG data if overall Accuracy is too low
-    output$ACC[as.logical(output$Outliers_ACC)] = NA
-    output$EEG_Signal[as.logical(output$Outliers_ACC)] = NA
-
+    output$TaskPerf[as.logical(output$Outliers_TaskPerf)] = NA
+    output$EEG_Signal[as.logical(output$Outliers_TaskPerf)] = NA
+    output$Behav[as.logical(output$Outliers_TaskPerf)] = NA
     
   } else {
-    # merge with full dataset
-    output =  merge(    output, 
-                        BehavData,
-                        by = c("ID", "Task"),
-                        all.x = TRUE,    all.y = FALSE )
+  # do nothing
   }
-  
-  
-  
   
   
   #No change needed below here - just for bookkeeping
