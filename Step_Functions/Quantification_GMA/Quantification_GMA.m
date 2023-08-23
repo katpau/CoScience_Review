@@ -43,18 +43,12 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
     Choices = ["full", "nonneg"];
     Conditional = ["NaN", "NaN"];
     SaveInterim = true;
-    Order = 19;
-
-
-    %% ToDo
-    %   - TODO: Choices include fitting the nonnegative interval ('nonneg'),
-    %     only, and fitting the full epoch ('full', as in Kummer et al., 2020).
+    Order = 20;
 
     %% Constants
     % Ne/c only, time (response locked) in ms
     COMPONENT = 'Ne/c';
     EVENT_WIN = [-100, 250];
-    MIN_TRIALS = 10;
     SEG_MIN_MS = 20;
 
     ELECTRODES = {'Fz', 'FCz', 'Cz'};
@@ -81,6 +75,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
     %% Data from previous steps
     timeWin = str2double(strsplit(INPUT.StepHistory.TimeWindow, ","));
     alysName = INPUT.AnalysisName;
+    min_trials = str2double(INPUT.StepHistory.Trials_MinNumber);
 
 
     %% Updating the SubjectStructure. No changes should be made here.
@@ -209,7 +204,11 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
                 [gmaOut(outIdx).('n_trials')] = ntrialsCond{:};
 
                 % SKIP channel(s), if below number of minimum trials
-                if ntrials < MIN_TRIALS, continue; end
+                if ntrials < min_trials
+                    minTrialMsg = repmat({'below minimum trials'}, nElectrodes, 1);
+                    [gmaOut(outIdx).('gma_log')] = minTrialMsg{:};
+                    continue; 
+                end
 
                 ERPavg = ERP;
                 ERPavg.data = mean(ERP.data, 3);
