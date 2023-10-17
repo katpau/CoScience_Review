@@ -53,16 +53,22 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         for i_cond = 1:length(Conditions)
             % Get EEGlab EEG structure from the provided Input Structure
             EEG = INPUT.data.(Conditions{i_cond});
+            LRP = INPUT.data.lrp;
             
             % Mark Trials with RTs faster than 0.1 and slower than 0.8s
             IdxKeep = cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {EEG.event.RT});
+            IdxKeep_lrp = cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {LRP.event.RT});
+
 
             
             Epochs_to_Keep = {EEG.event.epoch};
             Epochs_to_Keep = unique([Epochs_to_Keep{IdxKeep}]);
+            Epochs_to_Keep_lrp = {LRP.event.epoch};
+            Epochs_to_Keep_lrp = unique([Epochs_to_Keep_lrp{IdxKeep_lrp}]);
             
             % ****** Keep only marked Trials ******
             EEG = pop_select( EEG, 'trial', Epochs_to_Keep);
+            LRP = pop_select( LRP, 'trial', Epochs_to_Keep_lrp);
             
             %#####################################################################
             %### Wrapping up Preprocessing Routine                         #######
@@ -72,6 +78,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             % and made available for next step. Always save the EEG structure in
             % the OUTPUT.data field, overwriting previous EEG information.
             OUTPUT.data.(Conditions{i_cond}) = EEG;
+            OUTPUT.data.lrp = LRP;
         end
     end
     
