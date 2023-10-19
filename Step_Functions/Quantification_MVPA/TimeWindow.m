@@ -43,7 +43,7 @@ try
     %%%%%%%%%%%%%%%% Routine for the analysis of this step
     % This functions starts from using INPUT and returns OUTPUT
     EEG = INPUT.data.EEG;
-    LRP = INPUT.data.LRP;
+    LRP = INPUT.data.lrp;
     
     % Condition Names and Triggers depend on analysisname
     if INPUT.AnalysisName == "Flanker_MVPA"
