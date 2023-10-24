@@ -20,10 +20,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # GetName of all relevant columns
   keptcolumns = colnames(Subset)
-  # Drop Localisation and Electrode if both of them are given (only Relevant for Alpha Asymmetry)
-  if (any(grepl("Localisation ", keptcolumns)) & any(grepl("Electrode", keptcolumns)) ) {
-    keptcolumns = keptcolumns[!keptcolumns == "Localisation"]  }
-  
+
   # Select relevant data and make sure its complete
   colNames_all = names(Subset)
   # Get DV
@@ -110,11 +107,16 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
      
       # Also for Electrode? (but sometimes only 2?) What for Block and Trial?? 
       # Now they would be all added here
-      if (length(AddPredictors)>0) { 
-          for  (iPredictor in AddPredictors) {
-            lm_formula = paste0(lm_formula, "+ (", iPredictor, "|ID)")
-          }
-      } 
+      #if (length(AddPredictors)>0) { 
+      #   for  (iPredictor in AddPredictors) {
+      #      lm_formula = paste0(lm_formula, "+ (", iPredictor, "|ID)")
+      #    }
+      #} 
+      # 
+      
+      # Hardcode additional Predictors?
+      lm_formula = paste(lm_formula, "+(Congruency|ID)")
+      
       
       
       #####################################################################################
@@ -122,7 +124,8 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       if (noRandomFactor == 1) {
         Model_Result = tryCatch({
           if (is.factor(Subset$Lab)) {Subset$Lab = as.numeric(Subset$Lab)}
-          
+          if (is.factor(Subset$ID)) {Subset$ID = as.numeric(Subset$ID)}
+
           if (lmFamily == "standard") {
             Model_Result = lm(as.formula(lm_formula), 
                             Subset)
@@ -145,6 +148,8 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
         
       } else {
         Model_Result = tryCatch({
+          if (is.factor(Subset$Lab)) {Subset$Lab = as.numeric(Subset$Lab)}
+          if (is.factor(Subset$ID)) {Subset$ID = as.numeric(Subset$ID)}
           if (lmFamily == "standard") {
           Model_Result = lmer(as.formula(lm_formula), 
                               Subset,
@@ -246,24 +251,8 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       }
       
 
-      
-      
-      # Only for Alpha Relevant
-      # # Expand Effect of Interest by additional factors (Hemisphere & Localisation only for Alpha Asymmetry)
-      # if ("Hemisphere" %in% keptcolumns) {
-      #   Effect_of_Interest = c(Effect_of_Interest, "Hemisphere")  }
-      # if ("Localisation" %in% keptcolumns) {
-      #   Effect_of_Interest = c(Effect_of_Interest, "Localisation")  }
-      # # Add Electrode to effect of interest only if frontal/paripartial_Etal
-      # if ("Electrode" %in% keptcolumns) {
-      #   if (length(unlist(unique(Subset$Electrode))) == 6) {
-      #     Effect_of_Interest = c(Effect_of_Interest, "Electrode")  }}
-      
       Effect_of_Interest = unique(Effect_of_Interest)
-      # Do not add other factors (Frequency Band)
-      # These are different hypotheses. We are only focused 
-      # on frontal alpha asymmetry.)
-      
+
       
       # Find index of effect of interest (and the indicated Conditions)
       if (length(Effect_of_Interest)>1) {
@@ -303,12 +292,14 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       # 
       
       # semi-partial (marginal) R squared for fixed effects
-      r2_fixef <- r2beta(Model_Result, method = "nsj")
-      r2_fixef = cbind(r2_fixef[Idx_Effect_of_Interest+1, c("Rsq","upper.CL", "lower.CL" )]) 
+      #r2_fixef <- r2glmm::r2beta(Model_Result, method = "nsj")
+      #r2_fixef = cbind(r2_fixef[Idx_Effect_of_Interest+1, c("Rsq","upper.CL", "lower.CL" )]) 
+      # Not working yet
+      r2_fixef = t(c(NA, NA, NA))
       
       # Cannot get the MuMIn installed =(
       ## for the whole model
-      # r2_total <- r.squaredGLMM(Model_Result, pj2014 = T)
+      r2_total <- MuMIn::r.squaredGLMM(Model_Result, pj2014 = T)
       
       # Get Results from Corinnas Function
       MLM_Result = mlm.table(Model_Result, Effect_of_Interest) 
@@ -325,7 +316,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       # Get FStatistics
       if (lmFamily == "binominal") {
         FStatInfo = cbind(anova(Model_Result)[Idx_Effect_of_Interest,c("F value")], NA, NA) # What are the Degrees of Freedom?
-      } else 
+      } else  {
       if (noRandomFactor == 0) { 
         FStatInfo = anova(Model_Result)[Idx_Effect_of_Interest,c("F value", "NumDF", "DenDF")]
       } else {
@@ -334,6 +325,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
                       ForAccessing$Df[Idx_Effect_of_Interest],
                       last(ForAccessing$Df))
       } }
+    }
       
      # prepare export
       if (length(Idx_Effect_of_Interest)>0) {

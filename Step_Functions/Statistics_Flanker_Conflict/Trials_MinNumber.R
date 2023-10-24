@@ -1,7 +1,7 @@
 Trials_MinNumber = function(input = NULL, choice = NULL) {
   StepName = "Trials_MinNumber"
   Choices = c("10", "6")
-  Order = 3.1
+  Order = 3.2
   output = input$data
   
   ## Contributors
@@ -12,7 +12,7 @@ Trials_MinNumber = function(input = NULL, choice = NULL) {
   not_enough_trials = output$Epochs < as.numeric(choice)
   if (sum(not_enough_trials)>0) {
   output$EEG_Signal[not_enough_trials] = NA 
-  output$RT[output$component == "Behav" && not_enough_trials] = NA # Also for RT, what about ACC?
+  output$RT[output$Component == "Behav" & not_enough_trials] = NA # Also for RT, what about ACC?
   }
   
   

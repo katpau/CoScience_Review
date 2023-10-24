@@ -101,9 +101,9 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     # Run Test
     ModelResult = test_Hypothesis_CK( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided, lmFamily)
     
-    # Test Direction
+    # Test Direction ??? 
     if (!SaveUseModel == "exportModel") {
-      if(!is.character(ModelResult) &&  any(!grepl( "Error", ModelResult))) {
+      if(!is.character(ModelResult)  &&  any(!grepl( "Error", ModelResult))) {
         if(!is.na(ModelResult$value_EffectSize)){
           ModelResult = test_DirectionEffect(DirectionEffect, Subset, ModelResult) 
         }}}
@@ -248,6 +248,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   Subset = output[,c("ID", "Personality_LE_Positiv", "Personality_NFC_NeedForCognition",  "Personality_CEI" )]
   Subset = Subset[!duplicated(Subset),]
   Subset = Subset[,-1]
+
   # psych::corr.test(x, y = NULL, use = "pairwise",method="pearson",adjust="holm", alpha=.05,ci=TRUE,minlength=5,normal=TRUE)
   if (!choice == "None") {
     Cors  = psych::corr.test(Subset, adjust = tolower(choice)) 
