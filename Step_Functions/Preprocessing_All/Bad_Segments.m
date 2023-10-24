@@ -61,7 +61,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         
         
         % Initalize Clean Segment Mask of length Trials or, if continous, then Sampling Points
-        if EEG.trials > 1
+        if strcmp(INPUT.StepHistory.Epoching_AC , "epoched")
             Clean_Segment_Mask = ones(EEG.trials,1);
         else
             Clean_Segment_Mask = ones(EEG.pnts,1);
@@ -154,7 +154,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             
             
             % ****** Remove Bad Segments ******
-            if EEG.trials > 1
+            if strcmp(INPUT.StepHistory.Epoching_AC , "epoched")
                 if  sum(Clean_Segment_Mask) == 0 
                     e.message = 'All Trials marked as bad (100%!!) .';
                     error(e.message);

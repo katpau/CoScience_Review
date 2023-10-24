@@ -239,7 +239,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             
             
             % ****** Remove bad Epochs ******
-            if  sum(Clean_Epochs_Mask) == 0
+            if  sum(Clean_Epochs_Mask) < 2
                 e.message = 'All Trials marked as bad (100%!!) .';
                 error(e.message);
             end

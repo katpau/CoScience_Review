@@ -58,6 +58,20 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         if ~strcmpi(Choice, "AllTrials")
             
             % Get critical RTs
+            % Unclear Error - sometimes wrong Format
+            if iscell(EEG.event(1).RT) 
+                for ic = 1:length(EEG.event)
+                    EEG.event(ic).RT = cell2mat(EEG.event(ic).RT);
+                    if ~isnumeric( EEG.event(ic).RT )
+                        if strcmp(EEG.event(ic).RT,  'NA')
+                           EEG.event(ic).RT  = NaN;
+                        else
+                           EEG.event(ic).RT  = str2num( EEG.event(ic).RT );
+                        end
+                    end
+                end
+            end
+
             RT = strsplit(Choice, "-"); RT = str2double(RT(2))/1000;
             % Mark Trials with RTs faster than critical value
             IdxKeep =  cellfun(@(x)~isempty(x) && x > RT, {EEG.event.RT});
