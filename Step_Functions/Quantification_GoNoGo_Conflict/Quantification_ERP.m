@@ -78,6 +78,8 @@ try
         try
             ERP = pop_epoch( EEG_for_ERP, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');
             ERP_forExport.(Condition_Names(i_Cond)) = mean(ERP.data,3);
+        catch
+            error("in at least one Condition not enough Trials")
         end
     end
     % Add Info on Exported ERP
@@ -159,7 +161,8 @@ try
         For_Relative.DataN2 = ConditionData;
         For_Relative.TimesN2 = EEGData.times(TimeIdx);
         For_Relative.ElectrodesN2 = Electrodes;
-        
+        For_Relative.ACC = INPUT.data.EEG.ACC;
+                
     else
         % ****** Extract Amplitude, SME, Epoch Count ******
         InitSize = [NrElectrodes,NrConditions];

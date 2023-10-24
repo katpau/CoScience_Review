@@ -55,6 +55,20 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         % Get EEGlab EEG structure from the provided Input Structure
         EEG = INPUT.data.(Conditions{i_cond});
         
+        % Unclear Error - sometimes wrong Format
+        if iscell(EEG.event(1).RT) 
+            for ic = 1:length(EEG.event)
+                EEG.event(ic).RT = cell2mat(EEG.event(ic).RT);
+                if ~isnumeric( EEG.event(ic).RT )
+                    if strcmp(EEG.event(ic).RT,  'NA')
+                       EEG.event(ic).RT  = NaN;
+                    else
+                       EEG.event(ic).RT  = str2num( EEG.event(ic).RT );
+                    end
+                end
+            end
+        end
+        
         % ****** Find Trials to be excluded ******
         if strcmpi(Choice, "accuracy")
             % Mark Trials with correct responses

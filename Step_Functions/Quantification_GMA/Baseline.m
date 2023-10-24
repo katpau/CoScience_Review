@@ -54,8 +54,17 @@ function OUTPUT = Baseline(INPUT, Choice)
             EEG = INPUT.data.(Conditions{i_cond});
 
             % ****** Apply Baseline Correction ******
-
-            EEG = pop_rmbase(EEG, [str2num(Choice)], []);
+            try
+                EEG = pop_rmbase( EEG, [str2num(Choice)] ,[]);
+            catch % for some Downsampled data the minimum is not exact and baseline does not work if bordering
+                Test = str2num(Choice);
+                if (1) - EEG.xmin*1000 < 5 % Times in s not ms
+                    EEG = pop_rmbase( EEG, [EEG.xmin*1000 Test(2)] ,[]);
+                else
+                    error('Baseline Window outside of Epoch');
+                end
+            end
+        
 
             %#####################################################################
             %### Wrapping up Preprocessing Routine                         #######
