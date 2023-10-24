@@ -195,7 +195,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
   } else {  
     print("Using existing LMER")
     Model_Result = ModelProvided
-    if ((is.character(Model_Result) &&  grepl( "Error", Model_Result)) ) {
+    if ((is.character(Model_Result) &&  grepl( "Error", Model_Result[1])) ) {
       lm_formula = Model_Result[2]
       lmFamily = Model_Result[3]
       Model_Result = Model_Result[1]
@@ -231,7 +231,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
     print("Prepare Estimates")
     # Check if Model was calculated successfully
     #  If there were Problems with the Model, extract NAs
-    if (is.character(Model_Result) &&  grepl( "Error", Model_Result)) {
+    if (is.character(Model_Result) &&  grepl( "Error", Model_Result[1])) {
       print("no Estimates since Error with Model ")
       Estimates = cbind.data.frame(Name_Test, Model_Result, t(rep(NA, 12)), length(unique(as.character(Subset$ID))),t(rep(NA, 7)))
     
@@ -325,7 +325,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
                       ForAccessing$Df[Idx_Effect_of_Interest],
                       last(ForAccessing$Df))
       } }
-    }
+    
       
      # prepare export
       if (length(Idx_Effect_of_Interest)>0) {
@@ -364,7 +364,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       
       # is there a way to extract estimates when more than 2 levels?
       # effectsize::standardize_parameters(Model_Result)
-    } 
+    } }
     colnames(Estimates) = c("Effect_of_Interest", "Statistical_Test", "EffectSizeType" ,"value_EffectSize", "CI_low", "CI90_high", "p_Value",  
                             "Beta", "SE", "pvalue", "Rand_Eff_SD", "Rsq","upper.CL", "lower.CL" ,
                             "n_participants", "av_epochs", "sd_epochs", "Singularity",
