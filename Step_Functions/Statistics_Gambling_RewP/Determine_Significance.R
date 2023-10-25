@@ -104,7 +104,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                   names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", "Lab", collumns_to_keep)]
     
     # Run Test
-    ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)
+    ModelResult = test_Hypothesis_V2( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)
     
     # Test Direction
     if (!SaveUseModel == "exportModel") {

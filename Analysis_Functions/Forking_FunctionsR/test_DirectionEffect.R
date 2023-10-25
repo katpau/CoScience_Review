@@ -13,6 +13,21 @@ test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResu
   } else {DV = "EEG_Signal"}
   
   
+  # Aggregate if trialwise for Flanker
+  if(length(unique(Subset$ID))*20 < nrow(Subset)) {
+    if("Electrode" %in% colnames(Subset)) {
+      Groupings = c("ID", "Congruency_notCentered", "Electrode")
+    } else {
+      Groupings = c("ID", "Congruency_notCentered")  
+    }
+    Subset = Subset %>%
+      group_by_at(Groupings) %>%
+      summarise(DV = mean(get(DV), na.rm =T),
+                Personality = get(DirectionEffect$Personality)[1])
+      colnames(Subset)[colnames(Subset) == "DV"] = DV
+      colnames(Subset)[colnames(Subset) == "Personality"] = DirectionEffect$Personality
+  }
+  
   if (DirectionEffect$Effect == "main") {
     Subset$Recode = NA
     Subset$Recode[Subset[,DirectionEffect$Smaller[1]]  ==    DirectionEffect$Smaller[2]] = 0
