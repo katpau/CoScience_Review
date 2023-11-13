@@ -19,7 +19,7 @@
 %   shape and $\beta$ as rate (which is the inverse of the  scale parameter
 %   $\theta$ used by MATLAB's <a href="matlab:help('gmapdf')">gmapdf</a>.
 %
-%   Even though the Gamma PDF is only defined, if shape and rate > 1, the
+%   Even though the Gamma PDF is only defined, if shape and rate > 0, the
 %   function also accepts NaN values to mark invalid distributions. Non-NaN
 %   parameter values will be checked for validity, though.
 %
@@ -340,19 +340,16 @@ classdef GammaDist < matlab.mixin.Copyable
             %   ip      - [double] x of first inflection point, preceding the
             %           mode (i.e. the point at which the slope of the function
             %           changes sign from negative to positive).
-            %           NaN for shape <= 2 or invalid PDF.
+            %           NaN for shape <= 1 or invalid PDF.
             %
             % See also
             %   GammaDist.isValidPdf
 
-            if ~isValidPdf(obj)
+            if ~isValidPdf(obj) || obj.shape <= 1
                 ip = NaN;
             else
-                if obj.shape <= 1, ip = NaN;
-                else
-                    shp = obj.shape - 1;
-                    ip = (shp - sqrt(shp)) / obj.rate;
-                end
+                shp = obj.shape - 1;
+                ip = (shp - sqrt(shp)) / obj.rate;
             end
         end
 
@@ -363,7 +360,7 @@ classdef GammaDist < matlab.mixin.Copyable
             %   ip      - [double] x of second inflection point, after the mode
             %           (i.e. the point at which the slope of the function
             %           changes sign from negative to positive).
-            %           NaN for shape <= 1 or invalid PDF.
+            %           NaN for shape <= 0 or invalid PDF.
             %
             % See also
             %   GammaDist.isValidPdf
@@ -371,27 +368,24 @@ classdef GammaDist < matlab.mixin.Copyable
             if ~isValidPdf(obj)
                 ip = NaN;
             else
-                if obj.shape <= 1, ip = NaN;
-                else
-                    shp = obj.shape - 1;
-                    ip = (shp + sqrt(shp)) / obj.rate;
-                end
+                shp = obj.shape - 1;
+                ip = (shp + sqrt(shp)) / obj.rate;
             end
         end
 
         function md = mode(obj)
-            %MODE Expected PDF mode
+            %MODE Expected PDF mode location
             %
             % Output
             %   md      - [double] x of the mode (the maximum and turning point)
-            %           Zero for shape < 1. NaN for an invalid PDF.
+            %           Zero for shape <= 1. NaN for an invalid PDF.
             %
             % See also
             %   GammaDist.isValidPdf
 
             if ~isValidPdf(obj)
                 md = NaN;
-            elseif obj.shape < 1
+            elseif obj.shape <= 1
                 md = 0;
             else
                 md = (obj.shape - 1) / obj.rate;
@@ -399,7 +393,7 @@ classdef GammaDist < matlab.mixin.Copyable
         end
 
         function x = mean(obj)
-            %MEAN Expected mean x of the PDF
+            %MEAN Expected location of the PDF mean
             %
             % Description
             %   Returns the exact (not rounded) estimated x of the PDF mean as:
@@ -425,7 +419,7 @@ classdef GammaDist < matlab.mixin.Copyable
         end
 
         function x = median(obj)
-            %MEDIAN Expected median x of the PDF using the Gamma inverse
+            %MEDIAN Expected location of the PDF median using the Gamma inverse
             % cumulative distribution function (gaminv)
             %
             % Description

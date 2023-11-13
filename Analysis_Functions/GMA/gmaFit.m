@@ -8,9 +8,10 @@
 %   [fitResult, initialGuess, argsUsed] = gmaFit(channelData);
 %
 %% Description
-%   Fits an initial guess of a Gamma probability density function on the largest
-%   nonnegative interval (LNNI), found in  in the data and optimizes the fit
-%   using Grid Restrained Nelder-Mead Algoritm (GRNMA).
+%   Fits an initial guess of a Gamma probability density function on the 
+%   nonnegative interval (NNI) with the largest area under the curve found in 
+%   the data and optimizes the fit using Grid Restrained Nelder-Mead Algoritm 
+%   (GRNMA).
 %
 %   GMA was developed by Kummer et al. (2020) to investigate empirical
 %   event-related potential (ERP) components, by fitting a Gamma PDF on the EEG
@@ -20,15 +21,14 @@
 %   This function works in multiple steps, given a data vector and time window
 %   for a valid mode of a potential PDF, which could be fitted on it.
 %   The default steps run as follows if each is successful:
-%   1.  Find the (first) largest nonnegative interval (LNNI) with a minimum
-%       length 20 data points (see <a href="matlab:help('nnegIntervals')">nnegIntervals</a>),
-%       which intersects with the time window.
-%   2.  Add zeros before the first point of the LNNI up to the first index in
-%       the data (e.g. for an LNNI of [10, 55] nine zeros would be inserted).
+%   1.  Find a nonnegative interval (NNI) with thw largest area under the curve 
+%       and a minimum length 20 data points (see <a href="matlab:help('nnegIntervals')">nnegIntervals</a>), which intersects 
+%       the time window with at least 50% of its width.
+%   2.  Add zeros before the first point of the NNI up to the first index in
+%       the data (e.g. for an NNI of [10, 55] nine zeros would be inserted).
 %   3.  The parameters of a Gamma PDF will be estimated for the zero padded
-%       LNNI, using close-form estimation (Ye & Chen, 2017,
-%       see <a
-%       href="matlab:help('presearch_closeform')">presearch_closeform</a>). The PDF mode must be within the time window.
+%       NNI, using close-form estimation (Ye & Chen, 2017, see <a href="matlab:help('presearch_closeform')">presearch_closeform</a>). 
+%       The PDF mode must be within the time window.
 %   4.  This initial fit will be optimized, using the Grid Restrained
 %       Nelder-Mead Algorithm (Bűrmen et al., 2006, see <a href="matlab:help('grnma')">grnma</a>).
 %   5.  The resulting (or any unsuccessful) fit will be returned as an instance
@@ -159,7 +159,7 @@
 %   presearch_random, presearch_random2, presearch_closeform, meeseeks
 
 %% Attribution
-%	Last author: Olaf C. Schmidtmann, last edit: 06.07.2023
+%	Last author: Olaf C. Schmidtmann, last edit: 24.08.2023
 %   Code adapted from the original version by André Mattes and Kilian Kummer.
 %   Source: https://github.com/0xlevel/gma
 %	MATLAB version: 2023a
@@ -264,12 +264,11 @@ function [result, x0, argsUsed] = gmaFit(data, winStart, winLength, args)
     %% Find the longest viable interval of nonnegative values
     % which sufficiently overlaps the search window, i.e. could contain a mode.
     args.segMinLength = max(args.segMinLength, SEG_MIN_PNTS);
-    [x0seg, ivMsg] = maxPosInterval(data, mWin, args.segMinLength, ...
-        round(args.segMinLength * 0.5));
+    [x0seg, ivMsg] = maxAreaInterval(data, mWin, args.segMinLength);
     logger(ivMsg);
 
     if isempty(x0seg)
-        logger("[gmaFit] Aborted. No fitting nonnegative interval " + ...
+        logger("[gmaFit] Aborted. No closed nonnegative interval " + ...
             "(with min. samples=%i) found.", args.segMinLength);
         % EXIT with failed results.
         result = GmaResults(NaN, NaN, 1, data, win = mWin, seg = [NaN, NaN], ...
@@ -379,57 +378,76 @@ function [result, x0, argsUsed] = gmaFit(data, winStart, winLength, args)
     if args.logEnabled; logger(result.resultStr); end
 end
 
-function [iv, msg] = maxPosInterval(data, win, minLength, minOverlap)
-    %maxPosInterval Get the (first) largest nonnegative interval within a time
-    %window
+function [iv, msg] = maxAreaInterval(data, win, minLength)
+    %maxAreaInterval Nonnegative interval with the largest area under the curve 
     %
-    %   Returns the full interval, even if it only partly overlaps the window
-    %   between the indices, i.e.
+    %   Returns the closed nonnegative interval (y >= 0) of a data vector, which 
+    %   1) has at least the minimum length,
+    %   2) has its center within a search window of indices (overlaps min. 50%),
+    %   3) and has the largest area under the curve (sum of all data values in
+    %      its interval; i.e., the values's mean times the interval length).
+    %   The returned interval will be returned in full, even if it starts or
+    %   ends outside the search window.
+    %
+    % See also: 
+    %   nnegIntervals
 
     arguments
         data (1, :)
         win = [1, numel(data)]
         minLength = 1
-        minOverlap = 1
     end
 
     iv = [];
 
-    % Search intervals of nonnegative values, both open and closed
-    nnegIv = nnegIntervals(data);
+    % Get closed intervals of nonnegative values.
+    [nnegIv, closed] = nnegIntervals(data, true);
 
     if isempty(nnegIv)
         msg = "No nonnegative intervals found in the data.";
         return;
     end
 
-    % All intervals intersecting the window (from..to)
-    ivWin = nnegIv(:, win(2) - nnegIv(1, :) >= minOverlap - 1 & ...
-        nnegIv(2, :) - win(1) >= minOverlap - 1);
+    % All intervals intersecting the window
+    winIntersect = win(2) > nnegIv(1, :) & win(1) < nnegIv(2, :);
+    ivWin = nnegIv(:, winIntersect);
+    closed = closed(winIntersect);
+
+    % Restrict open intervals to the window
+    [ivWin(:, ~closed)] = [max(ivWin(1, ~closed), win(1)); ...
+        min(ivWin(2, ~closed), win(2))];
+    
+    % Remove anything below the minimum length
+    ivSizes = diff(ivWin) + 1;
+    ivWin = ivWin(:, ivSizes >= minLength);
+    
+    % Only keep intervals, which either overlap with at least 50% of their size
+    ivCenter = round(sum(ivWin) * 0.5);
+    centerInside = win(2) > ivCenter & win(1) < ivCenter;
+    % or occupy at least 50% of the window
     ivWinInside = [max(ivWin(1, :), win(1)); min(ivWin(2, :), win(2))];
+    ivSizeInside = diff(ivWinInside) + 1 >= diff(win) * 0.5;
+    ivWin = ivWin(:, centerInside | ivSizeInside);
 
-    if isempty(ivWinInside)
-        msg = sprintf("No nonnegative intervals within the search window " + ...
-            "[%i, %i] found.", win(1), win(2));
-        return;
-    end
+    % or keep it, if there is only one interval?
 
-    % Remove anything below the minimum length and select the largest
-    ivSizes = diff(ivWinInside);
-    minMask = ivSizes >= minLength;
-    ivSizes = ivSizes(minMask);
-
-    if isempty(ivSizes)
+    if isempty(ivWin)
         msg = sprintf("No nonnegative intervals of sufficient length (%i " + ...
             "samples) found within the search window [%i .. %i].", ...
             minLength, win(1), win(2));
         return;
     end
 
-    ivWin = ivWin(:, minMask);
-    [~, maxIdx] = max(ivSizes);
+    % Calculate area under the curve and pick the largest as result
+    nIv = size(ivWin, 2);
+    ivArea = zeros(1, nIv);
+    for i = 1:nIv
+        ivArea(i) = sum(data(ivWin(1, i):ivWin(2, i)));
+    end
+    
+    [~, maxIdx] = max(ivArea);
     iv = ivWin(:, maxIdx);
-    msg = sprintf("Largest nonnegative interval found at [%i, %i].", iv');
+    msg = sprintf("Nonnegative interval found at [%i, %i].", iv');
 end
 
 % Local function to handle console outputs, used as nested function

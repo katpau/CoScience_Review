@@ -43,18 +43,12 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
     Choices = ["full", "nonneg"];
     Conditional = ["NaN", "NaN"];
     SaveInterim = true;
-    Order = 19;
-
-
-    %% ToDo
-    %   - TODO: Choices include fitting the nonnegative interval ('nonneg'),
-    %     only, and fitting the full epoch ('full', as in Kummer et al., 2020).
+    Order = 20;
 
     %% Constants
     % Ne/c only, time (response locked) in ms
     COMPONENT = 'Ne/c';
     EVENT_WIN = [-100, 250];
-    MIN_TRIALS = 10;
     SEG_MIN_MS = 20;
 
     ELECTRODES = {'Fz', 'FCz', 'Cz'};
@@ -81,6 +75,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
     %% Data from previous steps
     timeWin = str2double(strsplit(INPUT.StepHistory.TimeWindow, ","));
     alysName = INPUT.AnalysisName;
+    min_trials = str2double(INPUT.StepHistory.Trials_MinNumber);
 
 
     %% Updating the SubjectStructure. No changes should be made here.
@@ -157,6 +152,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
                 'eeg_peak', emp, ...
                 'eeg_peak_ms', emp, ...
                 'eeg_peak_sme', emp, ...
+                'eeg_peak_pos', emp, ...
                 'eeg_mean_win', emp, ...
                 'eeg_peak_win', emp, ...
                 'eeg_peak_win_ms', emp, ...
@@ -209,7 +205,11 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
                 [gmaOut(outIdx).('n_trials')] = ntrialsCond{:};
 
                 % SKIP channel(s), if below number of minimum trials
-                if ntrials < MIN_TRIALS, continue; end
+                if ntrials < min_trials
+                    minTrialMsg = repmat({'below minimum trials'}, nElectrodes, 1);
+                    [gmaOut(outIdx).('gma_log')] = minTrialMsg{:};
+                    continue; 
+                end
 
                 ERPavg = ERP;
                 ERPavg.data = mean(ERP.data, 3);
@@ -236,6 +236,9 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
                 [gmaOut(outIdx).('eeg_peak_ms')] = eegPeakNegMs{:};
                 eegPeakNegSme = num2cell(Peaks_SME(ERP.data, "NEG"));
                 [gmaOut(outIdx).('eeg_peak_sme')] = eegPeakNegSme{:};
+                eegPeakPos = Peaks_Detection(ERPavg.data, "POS");
+                eegPeakPos = num2cell(eegPeakPos);
+                [gmaOut(outIdx).('eeg_peak_pos')] = eegPeakPos{:};
 
                 % Window of interest, only
                 ERPdataWin = ERPavg.data(:, sampleWin(1):sampleWin(2));
@@ -330,8 +333,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
                 'GmaArgs', 'x', 'y', 'version', 'timestamp', 'gma_log'};
             tblStruct = rmfield(tblStruct, tblDrop);
             % A table, which can easily be written to file (e.g., as csv)
-            OUTPUT.data.ExportTbl = struct2table(tblStruct);
-
+            OUTPUT.data.Export = struct2table(tblStruct);
 
             %% Extract struct for plotting and the GmaResults
             % including instance for further statistics.
@@ -342,8 +344,9 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
             
             gmaDrop = {'lab', 'experimenter', 'time_win', 'eeg_mean', ...
                 'eeg_sme', 'eeg_peak', 'eeg_peak_ms', 'eeg_peak_sme', ...
-                'eeg_mean_win', 'eeg_peak_win', 'eeg_peak_win_ms', 'shape', ...
-                'rate', 'yscale', 'ip1', 'mode', 'ip2', 'skew', 'excess', ...
+                'eeg_peak_pos', 'eeg_mean_win', 'eeg_peak_win', ...
+                'eeg_peak_win_ms', 'shape', 'rate', 'yscale', 'ip1', ...
+                'mode', 'ip2', 'skew', 'excess', ...
                 'rmse', 'nrmse', 'r', 'rmse_full', 'nrmse_full', 'r_full'};
 
             gmaOut = rmfield(gmaOut, gmaDrop);

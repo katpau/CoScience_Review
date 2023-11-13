@@ -40,7 +40,7 @@ function OUTPUT = Trials_Performance(INPUT, Choice)
     StepName = "Trials_Performance";
     Choices = ["RTs", "NoPostError+RTs", "None"];
     Conditional = ["NaN", "NaN", "NaN"];
-    SaveInterim = true;
+    SaveInterim = false;
     Order = 18;
 
     % ****** Updating the OUTPUT structure ******
