@@ -334,11 +334,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
             tblStruct = rmfield(tblStruct, tblDrop);
             % A table, which can easily be written to file (e.g., as csv)
             OUTPUT.data.Export = struct2table(tblStruct);
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> ede4f4ec9ceb14b91b8eda4b4329e2f9cd089253
             %% Extract struct for plotting and the GmaResults
             % including instance for further statistics.
             % Important: when loading the mat-file, the GmaResults class MUST be
