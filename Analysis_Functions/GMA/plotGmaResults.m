@@ -207,10 +207,10 @@ function plotGmaResults(results, args)
     dataColor = [0.8500, 0.3250, 0.0980];
     ax.YColor = dataColor;
     %ylabel('Channel \muV', 'Color', dataColor);
-    ylabel('\mu V', 'fontsize', 12, 'Color', dataColor);
+    ylabel('\muV', 'fontsize', 12, 'Color', dataColor);
 
     dx = 1:nData;
-    ppData = plot(dx, chData * dsign);
+    ppData = plot(dx, chData * dsign, DisplayName="Data");
 
     if anynan(args.xlim)
         if nData && ~isempty(results.y)
@@ -223,7 +223,7 @@ function plotGmaResults(results, args)
     [l1, u1] = bounds([chData(:, args.xlim(1) + 1:args.xlim(2)), results.y]);
     maxLim = max(abs([l1, u1]));
     % Slightly increase the limits beyond the bounds to display curves properly.
-    yBounds = [min(-1, -maxLim), max(1, maxLim)] * 1.1;
+    yBounds = [min(-0.1, -maxLim), max(0.1, maxLim)] * 1.1;
 
     % include the last point
     xlim(args.xlim + [0, 1]);
@@ -255,10 +255,12 @@ function plotGmaResults(results, args)
 
         if fitSuccessful
             ppGma = plot(px, py, LineWidth = 2, ...
-                Marker = 'o', MarkerSize = 3, MarkerIndices = markers);
+                Marker = 'o', MarkerSize = 3, MarkerIndices = markers, ...
+                DisplayName="Gamma PDF");
         else
             ppGma = plot(px, py, ':', LineWidth = 2, ...
-                Marker = 'o', MarkerSize = 3, MarkerIndices = markers);
+                Marker = 'o', MarkerSize = 3, MarkerIndices = markers, ...
+                DisplayName="Gamma PDF (no fit)");
         end
 
         xlim(args.xlim);
@@ -283,23 +285,24 @@ function plotGmaResults(results, args)
                 % Shift the plot by the local offset
                 plot(tx + results.localOffset, ty, LineStyle = tailLine, ...
                     LineWidth = 2, Color = '#666', ...
-                    Marker = 'o', MarkerSize = 2, MarkerIndices = tailPois);
+                    Marker = 'o', MarkerSize = 2, MarkerIndices = tailPois, ...
+                    HandleVisibility="off");
             end
 
             if results.x(1) > 1
                 [tx, ty] = results.getTailFront();
                 % Shift the plot by the local offset
                 plot(tx + results.localOffset, ty, LineStyle = tailLine, ...
-                    LineWidth = 2, Color = '#666');
+                    LineWidth = 2, Color = '#666', HandleVisibility="off");
             end
         end
     end
 
     if dx(1) ~= args.xorigin
         % Draw time lock
-        xline(args.xorigin);
+        xline(args.xorigin, HandleVisibility="off");
     end
-    yline(0);
+    yline(0, HandleVisibility="off");
 
     % Mark nonnegative interval found by the pre-search
     segmarks = results.seg;
@@ -307,9 +310,9 @@ function plotGmaResults(results, args)
     if all(segmarks > 0)
         segLabel = sprintf("[%g, %g) ms", segmarksMs);
         segxl = xline(max(1, segmarks(1)), ":", segLabel, LineWidth = 1, ...
-            LabelOrientation = "horizontal");
+            LabelOrientation = "horizontal", HandleVisibility="off");
         segxl.FontSize = 9;
-        xline(segmarks(2), ":", LineWidth = 1);
+        xline(segmarks(2), ":", LineWidth = 1, HandleVisibility="off");
     end
 
     % Mark search window for mode
@@ -318,14 +321,16 @@ function plotGmaResults(results, args)
     if winmarks(1) > 1
         wxl1 = xline(winmarks(1), "-.", sprintf("  %g ms", winmarksMs(1)), ...
             LineWidth = 0.5, color = [0.4660, 0.6740, 0.1880], ...
-            LabelHorizontalAlignment = "right", LabelVerticalAlignment = "bottom");
+            LabelHorizontalAlignment = "right", ...
+            LabelVerticalAlignment = "bottom", HandleVisibility="off");
         wxl1.FontSize = 9;
     end
 
     if winmarks(2) >= winmarks(1) && winmarks(2) < nData
         wxl2 = xline(winmarks(2), "-.", sprintf("  %g ms", winmarksMs(2)), ...
             LineWidth = 0.5, color = [0.4660, 0.6740, 0.1880], ...
-            LabelHorizontalAlignment = "left", LabelVerticalAlignment = "bottom");
+            LabelHorizontalAlignment = "left", ...
+            LabelVerticalAlignment = "bottom", HandleVisibility="off");
         wxl2.FontSize = 9;
     end
 
@@ -339,11 +344,7 @@ function plotGmaResults(results, args)
     % grid on;
 
     % Legend
-    if isempty(results.y)
-        ldg = legend(ppData, {'data'});
-    else
-        ldg = legend([ppGma, ppData], {'GMA fit', 'data'});
-    end
+    ldg = legend(AutoUpdate = 'off');
     ldg.Location = "southeast";
 
     %% Data Text Panel
