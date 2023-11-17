@@ -53,7 +53,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         for i_cond = 1:length(Conditions)
             % Get EEGlab EEG structure from the provided Input Structure
             EEG = INPUT.data.(Conditions{i_cond});
-            LRP = INPUT.data.lrp;
+            LRP = INPUT.data.LRP;
             
             % Mark Trials with RTs faster than 0.1 and slower than 0.8s
             IdxKeep = cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {EEG.event.RT});
@@ -78,7 +78,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             % and made available for next step. Always save the EEG structure in
             % the OUTPUT.data field, overwriting previous EEG information.
             OUTPUT.data.(Conditions{i_cond}) = EEG;
-            OUTPUT.data.lrp = LRP;
+            OUTPUT.data.LRP = LRP;
         end
     end
     
