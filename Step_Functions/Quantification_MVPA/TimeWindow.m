@@ -43,7 +43,7 @@ try
     %%%%%%%%%%%%%%%% Routine for the analysis of this step
     % This functions starts from using INPUT and returns OUTPUT
     EEG = INPUT.data.EEG;
-    LRP = INPUT.data.lrp;
+    LRP = INPUT.data.LRP;
     
     % Condition Names and Triggers depend on analysisname
     if INPUT.AnalysisName == "Flanker_MVPA"
@@ -117,18 +117,20 @@ try
     
     %% LRP
     % Preprocessing 
-    ms_start = -300;
+     ms_start = -300;
     ms_end = 299;
     
-    % Create EEG substructures from 3d EEGmatrix containing only trials from LRP electrodes (channels x dp x trials)
-    chanlocs = struct2table(LRP.chanlocs);
+%     % Create EEG substructures from 3d EEGmatrix containing only trials from LRP electrodes (channels x dp x trials)
+%     chanlocs = struct2table(LRP.chanlocs);
     Electrodes = upper(strsplit(OUTPUT.StepHistory.Electrodes, ", ")); 
-    lrp_chanlocs = [find(strcmp(chanlocs.labels, Electrodes(1))) find(strcmp(chanlocs.labels, Electrodes(2)))]; %only use LRP electrodes of interest
+%     lrp_chanlocs = [find(strcmp(chanlocs.labels, Electrodes(1))) find(strcmp(chanlocs.labels, Electrodes(2)))]; %only use LRP electrodes of interest
+%     
+%     EEG_lrp = pop_select(LRP, 'channel', lrp_chanlocs); %remove other channels from EEG structure
+%     
+%     clear chanlocs lrp_chanlocs
     
-    EEG_lrp = pop_select(LRP, 'channel', lrp_chanlocs); %remove other channels from EEG structure
-    
-    clear chanlocs lrp_chanlocs
-    
+    EEG_lrp = LRP;    
+
     %select response types (correct and error)
     EEG_lrp.data = EEG_lrp.data(:,:,events_response.responsetype ~= 0);
     
