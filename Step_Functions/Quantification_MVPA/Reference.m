@@ -87,7 +87,10 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             Mastoids = find(contains({EEG.chanlocs.labels}, {'MAST'}));
             EEG = pop_reref(EEG, {EEG.chanlocs(Mastoids).labels}, 'keepref', 'on');
         elseif strcmpi(Choice, "CSD")
+            % for LRP, we need to rereference data to the Mastoids
             LRP = EEG;
+            Mastoids = find(contains({LRP.chanlocs.labels}, {'MAST'}));
+            LRP = pop_reref(LRP, {LRP.chanlocs(Mastoids).labels}, 'keepref', 'on');
             EEG.data = laplacian_perrinX(EEG.data, [EEG.chanlocs.X],[EEG.chanlocs.Y],[EEG.chanlocs.Z]);
         end
         
@@ -101,7 +104,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         % and made available for next step. Always save the EEG structure in
         % the OUTPUT.data field, overwriting previous EEG information.
         OUTPUT.data.(Conditions{i_cond}) = EEG;
-        OUTPUT.data.lrp = LRP;
+        OUTPUT.data.LRP = LRP;
 
 
     end
