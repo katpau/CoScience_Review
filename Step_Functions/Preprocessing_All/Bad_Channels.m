@@ -76,9 +76,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
         elseif strcmpi(Choice,"HAPPE")
             [EEG_removed, ~, ~] = pop_rejchan(EEG, 'threshold',[-3 3],'norm','on','measure','spec','freqrange',[1 125] );
             [EEG_removed, ~, ~]= pop_rejchan(EEG_removed, 'threshold',[-3 3],'norm','on','measure','spec','freqrange',[1 125] ); % is applied twice!
-            BadChannels_Index=  setdiff({EEG.chanlocs.labels},{EEG_removed.chanlocs.labels});
-            BadChannels_Index = find(ismember({EEG.chanlocs.labels}, BadChannels_Index));
-            
+            [~, BadChannels_Index] =  setdiff({EEG.chanlocs.labels},{EEG_removed.chanlocs.labels});         
             
         elseif strcmpi(Choice, "PREP")
             EEG_removed = findNoisyChannels(EEG);

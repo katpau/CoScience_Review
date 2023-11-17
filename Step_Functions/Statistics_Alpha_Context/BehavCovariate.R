@@ -94,8 +94,11 @@ output$Condition[output$Condition %in% "EroticMan" & output$Gender %in% 1] = "Er
 output$Condition[output$Condition %in% "EroticMan" & output$Gender %in% 2] = "EroticSameSex"
 output$Condition[output$Condition %in% "EroticWoman" & output$Gender %in% 2] = "EroticOppositeSex"
 output$Condition[output$Condition %in% "EroticWoman" & output$Gender %in% 1] = "EroticSameSex"
-output$EEG_Signal[is.na(output$Gender) & output$Condition %in% "EroticMan"] = NA
-output$EEG_Signal[is.na(output$Gender) & output$Condition %in% "EroticWoman"] = NA
+# If Gender not known, delete Entry for Sex specific Entries 
+GenderUnknown = c(which(is.na(output$Gender) & output$Condition %in% "EroticMan"),
+                  which(is.na(output$Gender) & output$Condition %in% "EroticWoman"));
+if (length(GenderUnknown) > 0) {
+  output  = output[-GenderUnknown,]}
 output  = output[,-which(names(output)=="Gender")]
 
 

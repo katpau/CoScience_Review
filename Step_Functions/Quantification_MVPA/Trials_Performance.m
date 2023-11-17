@@ -58,8 +58,6 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             % Mark Trials with RTs faster than 0.1 and slower than 0.8s
             IdxKeep = cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {EEG.event.RT});
             IdxKeep_lrp = cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {LRP.event.RT});
-
-
             
             Epochs_to_Keep = {EEG.event.epoch};
             Epochs_to_Keep = unique([Epochs_to_Keep{IdxKeep}]);

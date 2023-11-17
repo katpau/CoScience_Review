@@ -3,32 +3,18 @@
 This Repository contains all Preprocessing and Analytical functions used in in the CoScience Project
 
 
+## How to review my code?
 
-## How to run the test?
+***To Run the Test, Step by Step:***
 
-***To Run the Test, across all forking options:***
+in Folder **Testing_Scripts** are the different files prepared, go there and follow the instructions.
 
-run **TEST_RDF.m** for the preprocessing
+run **TEST_Preproc_xxx.m** for the preprocessing
 
-run **TEST_RDF_Stats.R** for the statistical analyses
-
-!! You do not need to run the Preprocessing before the Statistics. Example Files are added.
-
-
-***Change the Analysis Name to what analysis you want to test***
- * Alpha_Resting (Cassie)
- * Alpha_Context (Kat)
- * Error_MVPA (Elisa, Jutta)
- * Flanker_Conflict (Corinna, Christoph, Alex)
- * Gambling_RewP (Anja, Hannes, Kai)
- * Gambling_N300H (Erik, Phillip)
- * GoNoGo_Conflict (Andre, Vera)
- * Ultimatum_Offer (Jojo, Johannes)
-
-## Can I run the code line by line if I suspect something is wrong?
-Yes, please use the **Troubleshooting_RDF_** scripts for this. It is explained there how to use it.
+run **TEST_Stats_xxx.R** for the statistical analyses
 
 !! You do not need to run the Preprocessing before the Statistics. Example Files are added.
+
 
 
 
@@ -46,7 +32,28 @@ And a bit of practical information on how to deal with this code here is collect
 
 
 
+## How to run the test across all forking options?
 
+***To Run the Test, across all forking options:***
+
+run **TEST_RDF.m** for the preprocessing
+
+run **TEST_RDF_Stats.R** for the statistical analyses
+
+!! You do not need to run the Preprocessing before the Statistics. Example Files are added.
+
+
+
+
+***Change the Analysis Name to what analysis you want to test***
+ * Alpha_Resting (Cassie)
+ * Alpha_Context (Kat)
+ * Error_MVPA (Elisa, Jutta)
+ * Flanker_Conflict (Corinna, Christoph, Alex)
+ * Gambling_RewP (Anja, Hannes, Kai)
+ * Gambling_N300H (Erik, Phillip)
+ * GoNoGo_Conflict (Andre, Vera)
+ * Ultimatum_Offer (Jojo, Johannes)
 
 ## More Details
 

@@ -39,7 +39,7 @@ Covariate = function(input = NULL, choice = NULL) {
   #########################################################
   # load correct file, these files have been created separately
   
-  QuestFolder = input$stephistory["Root_Personality"]
+  QuestFolder = input$stephistory[["Root_Personality"]]
   if (Attention_Checks_Personality_choice == "Applied") {
     if (Outliers_Personality_choice == "None") {
       QuestionnaireFile = "Personality-Scores-filtered_outliers-notremoved.csv"

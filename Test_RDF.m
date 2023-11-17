@@ -2,11 +2,12 @@
 % this is only for testing, since the analysis is done on HUMMEL (UHH
 % server) and SLURM (Job scheduler parallelizing across subjects)
 
-AnalysisName = "Alpha_Context"
+AnalysisName = "Error_GMA";
 % choice from: 
 % * Alpha_Resting (Cassie)
 % * Alpha_Context (Kat)
 % * Error_MVPA (Elisa)
+% * Error_GMA (Olaf)
 % * Flanker_Conflict (Corinna)
 % * Gambling_RewP (Anja)
 % * Gambling_N300H (Erik)
@@ -33,6 +34,12 @@ switch AnalysisName
         MatlabAnalysisName = "Flanker_MVPA";
         MaxStep = "16";
         Step_Functions_To_Add = ["Epoching_Tasks", "Quantification_MVPA"];
+
+    case "Error_GMA" 
+        ImportedTask = "GoNoGo"; % Flanker or GoNoGo
+        MatlabAnalysisName = "GoNoGo_GMA"; % Flanker_GMA or GoNoGo_GMA
+        MaxStep = "19";
+        Step_Functions_To_Add = ["Epoching_Tasks", "Quantification_GMA"];
         
     case "Flanker_Conflict" 
         ImportedTask = "Flanker";
@@ -79,13 +86,18 @@ end
 
 % Get path of this master file and add it to current directory.
 % Allows easy running of this script
-[RootFolder] = fileparts(matlab.desktop.editor.getActiveFilename);
-RootFolder = strcat(RootFolder,'/');
+
+% [ocs] Using 'matlab.desktop.editor.getActiveFilename' could be confusing, as
+% another file might be open in the editor. Instead, we use the file name of the
+% script currently running.
+RootFolder = fileparts(mfilename('fullpath'));
+RootFolder = strcat(RootFolder, '/');
 addpath(RootFolder)
 
 % Following inputs are flexible (use example of Alpha in different Contexts)
-SubjectToTest = "sub-AM04EN20"; % Name of Subject to run, is actually based on Subjects in Raw Data
+SubjectToTest = "sub-AA06WI11"; % Name of Subject to run, is actually based on Subjects in Raw Data
 % Alternative "sub-AU06EL20", "sub-AA06WI11"
+% All: sub-AA06WI11	sub-AG04EN28	sub-AG05AS29	sub-AH17AR05	sub-AHSAER12	sub-AM04EN20	sub-AU06EL20	sub-CH05ER25	sub-ER05EL09
 DesignFile = "DESIGN"; % Name of .mat file including overview of all Steps (in correct order) and their choices and conditional Statements
 ForkingFile = "FORKS"; % name of .mat file including List of Forks to be run in verbose format (name of choices separated by %)
 
@@ -110,10 +122,21 @@ writetable(table(ForkingFile),ListFile, 'WriteVariableNames',0);
 
 % Add Relevant Paths including predefined functions and eeglab functions
 addpath(strcat(RootFolder, "Parfor_Functions/"))
-addpath(genpath(strcat(RootFolder, "Analysis_Functions/")))
-rmpath(genpath(strcat(RootFolder, "Analysis_Functions/eeglab2022.0")))
-cd(strcat(RootFolder, "Analysis_Functions/eeglab2022.0"))
-eeglab
+
+% Add Analysis Functions
+% [ocs] Remove EEGLAB paths and let it handle its paths
+afPaths = genpath(strcat(RootFolder, "Analysis_Functions/"));
+afSplit = strsplit(afPaths, ':');
+% Remove all subfolders of eeglab2022
+afSplit = afSplit(cellfun(@(x) ~contains(x, ['eeglab2022.0', filesep]), afSplit));
+addpath(strjoin(afSplit, ':'));
+
+% A simple (not robust) check, if EEGLAB was initialized (i.e., added its
+% /functions subpath.
+if ~contains(path, 'eeglab2022.0/functions')
+    eeglab('nogui');
+end
+
 % Add Paths relevant for the Preprocessing of this specific Analysis (some
 % analyses differ in their choices and oiptions)
 Step_Functions_To_Add = ["Preprocessing_All", Step_Functions_To_Add];
@@ -126,20 +149,20 @@ end
 % other inputs that forking function takes, to manage parallelisation
 IndexSubjectsSubset = "1"; % if multiple Forking Files are listed in the csv file, index which one should be run (here always 1)
 RetryError="0" ; % usually, if error ocurrs, stop step and all combinations that include that fork. if errors should be retried, change here to "1"
-ParPools="3"; % how many parallel instances can be run
+ParPools="6"; % how many parallel instances can be run
 PrintLocation = "0"; % some lines can be printed to console to make it easier to navigate errors (change to "1" if desired)
 
 
-parfor_Forks(IndexSubjectsSubset,      ListFile,  DesignFile, ForkingFile, OutputFolder, ...
-    RawFolder, MatlabAnalysisName, MaxStep,    RetryError, LogFolder, ParPools, PrintLocation)
+% parfor_Forks(IndexSubjectsSubset,      ListFile,  DesignFile, ForkingFile, OutputFolder, ...
+%     RawFolder, MatlabAnalysisName, MaxStep,    RetryError, LogFolder, ParPools, PrintLocation)
 
 
 % if only Main Path needs to be run comment out call parfor_Forks above and
 % use this instead
 
-%SubjectListFile=strcat(RootFolder, "Only_ForGit_To_TestRun/ForkingFiles/", AnalysisName, "/List_Subjects-Main.csv");
-%parfor_MainPath(IndexSubjectsSubset, SubjectListFile, DesignFile, ForkingFile, OutputFolder, ...
-%    RawFolder, MatlabAnalysisName, "10", RetryError, LogFolder, ParPools, PrintLocation)
+SubjectListFile=strcat(RootFolder, "Only_ForGit_To_TestRun/ForkingFiles/", AnalysisName, "/List_Subjects-Main.csv");
+parfor_MainPath(IndexSubjectsSubset, SubjectListFile, DesignFile, ForkingFile, OutputFolder, ...
+   RawFolder, MatlabAnalysisName, "10", RetryError, LogFolder, ParPools, PrintLocation)
 
 
 % CS: comment for testing commits

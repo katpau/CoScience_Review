@@ -49,19 +49,19 @@ RT = function(input = NULL, choice = NULL) {
   RT_Data = BehavData %>%
     group_by(ID, Condition_Instruction) %>%
     summarise(Behav_RT = mean(RT),
-              OrderInstr = Order_Instruction) 
+              OrderInstr = Order_Instruction[1]) 
   
   } else if (choice == "trimmedAV") {
     RT_Data = BehavData %>%
       group_by(ID, Condition_Instruction) %>%
       summarise(Behav_RT = mean(RT, trim = 0.05),# lowest and highest 5 %
-                OrderInstr = Order_Instruction) 
+                OrderInstr = Order_Instruction[1]) 
     
   } else if (choice == "Median") {
     RT_Data = BehavData %>%
       group_by(ID, Condition_Instruction) %>%
       summarise(Behav_RT = median(RT),
-                OrderInstr = Order_Instruction) 
+                OrderInstr = Order_Instruction[1]) 
   }
   
   #########################################################

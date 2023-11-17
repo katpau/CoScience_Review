@@ -34,9 +34,9 @@ function  OUTPUT = Cluster_Electrodes(INPUT, Choice);
 % Order determines when it should be run.
 StepName = "Cluster_Electrodes";
 Choices = ["no_cluster", "cluster"]; 
-Conditional = ["NaN", "Reference ~= ""CSD"" && contains(Electrodes, ""F5"") "]; % F5 indicates that more than 1 channel was used at one hemisphere
+Conditional = ["NaN", "Reference ~= ""CSD"" "]; 
 SaveInterim = logical([0]); 
-Order = [19]; 
+Order = [18]; 
  
 %****** Updating the OUTPUT structure ****** 
 INPUT.StepHistory.Cluster_Electrodes = Choice; 

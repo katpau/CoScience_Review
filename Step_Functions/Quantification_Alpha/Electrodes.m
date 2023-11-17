@@ -37,7 +37,7 @@ StepName = "Electrodes";
 Choices = ["F3,F4", "F3,F4,F5,F6,AF3,AF4", "F3,F4,P3,P4", "F3,F4,F5,F6,AF3,AF4,P3,P4,P5,P6,PO3,PO4"]; 
 Conditional = ["Cluster_Electrodes == ""no_cluster"" ", "NaN", "Cluster_Electrodes == ""no_cluster"" ", "NaN"]; 
 SaveInterim = logical([0]); 
-Order = [18]; 
+Order = [19]; 
  
 %****** Updating the OUTPUT structure ****** 
 INPUT.StepHistory.Electrodes = Choice; 

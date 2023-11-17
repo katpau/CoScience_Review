@@ -61,18 +61,18 @@ try
     
     % epoch data
     for i_Cond = 1:NrConditions
-        (Condition_Names(i_Cond))
+        %Condition_Names(i_Cond)
         pop_epoch(EEG, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');     
     end
 
    % epoch lrp data
    for i_Cond = 1:NrConditions
-        (Condition_Names(i_Cond))
+        %Condition_Names(i_Cond)
         pop_epoch(LRP, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');     
     end
     
     % run first-level lrp and mvpa analyses    
-     addpath(genpath(strcat(pwd, "/Analysis_Functions/Error_MVPA/")))
+   %  addpath(genpath(strcat(pwd, "/Analysis_Functions/Error_MVPA/")))
     
     % Create vector containing the response types
     events = struct2table(EEG.event);
@@ -223,7 +223,7 @@ try
     EEG_mvpa = pop_select(EEG, 'nochannel', rm_chan_names); %remove channels from EEG structure
     EEG_mvpa.chaninfo.additional_chans_removed = rm_chan_names;
 
-    if length(EEG_mvpa.data(:,1,1)) ~= size(common_channels)
+    if length(EEG_mvpa.data(:,1,1)) ~= size(common_channels,1)
         fprintf('The number of channels does not equal the requested number of common channels. Continuing with next participant.');
         e.message = "Wrong number of channels.";
         error(e.message);
@@ -364,7 +364,7 @@ try
         num2cell(ACC)]; % add other
     OUTPUT.Export = Export;
     
-    rmpath(genpath(strcat(pwd, "/Analysis_Functions/Error_MVPA/")))
+    % rmpath(genpath(strcat(pwd, "/Analysis_Functions/Error_MVPA/")))
     
     % ****** Updating the OUTPUT structure ******
     % No changes should be made here.
