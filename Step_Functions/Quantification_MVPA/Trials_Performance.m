@@ -53,21 +53,24 @@ function OUTPUT = Trials_Performance(INPUT, Choice)
     EXCL_POST = {'post_error', 'post_slow_correct', 'post_slow_error'};
 
     try % For Error Handling, all steps are positioned in a try loop to capture errors
+    
+    
 
         Conditions = fieldnames(INPUT.data);
         for i_cond = 1:length(Conditions)
             % Get EEGlab EEG structure from the provided Input Structure
             EEG = INPUT.data.(Conditions{i_cond});
-
+            
             %#####################################################################
             %### Start Preprocessing Routine                               #######
             %#####################################################################
-
+            
             % EARLY EXIT if not epoched
             if isempty(EEG.epoch)
                 error("Data is not epoched.");
-            end
-
+            end  
+            
+            
             if ~strcmp(Choice, "None")
 
                 postValid = true(1, length(EEG.epoch));
@@ -75,15 +78,17 @@ function OUTPUT = Trials_Performance(INPUT, Choice)
                     postValid = cellfun(@(x) ~isempty(x) && ...
                         ~any(contains(EXCL_POST, x{1})), ...
                         {EEG.epoch.eventPost_Trial});
+                        
                 end
 
                 % % Mark Trials with RTs faster than 0.1 and slower than 0.8s
                 rtValid = cellfun( ...
                     @(x) ~isempty(x) && x{1} > 0.1 && x{1} < 0.8, {EEG.epoch.eventRT});
-
+                    
+                    
                 % Combine Indices
                 validEpochs = postValid & rtValid;
-
+   
                 if all(~validEpochs)
                     error("No trials could be matched.");
                 elseif all(validEpochs)
@@ -91,10 +96,13 @@ function OUTPUT = Trials_Performance(INPUT, Choice)
                 else
                     validEpochIdx = find(validEpochs);
                     EEG = pop_select(EEG, 'trial', validEpochIdx);
+                    
                 end
-                OUTPUT.data.EEG = EEG;
+                OUTPUT.data.(Conditions{i_cond}) = EEG;
             end
         end
+        
+ 
 
         % ****** Error Management ******
     catch e
