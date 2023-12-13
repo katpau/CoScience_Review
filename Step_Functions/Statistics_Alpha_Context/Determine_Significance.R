@@ -119,10 +119,11 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     # Test Direction
     if (!SaveUseModel == "exportModel") {
-      if(!is.character(ModelResult) &&  any(!grepl( "Error", ModelResult))) {
-        if(!is.na(ModelResult$value_EffectSize)){
+      if (!DirectionEffect$Effect == "notdirected") {
+      if (!is.character(ModelResult) &&  any(!grepl( "Error", ModelResult))) {
+        if (!is.na(ModelResult$value_EffectSize)) {
       ModelResult = test_DirectionEffect(DirectionEffect, Subset, ModelResult) 
-    }}}
+    }}} }
     
     return(ModelResult)
   }
@@ -215,8 +216,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   collumns_to_keep = c("Condition1", Covariate_Name, additional_Factors_Name)  
   Effect_of_Interest = "Condition1"
   DirectionEffect = list("Effect" = "main",
-                         "Larger" = c("Condition1", "0"),
-                         "Smaller" = c("Condition1", "50"))
+                         "Larger" = c("Condition1", "50"),
+                         "Smaller" = c("Condition1", "0"))
   
   H1.1_Mag = wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
                                DirectionEffect, collumns_to_keep, Task, AnalysisPhase)
@@ -570,14 +571,14 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   # Test for Rating only
   Effect_of_Interest = c(Behavior_Name[grepl("Pleasure", Behavior_Name)], Personality_Name)
-  DirectionEffect = "notdirected"
+  DirectionEffect = list("Effect" = "notdirected")
   H2.4_prepRating = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
                                         DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.4_Model) 
   
   # Test for Condition * Rating
   # Test for Rating only
   Effect_of_Interest = c(Behavior_Name[grepl("Pleasure", Behavior_Name)], Personality_Name, "Condition1")
-  DirectionEffect = "notdirected"
+  DirectionEffect = list("Effect" = "notdirected")
   H2.4_prepRatingCond = wrap_test_Hypothesis( Name_Test,lm_formula, output, Effect_of_Interest, 
                                           DirectionEffect, collumns_to_keep, Task, AnalysisPhase, "previousModel", H2.4_Model) 
   

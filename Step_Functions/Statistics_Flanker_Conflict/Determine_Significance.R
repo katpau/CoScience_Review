@@ -50,8 +50,6 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   # CK: covariates to be added to the LMM (in the following way)see test_Hypotheses)
-  
-  
   # Get possible additional factors to be included in the GLM (depends on the forking
   # these have been determined at earlier step (Covariate) when determining the grouping variables)
   additional_Factors_Name = input$stephistory[["additional_Factors_Name"]]
@@ -99,7 +97,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                                                                     "SME", "EEG_Signal", columns_to_keep)])
     
     # Run Test
-    ModelResult = test_Hypothesis_CK( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided, lmFamily)
+    ModelResult = test_Hypothesis_CK( Name_Test,lm_formula, Subset, columns_to_keep, Effect_of_Interest, SaveUseModel, ModelProvided, lmFamily)
     
     # Test Direction ??? 
     if (!SaveUseModel == "exportModel") {
@@ -118,19 +116,26 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # Dispositional CEI relates to behavioral indices    ####
   # Above and beyond Intelligence                      ####
   #########################################################
-  for (control_IST in c("", "_withIST")) {
+  for (control_Block in c("", "_withBlock")) {
     for (BehavDV in c("RT", "ACC")) {
+      for (control_IST in c("", "_withIST")) {
+
  
     print(paste("Test Effect on ", BehavDV))
       if (control_IST == "_withIST") {
         lm_formula =   paste( BehavDV, " ~ (( Congruency * Personality_CEI) + IST ) ", Covariate_Formula)
         columns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, BehavDV, "Congruency_notCentered", 
-                            "Block", "Trial", "IST")        
+                            "IST")        
       } else {
     lm_formula =   paste( BehavDV, " ~ (( Congruency * Personality_CEI) ) ", Covariate_Formula)
-    columns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, BehavDV, "Congruency_notCentered", 
-                        "Block", "Trial")
+    columns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, BehavDV, "Congruency_notCentered")
       }
+      
+      if (control_Block == "_withBlock") {
+        columns_to_keep = c(columns_to_keep, "Block" )
+        lm_formula = paste(lm_formula, "+ Block")
+      }
+      
     Effect_of_Interest = c("Personality_CEI")
     Effect_of_Interest_IA = c("Personality_CEI", "Congruency")
     DirectionEffect = list("Effect" = "correlation",
@@ -143,6 +148,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                               "DV" = BehavDV)
     
     if (BehavDV == "ACC") { lmFamily  = "binominal"} else {lmFamily = "standard" }
+    
     H_1_Model = wrap_test_Hypothesis("",lm_formula, output,
                                      "",  "", 
                                      columns_to_keep, "Behav",
@@ -207,38 +213,16 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest_IA,
                                                       DirectionEffect_IA, columns_to_keep, DV,
                                                       "previousModel", H_4_Model)  )
-  }}
+  }}}
   
-  
-  
-  # TO DO??????
-  # CK: additionally both models can be compared by criterions like (R², AIC)
-  # or by model comparison with test for deviances via ANOVA
-  #anova(m1., m2)
-  # m1 = model of Hypothesis 1+2
-  # m2 = model with fluid intelligence as additional predictor Hypothesis 3
-  # the smaller the deviance the better fits the model
-  # significance examination  
-  
-  
-  
-  # TO DO??????
-  ## 1 Null model to calculate intra-class correlation
-  #m0 <- lmer(EEG_Signal ~ 1 + (1 | ID), data = Subset)  
-    # criterion = RT, FMT, N2, P3 
-    # data = data frame for each criterion containing the respective trial by trial data (cf. test_Hypothesis.R) as subset of main data frame
-  
-  # intraclass correlation (ICC) = random intercept variance / (random intercept variance + residual variance)
-  #var_m0 <- as.data.frame(VarCorr(m0))
-  #var_m0$vcov[1] / (var_m0$vcov[1] + var_m0$vcov[2])
   
 
-  # TO DO?????
-  ## Exploratory: controlling for block and nesting in lab
-  #m1e <- lmer(criterion ~ demand.cwc * CEI.cgm + electrode.cwc + block.cwc
-  #            # + fluidIntelligence.cgm                                     # for m2e
-  #            + (demand.cwc | labID / ID), data = sub.df)
   
+  
+  ######################################################################################
+  ### INTERLAB VARIANCE?
+  ## !! Control for Lab is not done for all forking paths => manually add for main path
+  ######################################################################################
   
   
   
@@ -261,10 +245,9 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   Cors_Estimates = cbind(
     c("Correlation_LE_NFC", "Correlation_LE_CEI", "Correlation_CEI_NFC")  ,
     "pearsonR", "r",
-    Cors$ci$r,Cors$ci$lower, Cors$ci$upper, p_s,
-    matrix(data=NA,nrow=3,ncol=7),
+    Cors$ci$r, Cors$ci$lower, Cors$ci$upper, p_s,
     nrow(Subset),
-    matrix(data=NA,nrow=3,ncol=7))
+    matrix(data=NA,nrow=3,ncol=26))
   colnames(Cors_Estimates) = colnames(Estimates)
   Estimates = rbind(Estimates,Cors_Estimates)
                  
