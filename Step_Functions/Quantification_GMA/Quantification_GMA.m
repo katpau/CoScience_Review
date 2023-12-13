@@ -196,7 +196,7 @@ function OUTPUT = Quantification_GMA(INPUT, Choice)
 
                 % TIME WINDOW of interest, relative to the epoch in samples
                 sampleWin = round((timeWin / 1000 - ERP.xmin) * srate + 1);
-                winLength = sampleWin(2) - sampleWin(1) + 1;
+                winLength = sampleWin(2) - sampleWin(1);
 
                 % Indices of present channels
                 outIdx = (iResp - 1) * nElectrodes + chPresent;

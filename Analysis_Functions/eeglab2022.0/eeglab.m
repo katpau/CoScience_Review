@@ -1015,10 +1015,11 @@ else
                 % special case of subfolder for Fieldtrip
                 % ---------------------------------------
                 if ~isempty(findstr(lower(dircontent(index).name), 'fieldtrip'))
-                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'compat') , 'electrodenormalize' );
-                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'forward'), 'ft_sourcedepth.m');
-                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'utilities'), 'ft_datatype.m');
-                    addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'plotting'), 'ft_plot_mesh.m');
+                    % [ocs] Skip adding fieldtrip removed folders
+                    % addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'compat') , 'electrodenormalize' );
+                    % addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'forward'), 'ft_sourcedepth.m');
+                    % addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'utilities'), 'ft_datatype.m');
+                    % addpathifnotexist( fullfile(dircontent(index).folder, dircontent(index).name, 'plotting'), 'ft_plot_mesh.m');
                     ptopoplot  = fileparts(mywhich('cbar'));
                     ptopoplot2 = fileparts(mywhich('topoplot'));
                     if ~isequal(ptopoplot, ptopoplot2)
