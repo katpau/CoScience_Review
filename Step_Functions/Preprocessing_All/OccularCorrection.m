@@ -101,7 +101,10 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                     % some labs did not record VOGabove, so use FP1 instead
                     if length(VEOG_Chans)<2
                         VEOG_Chans = find(contains({EEG.chanlocs.labels}, {'FP1', 'VOGbelow'}));
-                    end                
+                    end       
+                    if length(VEOG_Chans)<2 % some subjects no VEOGs at all
+                        error("Only one or less VEOG channels in the data")
+                    end
                     
                     badApple = APPLE_corr(EEG_fil, VEOG_Chans);
                     badIC = sort(unique([badApple.BlinkTemplate_badIC(:), badApple.VEOG_badIC(:)']));
@@ -146,6 +149,9 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 % some labs did not record VOGabove, so use FP1 instead
                 if length(VEOG_Chans)<2
                     VEOG_Chans = find(contains({EEG.chanlocs.labels}, {'FP1', 'VOGbelow'}));
+                end
+                if length(VEOG_Chans)<2 % some subjects no VEOGs at all
+                    error("Only one or less VEOG channels in the data")
                 end
                 
                 % Determine EEG Channels that are corrected, VEOG channels are removed

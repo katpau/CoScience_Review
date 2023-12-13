@@ -1,5 +1,5 @@
-Outliers_RT = function(input = NULL, choice = NULL) {
-  StepName = "Outliers_RT"
+Outliers_Behav = function(input = NULL, choice = NULL) {
+  StepName = "Outliers_Behav"
   Choices = c("Applied", "None")
   Order = 9.3
   output = input$data
@@ -23,7 +23,7 @@ Outliers_RT = function(input = NULL, choice = NULL) {
   Threshold = input$stephistory[["Outliers_Threshold"]]
   Treatment = input$stephistory[["Outliers_Treatment"]]
   
-  if (choice == "Applied"){
+if (choice == "Applied"){
     
     # Set up outlier function based on Choice on Thresholds, takes the corresponding values (central tendency, width),
     # returns 0&1, 1 for the values exceeding the acceptable range
@@ -50,27 +50,25 @@ Outliers_RT = function(input = NULL, choice = NULL) {
     #########################################################
     # (2) Identify Outliers 
     #########################################################
-    # for RT, only one value per Task and Subject should be used
-    # select only relevant columns and drop duplicates
-    output_RT = output[,c("ID", "Condition", "Task", "Behav_RT")] 
-    output_RT = output_RT[!is.na(output_RT$Behav_RT), ]
-    output_RT = output_RT[!duplicated(output_RT), ]
+    # select only relevant rows
+    output_Behav = output[output$Component == "RTDiff"| output$Component == "post_ACC",
+                       c("ID", "Condition", "Task", "Behav", "Component",
+                         "Experimenter", "Lab", "TaskPerf",
+                         names(output)[grepl("Covariate_|Personality", names(output))])] 
+
     
-    
-    output_RT_outlier = output_RT %>%
-      group_by(Condition, Task) %>%
-      summarise(Outliers_RT = outlierfunction(Threshold, Behav_RT, 0),
+    # Define outliers separately for Task, Condition and Component
+    output_Behav_outlier = output_Behav %>%
+      group_by(Condition, Task, Component) %>%
+      summarise(Outliers_Behav = outlierfunction(Threshold, Behav, 0),
                 ID = ID) %>%
       ungroup()
     
-    
-    # merge with full dataset
-    output =  merge(    output, 
-                        output_RT_outlier,
-                        by = c("ID", "Condition", "Task" ),
-                        all.x = TRUE,    all.y = FALSE )
-    
-    
+    # merge with behavior table
+    output_Behav =  merge(output_Behav,    
+                          output_Behav_outlier,
+                          by = c("Condition", "Task", "ID", "Condition", "Component"),   
+                          all.x = TRUE,    all.y = FALSE )
     
     
     #########################################################
@@ -78,30 +76,32 @@ Outliers_RT = function(input = NULL, choice = NULL) {
     #########################################################
     if (Treatment == "Replace" ){
       # Save Min/Max in collumn for later
-      MinMax = output_RT %>%
-        group_by(Condition, Task)%>%
-        do(outlierfunction(Threshold, .$Behav_RT, 1))%>%
+      MinMax = output_Behav %>%
+        group_by(Condition, Task, Component)%>%
+        do(outlierfunction(Threshold, .$Behav, 1))%>%
         ungroup()
       
       
       # merge with output
-      output =  merge(output,    
+      output_Behav =  merge(output_Behav,    
                       MinMax,
-                      by = c("Condition", "Task"),   
+                      by = c("Condition", "Task", "Component"),   
                       all.x = TRUE,    all.y = FALSE )
       
-      ExceedMin = which(output$Behav_RT<output$Min)
-      ExceedMax = which(output$Behav_RT>output$Max)
-      output$Behav_RT[ExceedMin] =   output$Min[ExceedMin]
-      output$Behav_RT[ExceedMax] =   output$Max[ExceedMax]
+      ExceedMin = which(output_Behav$Behav<output_Behav$Min)
+      ExceedMax = which(output_Behav$Behav>output_Behav$Max)
+      output_Behav$Behav[ExceedMin] =   output_Behav$Min[ExceedMin]
+      output_Behav$Behav[ExceedMax] =   output_Behav$Max[ExceedMax]
       
       # Exclude Value
     } else {
-      output$Behav_RT[as.logical(output$Outliers_RT)] = NA  }
+      output_Behav$Behav[as.logical(output_Behav$Outliers_Behav)] = NA
+      output_Behav$Behav[as.logical(output_Behav$Outliers_Behav)] = NA 
+      }
     
-    
-    # Remove collumns
-    output = output[,!names(output) %in% c("Outliers_RT",  "Min", "Max")]
+    # Merge with EEG Dataframe
+    output = bind_rows (output[!(output$Component == "RTDiff"| output$Component == "post_ACC"),],
+              output_Behav[, names(output_Behav) %in% names(output)])
     
   }
   

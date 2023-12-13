@@ -1,5 +1,5 @@
-Select_Trials_RT = function(input = NULL, choice = NULL) {
-  StepName = "Select_Trials_RT"
+Select_TrialsRT = function(input = NULL, choice = NULL) {
+  StepName = "Select_TrialsRT"
   Choices = c("RTs", "all")
   Order = 9.1
   output = input$data

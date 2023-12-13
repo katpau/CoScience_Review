@@ -19,7 +19,7 @@ Center = function(input = NULL, choice = NULL) {
     if (input$stephistory["Covariate"] != "None" & !grepl("Gender", input$stephistory["Covariate"])) {
     # this is done across all subjects and there should be only one value per Subject when normalizing
     Relevant_Collumns =  names(output)[grep(c("Covariate_"), names(output))]
-    Personality = unique(output[,c("ID", Relevant_Collumns )])
+    Personality = output[,c("ID", Relevant_Collumns )] %>% distinct
     # Remove from output file
     output = output[,-which(names(output) %in% Relevant_Collumns)]
     

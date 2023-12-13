@@ -112,8 +112,10 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     # Test Direction
     if (!SaveUseModel == "exportModel") {
-      ModelResult = test_DirectionEffect(DirectionEffect, Subset, ModelResult) 
-    }
+      if(!is.character(ModelResult) &&  any(!grepl( "Error", ModelResult))) {
+        if(!is.na(ModelResult$value_EffectSize)){
+          ModelResult = test_DirectionEffect(DirectionEffect, Subset, ModelResult) 
+        }}}
     
     return(ModelResult)
   }
@@ -186,7 +188,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # To be added Worry ~ Instruction  * only NoGo N2   (? or t-tests?)
   print("Test Effect of N2 and Instruction on Worry")
   Name_Test = c("Worry_Instruction_N2")
-  lm_formula =   paste( "StateAnxiety ~ ( Condition_Instruction  * EEG_Signal)", Covariate_Formula)
+  lm_formula =   paste( "StateAnxiety ~ ( Condition_Instruction  * EEG_Signal)", Covariate_Formula, additional_Factor_Formula)
   collumns_to_keep = c("Condition_Instruction", "EEG_Signal", "StateAnxiety", Covariate_Name, additional_Factors_Name) 
   Component = "N2"
   Condition_Type = c("Diff")

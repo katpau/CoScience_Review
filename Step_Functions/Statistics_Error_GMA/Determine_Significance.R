@@ -58,11 +58,12 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   additional_Factors_Name = "Electrode"
   additional_Factor_Formula = "+ Electrode"
   
-  
+  # merge GMA and Component collumn
+  output$Component[output$Component == "Ne/c"] = as.character(output$GMA_Measure[output$Component == "Ne/c"])
   #########################################################
   # (2) Initiate Functions for Hypothesis Testing
   #########################################################
-  wrap_test_Hypothesis = function (Name_Test,lm_formula,  Data, GMA_Measure, Task, Effect_of_Interest, DirectionEffect,
+  wrap_test_Hypothesis = function (Name_Test,lm_formula,  Data, Component, Task, Effect_of_Interest, DirectionEffect,
                                    columns_to_keep,   SaveUseModel, ModelProvided) {
     # wrapping function to parse specific Information to the test_Hypothesis Function
     # Does three things: (1) Select Subset depending on Conditions and Tasks ans Analysis Phase
@@ -95,9 +96,9 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     
     # Create Subset
-    Subset = Data[Data$GMA_Measure == GMA_Measure &
+    Subset = Data[Data$Component == Component &
                     Data$Task == Task,
-                  names(Data) %in% c("ID", "Epochs", "SME", "EEG_Signal", "Lab", columns_to_keep)]
+                  names(Data) %in% c("ID", "Lab", "Epochs", "SME", "Component", columns_to_keep)]
     
     # Run Test
     ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)
@@ -117,7 +118,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   #########################################################
   Names_GMA = c("rate",   "excess" ,"shape"  ,"skewness"  , "inflection1", "scaling", "inflection2")
   GMA_colnames = c("rate",   "excess" ,"shape"  ,"skew"  , "ip1_ms", "yscale", "ip2_ms")
-  columns_to_keep = c("Condition", Covariate_Name, additional_Factors_Name,  "GMA_Measure")
+  columns_to_keep = c("Condition", Covariate_Name, additional_Factors_Name,  "GMA_Measure", "EEG_Signal")
   Effect_of_Interest = "Condition"
   lm_formula =   paste( "EEG_Signal ~  Condition ", Covariate_Formula, additional_Factor_Formula)
   # Electrode Fix or possible?
@@ -153,12 +154,12 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   #########################################################
   
   for (i_Personality in c("Personality_MPS_PersonalStandards","Personality_MPS_ConcernOverMistakes")) {
-    columns_to_keep = c("Condition", Covariate_Name, i_Personality, additional_Factors_Name,  "GMA_Measure")
+    columns_to_keep = c("Condition", Covariate_Name, i_Personality, additional_Factors_Name, "EEG_Signal")
     
-    DirectionEffect_IA = list("Effect" = "correlation",
+    DirectionEffect_Main = list("Effect" = "correlation",
                               "Personality" = i_Personality)
     
-    DirectionEffect_Main = list("Effect" = "interaction_correlation",
+    DirectionEffect_IA = list("Effect" = "interaction_correlation",
                                 "Larger" = c("Condition", "error"),
                                 "Smaller" = c("Condition", "correct"),
                                 "Personality" = i_Personality)
@@ -166,10 +167,11 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     lm_formula =   paste( "EEG_Signal ~  Condition * ", i_Personality,  Covariate_Formula, additional_Factor_Formula)
     
    for (i_GMA in 1:length(Names_GMA)) {
+     
     for (i_task in c("GoNoGo", "Flanker")) {
 
       print(paste("Test ", i_Personality, i_task, Names_GMA[i_GMA]))
-      Name_Test = paste0(i_Personality, Names_GMA[i_GMA], "_", i_task)
+      Name_Test = paste0(i_Personality, "_", Names_GMA[i_GMA], "_", i_task)
 
       
       Model = wrap_test_Hypothesis("",lm_formula, output, GMA_colnames[i_GMA], i_task,
@@ -194,11 +196,40 @@ Determine_Significance = function(input = NULL, choice = NULL) {
 }
   
   
+  #########################################################
+  # (5) Personality Effect on Behaviour
+  #########################################################
+  Estimates_behav = data.frame()
+  for (i_Personality in c("Personality_MPS_PersonalStandards","Personality_MPS_ConcernOverMistakes")) {
+    columns_to_keep = c("Condition", Covariate_Name, i_Personality,  "Behav")
+    
+    DirectionEffect_Main = list("Effect" = "correlation",
+                                "Personality" = i_Personality,
+                                "DV" = "Behav")
+    
+    lm_formula =   paste( "Behav ~  Condition * ", i_Personality,  Covariate_Formula)
+    
+    for (i_Behav in c("RTDiff", "post_ACC")) {
+      for (i_task in c("GoNoGo", "Flanker")) {
+        
+        print(paste("Test ", i_Personality, i_task, i_Behav))
+        Name_Test = paste0(i_Personality, "_", i_Behav, "_", i_task)
+        
+        
+        Estimates_behav = rbind(Estimates_behav,
+                          wrap_test_Hypothesis(paste0("Main_", Name_Test),
+                                     lm_formula, output, i_Behav, i_task,
+                                     i_Personality,
+                                     DirectionEffect_Main, columns_to_keep))
+  
+      }}
+  }
+  
   
   
   
   #########################################################
-  # (5) Correct for Multiple Comparisons for Hypothesis 1
+  # (6) Correct for Multiple Comparisons for Hypothesis 1
   #########################################################
   for (i_task in c("GoNoGo", "Flanker")) {
     for (i_Test in c("Accuracy", "Main|Interaction")) {
@@ -210,7 +241,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
       
     }
   }
-  
+  # Add behavioural ones without correction?
+  Estimates = rbind(Estimates, Estimates_behav)
   
   #########################################################
   # (6) Export as CSV file

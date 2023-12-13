@@ -53,43 +53,56 @@ function OUTPUT = Reference(INPUT, Choice)
             % Get EEGlab EEG structure from the provided Input Structure
             EEG = INPUT.data.(Conditions{i_cond});
 
-            % Add old reference back to signal
             prevRef = INPUT.StepHistory.Reference_AC;
-            if ~strcmp(prevRef, "CAV")
-                if strcmp(prevRef, "Cz")
-                    RefInfo = {'CZ', -0, 0, 0, 0, 1, 0, 90, 1, 'EEG'};
-                    ChanlocFields = fields(EEG.chanlocs);
-                    for ifield = 1:10
-                        EEG.chanlocs(EEG.nbchan + 1).(ChanlocFields{ifield}) = RefInfo{ifield};
-                    end
+            % No Change for Mastoids needed
+            if ~(strcmp(prevRef, "Mastoids") && strcmpi(Choice, "Mastoids"))
 
-                elseif strcmp(prevRef, "Mastoids")
-                    RefInfo = {'MASTr', 108, 0.578, -0.307, -0.946, -0.25, -108, -14.1, 1.03, 'EEG'; ...
-                        'MASTl', -108, 0.578, -0.307, 0.946, -0.25, 108, -14.1, 1.03, 'EEG'};
-                    ChanlocFields = fields(EEG.chanlocs);
-                    for ifield = 1:10
-                        EEG.chanlocs(EEG.nbchan + 1).(ChanlocFields{ifield}) = RefInfo{ifield};
-                        EEG.chanlocs(EEG.nbchan + 2).(ChanlocFields{ifield}) = RefInfo{ifield};
+                if ~strcmp(prevRef, "CAV")
+                    % Add old reference back to signal when not CAV
+                    if strcmp(prevRef, "Cz")
+                        RefInfo = {'CZ', -0, 0, 0, 0, 1, 0, 90, 1, 'EEG'};
+                        ChanlocFields = fields(EEG.chanlocs);
+                        for ifield = 1:10
+                            EEG.chanlocs(EEG.nbchan + 1).(ChanlocFields{ifield}) = RefInfo{ifield};
+                        end
+    
+                    elseif strcmp(prevRef, "Mastoids")
+                        RefInfo = {'MASTr', 108, 0.578, -0.307, -0.946, -0.25, -108, -14.1, 1.03, 'EEG'; ...
+                            'MASTl', -108, 0.578, -0.307, 0.946, -0.25, 108, -14.1, 1.03, 'EEG'};
+                        ChanlocFields = fields(EEG.chanlocs);
+                        for ifield = 1:10
+                            EEG.chanlocs(EEG.nbchan + 1).(ChanlocFields{ifield}) = RefInfo{ifield};
+                            EEG.chanlocs(EEG.nbchan + 2).(ChanlocFields{ifield}) = RefInfo{ifield};
+                        end
+                        EEG.data(end + 1, :) = 0;
                     end
+    
+                    % update EEGlab structure
                     EEG.data(end + 1, :) = 0;
+                    EEG.nbchan = size(EEG.data, 1); % update Channel Number
+                    EEG = eeg_checkset(EEG);
+                end
+    
+                % ****** Apply new reference ******
+                % [ocs]: CHANGE Only re-reference if the reference channel is
+                % different. [KP: CAV better always as different number of Channels now, interpolated, Filtered, only Mastoids do not need to Change]
+                if strcmpi(Choice, "CAV")
+                    EEG = pop_select( EEG, 'nochannel',{'VOGabove','VOGbelow','HOGr','HOGl'}); 
+                    EEG = pop_reref(EEG, []);
+                elseif strcmpi(Choice, "Mastoids")
+                    Mastoids = find(contains({EEG.chanlocs.labels}, {'MAST'}));
+                    EEG = pop_reref(EEG, {EEG.chanlocs(Mastoids).labels}, 'keepref', 'on');
+                elseif strcmpi(Choice, "CSD")
+                    EEG = pop_select( EEG, 'nochannel',{'VOGabove','VOGbelow','HOGr','HOGl', 'MASTl', 'MASTr'}); 
+                    EEG.data = laplacian_perrinX(EEG.data, [EEG.chanlocs.X], [EEG.chanlocs.Y], [EEG.chanlocs.Z]);
+	    		    EEG.data = EEG.data/100;
                 end
 
-                % update EEGlab structure
-                EEG.data(end + 1, :) = 0;
-                EEG.nbchan = size(EEG.data, 1); % update Channel Number
-                EEG = eeg_checkset(EEG);
+            
+            
             end
 
-            % ****** Apply new reference ******
-            % [ocs]: CHANGE Only re-reference if the reference channel is different.
-            if ~strcmpi(prevRef, "CAV") && strcmpi(Choice, "CAV")
-                EEG = pop_reref(EEG, []);
-            elseif ~strcmp(prevRef, "Mastoids") && strcmpi(Choice, "Mastoids")
-                Mastoids = find(contains({EEG.chanlocs.labels}, {'MAST'}));
-                EEG = pop_reref(EEG, {EEG.chanlocs(Mastoids).labels}, 'keepref', 'on');
-            elseif strcmpi(Choice, "CSD")
-                EEG.data = laplacian_perrinX(EEG.data, [EEG.chanlocs.X], [EEG.chanlocs.Y], [EEG.chanlocs.Z]);
-            end
+
 
             %#####################################################################
             %### Wrapping up Preprocessing Routine                         #######

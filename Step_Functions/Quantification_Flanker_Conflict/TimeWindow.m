@@ -177,6 +177,12 @@ try
         % Define Time Window Based on this
         TimeWindow_N2 = [EEG_epoched.times(Latency_N2+(TimeIdx_N2(1))) - 25, EEG_epoched.times(Latency_N2+(TimeIdx_N2(1))) + 25];
         TimeWindow_P3 = [EEG_epoched.times(Latency_P3+(TimeIdx_P3(1))) - 25, EEG_epoched.times(Latency_P3+(TimeIdx_P3(1))) + 25];
+            
+        %TimeWindow_N2 = EEG_epoched.times(TimeIdx_N2); TimeWindow_N2 = TimeWindow_N2(Latency_N2);
+        %TimeWindow_N2 = [TimeWindow_N2 - 25, TimeWindow_N2 + 25];
+        %TimeWindow_P3 = EEG_epoched.times(TimeIdx_P3); TimeWindow_P3 = TimeWindow_P3(Latency_P3);
+        %TimeWindow_P3 = [TimeWindow_P3 - 25, TimeWindow_P3 + 25];
+    
         
     elseif contains(TimeWindow_N2, "Relative_Group")
         % Time window needs to be longer since peak could be at edge
@@ -321,6 +327,7 @@ try
     Power_DB = Power_DB(:,TimeIdx_FMT,:);
     if INPUT.StepHistory.Cluster_Electrodes == "cluster"
         Power_DB = mean(Power_DB,1);
+        Electrodes_MFT = strcat('Cluster ', join(Electrodes_MFT));
     end
     
     
@@ -335,8 +342,7 @@ try
     else
         % ***** Extract Power per Trial across Time Window ******
         % Single_TrialData_Theta = squeeze(mean(Power_DB,2));
-        Single_TrialData_Theta = 10*log10(mean(Power_DB,2)); % LOG10??
-        
+        Single_TrialData_Theta = 10*log10(mean(Power_DB,2)); % LOG10??     
         colNames_Theta =[strcat("FMT_", Electrodes_N2')'];
         % Reshape to drop Time and make electrodes first
         Single_TrialData_Theta = reshape(Single_TrialData_Theta,[size(Single_TrialData_Theta,3),size(Single_TrialData_Theta,1)]);

@@ -36,9 +36,9 @@ switch AnalysisName
         Step_Functions_To_Add = ["Epoching_Tasks", "Quantification_MVPA"];
 
     case "Error_GMA" 
-        ImportedTask = "GoNoGo"; % Flanker or GoNoGo
-        MatlabAnalysisName = "GoNoGo_GMA"; % Flanker_GMA or GoNoGo_GMA
-        MaxStep = "19";
+        ImportedTask = "Flanker"; % Flanker or GoNoGo
+        MatlabAnalysisName = "Flanker_GMA"; % Flanker_GMA or GoNoGo_GMA
+        MaxStep = "20";
         Step_Functions_To_Add = ["Epoching_Tasks", "Quantification_GMA"];
         
     case "Flanker_Conflict" 

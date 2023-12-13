@@ -1,0 +1,3 @@
+[submodule "Analysis_Functions/GMA"]
+	path = Analysis_Functions/GMA
+	url = https://github.com/0xlevel/gma.git

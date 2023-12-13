@@ -40,7 +40,7 @@ function OUTPUT = Trials_Performance(INPUT, Choice)
     StepName = "Trials_Performance";
     Choices = ["RTs", "NoPostError+RTs", "None"];
     Conditional = ["NaN", "NaN", "NaN"];
-    SaveInterim = true;
+    SaveInterim = false;
     Order = 18;
 
     % ****** Updating the OUTPUT structure ******
@@ -77,25 +77,22 @@ function OUTPUT = Trials_Performance(INPUT, Choice)
                         {EEG.epoch.eventPost_Trial});
                 end
 
-                % Mark Trials with RTs faster than 0.1 and slower than 0.8s
+                % % Mark Trials with RTs faster than 0.1 and slower than 0.8s
                 rtValid = cellfun( ...
                     @(x) ~isempty(x) && x{1} > 0.1 && x{1} < 0.8, {EEG.epoch.eventRT});
 
+                % Combine Indices
                 validEpochs = postValid & rtValid;
 
-                if ~all(validEpochs)
+                if all(~validEpochs)
+                    error("No trials could be matched.");
+                elseif all(validEpochs)
+                    % No Change needed
+                else
                     validEpochIdx = find(validEpochs);
-
-                    try
-                        % May throw an exception, if no trials were matched.
-                        EEG = pop_select(EEG, 'trial', validEpochIdx);
-                    catch
-                        % ???: Is this the correct way to handle the exception?
-                        error("No trials could be matched for choice %s", Choice);
-                    end
-
-                    OUTPUT.data.EEG = EEG;
+                    EEG = pop_select(EEG, 'trial', validEpochIdx);
                 end
+                OUTPUT.data.EEG = EEG;
             end
         end
 

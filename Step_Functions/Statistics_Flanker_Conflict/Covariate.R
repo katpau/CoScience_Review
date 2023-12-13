@@ -1,7 +1,7 @@
 Covariate = function(input = NULL, choice = NULL) {
   StepName = "Covariate"
   Choices = c("None", "Gender", "Age", "BDI_Depression", "BFI_Anxiety", "BFI_OpenMindedness","BFI_Conscientiousness","BFI_Agreeableness","BFI_Extraversion", "BFI_NegativeEmotionality", "Big5_OCEAN")
-  Order = 4
+  Order = 3.1
   output = input$data
   
   ## Contributors
