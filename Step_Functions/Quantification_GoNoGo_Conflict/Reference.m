@@ -96,7 +96,7 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             elseif strcmpi(Choice, "CSD")
                 EEG = pop_select( EEG, 'nochannel',{'VOGabove','VOGbelow','HOGr','HOGl', 'MASTl', 'MASTr'});
                 EEG.data = laplacian_perrinX(EEG.data, [EEG.chanlocs.X], [EEG.chanlocs.Y], [EEG.chanlocs.Z]);
-		EEG.data = EEG.data/100;
+		        EEG.data = EEG.data/100;
             end
 
 
