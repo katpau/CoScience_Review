@@ -1,5 +1,5 @@
-Outliers_ACC = function(input = NULL, choice = NULL) {
-  StepName = "Outliers_ACC"
+OutliersACC = function(input = NULL, choice = NULL) {
+  StepName = "OutliersACC"
   Choices = c("Applied", "None")
   Order = 9.4
   output = input$data
