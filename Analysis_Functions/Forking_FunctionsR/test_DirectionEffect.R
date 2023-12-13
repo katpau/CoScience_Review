@@ -14,7 +14,7 @@ test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResu
   
   
   # Aggregate if trialwise for Flanker
-  if(length(unique(Subset$ID))*20 < nrow(Subset)) {
+  if(length(unique(Subset$ID))*40 < nrow(Subset)) {
     if("Electrode" %in% colnames(Subset)) {
       Groupings = c("ID", "Congruency_notCentered", "Electrode")
     } else {

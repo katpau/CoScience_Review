@@ -58,7 +58,7 @@ source_Design = function (ListOfStepFunctionFolders) {
       imported =  readLines(StepFunctions[ifile])
       eval(parse(text = imported[grep("Order = ", imported)]))
       eval(parse(text = imported[grep("Choices = ", imported)]))
-      FunctionName = gsub(".R", "", StepFunctions_Short[ifile])
+      FunctionName = gsub("\\.R", "", StepFunctions_Short[ifile])
       FunctionOrder = c(FunctionOrder, Order)
       eval(parse(text = paste0(FunctionName, "= Choices")))
       FunctionNames = c(FunctionNames, FunctionName)
