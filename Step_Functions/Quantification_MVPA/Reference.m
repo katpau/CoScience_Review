@@ -93,11 +93,12 @@ function OUTPUT = Reference(INPUT, Choice)
                     EEG = pop_reref(EEG, {EEG.chanlocs(Mastoids).labels}, 'keepref', 'on');
                     LRP = EEG;
                 elseif strcmpi(Choice, "CSD")
-                    LRP = EEG; % Rereference LRP Data never to CSD
-                    Mastoids = find(contains({LRP.chanlocs.labels}, {'MAST'}));
+                    % Rereference LRP Data never to CSD
+                    Mastoids = find(contains({EEG.chanlocs.labels}, {'MAST'}));
+		    LRP = pop_reref(EEG, {EEG.chanlocs(Mastoids).labels}, 'keepref', 'on');
                     EEG = pop_select( EEG, 'nochannel',{'VOGabove','VOGbelow','HOGr','HOGl', 'MASTl', 'MASTr'}); 
                     EEG.data = laplacian_perrinX(EEG.data, [EEG.chanlocs.X], [EEG.chanlocs.Y], [EEG.chanlocs.Z]);
-	    		          EEG.data = EEG.data/100;
+	    	    EEG.data = EEG.data/100;
                 end        
           end
 
