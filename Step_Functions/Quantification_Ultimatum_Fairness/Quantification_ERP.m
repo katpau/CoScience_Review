@@ -147,8 +147,8 @@ try
         [~, Latency_FRN] = Peaks_Detection(AV_FRN(:,TimeIdx_FRN,:), "NEG");
         [~, Latency_FMT] = Peaks_Detection(AV_FMT(:,TimeIdx_FMT,:), "POS");
         % Define Time Window Based on this
-        TimeWindow_FRN = [EEG_for_Relative.times(Latency_FRN+(TimeIdx_FRN(1))) - 25, EEG_for_Relative.times(Latency_FRN+(TimeIdx_FRN(1))) + 25];
-        TimeWindow_FMT = [EEG_for_Relative.times(Latency_FMT+(TimeIdx_FMT(1))) - 25, EEG_for_Relative.times(Latency_FMT+(TimeIdx_FMT(1))) + 25];
+        TimeWindow_FRN = [EEG_for_Relative.times(Latency_FRN+(TimeIdx_FRN(1))-1) - 25, EEG_for_Relative.times(Latency_FRN+(TimeIdx_FRN(1))-1) + 25];
+        TimeWindow_FMT = [EEG_for_Relative.times(Latency_FMT+(TimeIdx_FMT(1))-1) - 25, EEG_for_Relative.times(Latency_FMT+(TimeIdx_FMT(1))-1) + 25];
         
         
     elseif contains(TimeWindow_FRN, "Relative_Group")

@@ -79,13 +79,13 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                     Event_Window = [-0.300 0.300]; % Epoch length in seconds
                     Relevant_Triggers = [211, 220 ]; %Responses Speed/Acc emphasis
 
-                elseif AnalysisName == "Flanker_GMA"
+                elseif AnalysisName == "Flanker_GMA" || AnalysisName == "Flanker_Perfectionism" 
                     Event_Window = [-0.500 0.800]; % Epoch length in seconds
                     Relevant_Triggers = [ 106, 116, 126,  136, ...
                         107, 117, 127, 137, 108, 118, 128, 138, ...
                         109, 119, 129, 139  ]; %Responses Experimenter Absent
                 
-                elseif AnalysisName == "GoNoGo_GMA"
+                elseif AnalysisName == "GoNoGo_GMA" || AnalysisName == "GoNoGo_Perfectionism" 
                     Event_Window = [-0.500 0.800]; % Epoch length in seconds
                     Relevant_Triggers = [211, 220 ]; %Responses Speed/Acc emphasis
                     
