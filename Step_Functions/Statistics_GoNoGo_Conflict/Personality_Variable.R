@@ -1,6 +1,6 @@
 Personality_Variable = function(input = NULL, choice = NULL) {
 StepName = "Personality_Variable"
-Choices = c("RSTPQ_BIS","BISBAS_BIS","BFI_Anxiety","PSWQ_Concerns","Z_AV_notweighted","Z_AV_ItemNr","Z_AV_Reliability","PCA","FactorAnalysis")
+Choices = c("RSTPQ_BIS","BISBAS_BIS","BFI_Anxiety","PSWQ_Concerns","Z_AV_notweighted","Z_AV_ItemNr","Z_AV_Reliability","PCA","Factor_Analysis")
 Order = 3
 output = input$data
 

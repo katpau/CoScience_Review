@@ -1,5 +1,5 @@
 # Add Name for Saving File
-TaskName = "Ultimatum_Offer"
+TaskName = "Ultimatum_Fairness"
 
 
 # Scores that are used without change

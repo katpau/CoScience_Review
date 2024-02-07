@@ -52,7 +52,7 @@ writetable(t,electrodes_tsv_name,'FileType','text','Delimiter','\t');
 % Prepare electrode json file = Information on unit and Coordinate System
 coordsystemStruct.EEGCoordinateUnits = 'mm';
 coordsystemStruct.EEGCoordinateSystem = 'ARS'; % X=Anterior Y=Right Z=Superior
-FileName = char(strcat(Filepath, Filename, '_electrodes.json'));
+FileName = char(strcat(Filepath, filesep, Filename, '_electrodes.json'));
 jsonwrite(FileName,coordsystemStruct, struct('indent','  '));  
 
 

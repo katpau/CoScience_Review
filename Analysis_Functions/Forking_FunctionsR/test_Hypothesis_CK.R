@@ -1,4 +1,4 @@
-test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided, lmFamily) {
+test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Effect_of_Interest, SaveUseModel, ModelProvided, lmFamily) {
   # this function is used to export the relevant estimates from the tested model or the model (determined by SaveUseModel)
   # Name_Test is the Name that will be added as first column, to identify tests across forks, str (next to the actual interaction term)
   # lm_formula contains the formula that should be given to the lm, str
@@ -42,7 +42,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
   # Prepare and Calculate LMer Model
   if (!SaveUseModel == "previousModel"){ 
     # check if data has been processed, otherwise don't proceed
-    if (length(unique(Subset$ID))<2) { # Change for final analysis
+    if (length(unique(Subset$ID))<50) { # Change for final analysis
       Model_Result = c("Error_when_computing_Model", lm_formula, lmFamily )
       
     } else {
@@ -63,60 +63,26 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
           }}
       }
       
+      # Also run 0 Model => DV can vary!
+      lm_formula_NULL = paste(DV, " ~ 1 + (1|ID)")
+      
+
       
       #####################################################################################
-      # Add subjects as random factors for Model based on lm_formula (within subject Design!!)
-      Predictors = unlist(strsplit(lm_formula, "\\~"))[2]
-      Predictors = gsub("\\ ", "", Predictors)
-      Predictors = gsub("\\+", "*", Predictors)
-      Predictors = gsub("\\)", "", Predictors)
-      Predictors = gsub("\\(", "", Predictors)
-      Predictors = unique(unlist(strsplit(Predictors, "\\*")))
-      Predictors = Predictors[!grepl("Covariate_", Predictors)]
-      Predictors = Predictors[!grepl("Personality_", Predictors)]
-      Predictors = Predictors[!grepl("Behav_", Predictors)]
-      Predictors = Predictors[!grepl("EEG_Signal", Predictors)]
-      
-      # Add Lab Predictor
-      lm_formula = paste(lm_formula, "+ (1|Lab)") 
+      # Do NOT Add Lab Predictor
+      # lm_formula = paste(lm_formula, "+ (1|Lab)") 
       
       # check how many levels per sub
       EntriesPerSub = Subset %>% count(ID) %>% summarise(max(n))
 
       noRandomFactor = 0 # Next does not work if TRIAL is included
-      lm_formula = paste(lm_formula, "+ (1|ID)")  
+      lm_formula = paste(lm_formula, "+ (Congruency|ID)")  
       lm_formula_noAdd_Random = lm_formula
-      AddPredictors = Predictors
-      # if ((EntriesPerSub)>1) {
-      #   noRandomFactor = 0
-      #   lm_formula = paste(lm_formula, "+ (1|ID)")  
-      #   lm_formula_noAdd_Random = lm_formula
-      #   
-      #   # check how many levels per predictor 
-      #   if (length(Predictors)>1) {
-      #     Levels = sapply(Subset[,Predictors], function(x) length(unique(x))) # nlevels counts also dropped levels
-      #   } else {
-      #     Levels = length(unique(Subset[,Predictors]))
-      #   }
-      #   AddPredictors = Predictors[Levels>1 &  Levels < EntriesPerSub ]
-      #   
-      # } else {
-      #   noRandomFactor = 1
-      #   AddPredictors = NULL
-      # }
-     
-      # Also for Electrode? (but sometimes only 2?) What for Block and Trial?? 
-      # Now they would be all added here
-      #if (length(AddPredictors)>0) { 
-      #   for  (iPredictor in AddPredictors) {
-      #      lm_formula = paste0(lm_formula, "+ (", iPredictor, "|ID)")
-      #    }
-      #} 
-      # 
+
       
-      # Hardcode additional Predictors?
-      lm_formula = paste(lm_formula, "+(Congruency|ID)")
-      
+      # Remove Nas
+      Subset = Subset[,c(columns_to_keep, "ID", "Lab", DV)]
+      Subset = Subset[complete.cases(Subset),]
       
       
       #####################################################################################
@@ -133,7 +99,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
             Model_Result = glm(as.formula(lm_formula), 
                               Subset,
                               family = binomial(link = "logit") )
-          }
+        }
           
           Model_Result$formula = lm_formula
           Model_Result$lmFamily = lmFamily 
@@ -154,14 +120,22 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
           Model_Result = lmer(as.formula(lm_formula), 
                               Subset,
                               control = lmerControl(optimizer = "bobyqa")) 
+          NullModel = lmer(as.formula(lm_formula_NULL), 
+                              Subset,
+                              control = lmerControl(optimizer = "bobyqa")) 
           } else if(lmFamily == "binominal") {
             Model_Result = glmer(as.formula(lm_formula), 
                                 Subset,
                                 family = binomial(link = "logit"),
                                 control = glmerControl(optimizer = "bobyqa")) 
+            NullModel = glmer(as.formula(lm_formula_NULL), 
+                                 Subset,
+                                 family = binomial(link = "logit"),
+                                 control = glmerControl(optimizer = "bobyqa")) 
           }
           attributes(Model_Result)$formula = lm_formula
           attributes(Model_Result)$lmFamily = lmFamily
+          attributes(Model_Result)$NullModel =  NullModel
           Model_Result
         }, error = function(e) {
           print("Error in Model")
@@ -205,20 +179,15 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       if (class(Model_Result) == "lm") {
         lm_formula = Model_Result$formula
         lmFamily = Model_Result$lmFamily
+        NullModel = Model_Result$NullModel
+        
       } else {
         lm_formula = Model_Result@formula
-        lmFamily = Model_Result@lmFamily}
+        lmFamily = Model_Result@lmFamily
+        NullModel = Model_Result@NullModel
+        }
       
     }}
-  
-  #----
-
-  # if there is a warning message - it can mostly be ignored (after checking covariance matrix: summary(model)$varcor)
-  # the optimization algorithm can be adjusted in order to prevent fitting error / singular fit or any other difficulty
-  # control = lmerControl(optimizer = "bobyqa")) # in most cases this optimizer works
-  # there is also a time consuming method to try all optimizers 
-  
-  
   
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # if only model is exported, stop here
@@ -233,11 +202,24 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
     #  If there were Problems with the Model, extract NAs
     if (is.character(Model_Result) &&  grepl( "Error", Model_Result[1])) {
       print("no Estimates since Error with Model ")
-      Estimates = cbind.data.frame(Name_Test, Model_Result, t(rep(NA, 12)), length(unique(as.character(Subset$ID))),t(rep(NA, 7)))
-    
+      Estimates = cbind.data.frame(Name_Test, "Error with Model", t(rep(NA, 32)) )
       
     
     } else {
+      
+      # Extract Epochs per Sub and Cond
+      Epochs = Subset[,c("ID", "Epochs", "Congruency_notCentered")] %>%
+        group_by(ID, Congruency_notCentered) %>%
+        summarise(Epochs = mean(Epochs, na.rm =TRUE))
+      
+      # Compare against Nullmodel
+      ModelComp = anova(Model_Result, NullModel )
+      ModelComp = c(ModelComp$`Pr(>Chisq)`[2] , ModelComp$AIC[1], ModelComp$AIC[2], ModelComp$BIC[1], ModelComp$BIC[2])
+      
+      var_Nullmodell = as.data.frame(VarCorr(NullModel))
+      ICC = var_Nullmodell $vcov[1] / (var_Nullmodell $vcov[1] + var_Nullmodell $vcov[2])
+      
+      
       # get Anova from model
       AnovaModel = anova(Model_Result)
       
@@ -288,16 +270,40 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       StatTest = rownames(AnovaModel)[Idx_Effect_of_Interest]
       
       
-      # Get Standardized effects
-      # 
-      
       # semi-partial (marginal) R squared for fixed effects
-      #r2_fixef <- r2glmm::r2beta(Model_Result, method = "nsj")
-      #r2_fixef = cbind(r2_fixef[Idx_Effect_of_Interest+1, c("Rsq","upper.CL", "lower.CL" )]) 
-      # Not working yet
-      r2_fixef = t(c(NA, NA, NA))
+      tryCatch(
+        {R2 = r2glmm::r2beta(Model_Result, method = "nsj")
+        PredicNames = R2$Effect
+        # Get Regressors including all Elements
+        PosIdx = which(rowSums(sapply(Effect_of_Interest, function(x) grepl(x, PredicNames))) == length(Effect_of_Interest))
+        # Remove Regressors with more Elements
+        PosIdx = PosIdx[which(sapply(PredicNames[PosIdx], function(x) {A = strsplit(x, ":"); length(unlist(A))}) == length(Effect_of_Interest))]
+        # Get last index (assuming that pne is the highest level most different from reference level
+        PosIdx = tail(PosIdx,1)
+        R2 = R2[PosIdx,]
+        R2 = unlist(R2)[6:8]
+        },
+        
+        error=function(cond) {
+          R2 = c(NA, NA, NA)
+          return(R2)
+        })
       
-      # Cannot get the MuMIn installed =(
+      
+      # Get classic MLM infos (not Anova, but separate regressors)
+      SumModel = summary(Model_Result)
+      PredicNames = SumModel[["vcov"]]@Dimnames[[1]]
+      # Get Regressors including all Elements
+      PosIdx = which(rowSums(sapply(Effect_of_Interest, function(x) grepl(x, PredicNames))) == length(Effect_of_Interest))
+      # Remove Regressors with more Elements
+      PosIdx = PosIdx[which(sapply(PredicNames[PosIdx], function(x) {A = strsplit(x, ":"); length(unlist(A))}) == length(Effect_of_Interest))]
+      # Get last index (assuming that pne is the highest level most different from reference level
+      PosIdx = tail(PosIdx,1)
+      SumModel = SumModel$coefficients[PosIdx,]
+      if(length(SumModel)<5) {SumModel = c(SumModel[1:2], NA, SumModel[3:4])} # when binominal dfs are missing?
+      PredicNames = PredicNames[PosIdx]
+      
+    
       ## for the whole model
       r2_total <- MuMIn::r.squaredGLMM(Model_Result, pj2014 = T)
       
@@ -330,12 +336,16 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
      # prepare export
       if (length(Idx_Effect_of_Interest)>0) {
       Estimates = cbind.data.frame(Name_Test, StatTest, partial_Eta, p_Value,  
-                                   t(MLM_Result), r2_fixef,
-                                   Nr_Subs, mean(Subset$Epochs), sd(Subset$Epochs), Singularity,
-                                   lm_formula, FStatInfo)
+                                   Nr_Subs, mean(Epochs$Epochs), sd(Epochs$Epochs), Singularity,
+                                   lm_formula, FStatInfo,
+                                   PredicNames, t(SumModel),
+                                   t(MLM_Result),
+                                   t(R2),
+                                   t(ModelComp),
+                                   t(ICC))
       } else {
       print("Effect not found in Model")
-      Estimates = cbind.data.frame(Name_Test, "Effect not found in Model", t(rep(NA, 20)) )
+      Estimates = cbind.data.frame(Name_Test, "Effect not found in Model", t(rep(NA, 32)) )
                                    
         
       }
@@ -365,13 +375,16 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       # is there a way to extract estimates when more than 2 levels?
       # effectsize::standardize_parameters(Model_Result)
     } }
-    colnames(Estimates) = c("Effect_of_Interest", "Statistical_Test", "EffectSizeType" ,"value_EffectSize", "CI_low", "CI90_high", "p_Value",  
-                            "Beta", "SE", "pvalue", "Rand_Eff_SD", "Rsq","upper.CL", "lower.CL" ,
+    colnames(Estimates) = c("Effect_of_Interest", "Statistical_Test", 
+                            "EffectSizeType" ,  "value_EffectSize", "CI_low", "CI90_high", "p_anova",  
+                            
                             "n_participants", "av_epochs", "sd_epochs", "Singularity",
-                            "formula", "F_value", "dfN", "dfD")
+                            "formula", "F_value", "dfN", "dfD",
+                            "RegressorName", "Estimate_summary", "Std.Error_summary", "df_summary", "t_z_summary", "p_summary",
+                            "Beta", "SE", "p_MLM", "Rand_Eff_SD", 
+                            "Rsq", "CI_low_Rsq", "CI_high_Rsq", 
+                            "ModelComparison_p", "AIC_0", "AIC_A", "BIC_0", "BIC_A","ICC")
   
     return (Estimates)
   }
-
-
 

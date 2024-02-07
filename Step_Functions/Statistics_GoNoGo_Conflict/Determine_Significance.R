@@ -278,10 +278,13 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   if (choice == "Holm"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "holm", n = comparisons)
+    Estimates_to_Correct$p_summary = p.adjust(Estimates_to_Correct$p_summary, method = "holm", n = comparisons)
   }  else if (choice == "Bonferroni"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "bonferroni", n = comparisons)
+    Estimates_to_Correct$p_summary = p.adjust(Estimates_to_Correct$p_summary, method = "bonferroni", n = comparisons)
   } else if (choice == "FDR"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "fdr", n = comparisons)
+    Estimates_to_Correct$p_summary = p.adjust(Estimates_to_Correct$p_summary, method = "fdr", n = comparisons)
   }
   
   

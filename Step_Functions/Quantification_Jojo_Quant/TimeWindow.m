@@ -32,20 +32,21 @@ function  OUTPUT = TimeWindow(INPUT, Choice)
 % saved on the harddrive (in order to be loaded and forked from there).
 % Order determines when it should be run.
 StepName = "TimeWindow";
-Choices = ["Relative_Group_wide", "Relative_Group_narrow", "Relative_Subject", "200,400", "250,350"];
+Choices = ["200,400", "Relative_Group_wide", "Relative_Group_narrow", "Relative_Subject"];
 Conditional = ["NaN", "NaN", "NaN", "NaN", "NaN"];
 SaveInterim = logical([1]);
 Order = [21];
 
 
-% FMT actually not Forked so this should be dropped.
 % For FMT save other time window
 if strcmp(Choice , "200,400")
-    ChoiceFMT = "200,350";
-elseif strcmp(Choice ,  "250,350" )
-    ChoiceFMT = "200,350";
-else
-    ChoiceFMT = Choice;
+    ChoiceFMT = "None";
+elseif strcmp(Choice ,  "Relative_Group_wide")
+    ChoiceFMT = "Relative_Group_wide";
+elseif strcmp(Choice ,  "Relative_Group_narrow")
+    ChoiceFMT = "Relative_Group_narrow";
+elseif strcmp(Choice ,  "Relative_Subject")
+    ChoiceFMT = "Relative_Subject";
 end
 INPUT.StepHistory.TimeWindow_FMT = ChoiceFMT;
 
