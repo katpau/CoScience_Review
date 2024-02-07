@@ -91,11 +91,11 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 Event_Window = [-0.200 0.500];
                 Relevant_Triggers = [101, 102, 201, 202 ]; % Target Onset
                 
-            elseif AnalysisName == "Ultimatum_Offer"
-                Event_Window = [-0.500 1.000];
-                Relevant_Triggers = [1,2,3 ]; % Offer Onset
+            elseif AnalysisName == "Ultimatum_Quant" || AnalysisName == "Ultimatum_Fairness"
+                    Event_Window = [-0.500 1.000];
+                    Relevant_Triggers = [1,2,3 ]; % Offer Onset
                 
-            elseif AnalysisName == "Gambling_FeedbackTheta" || AnalysisName == "Gambling_RewP"
+            elseif AnalysisName == "Gambling_Quant" || AnalysisName == "Gambling_RewP"
                 Event_Window = [-0.500 1.000];
                 Relevant_Triggers = [100, 110, 150, 101, 111, 151, 200, 210, 250, 201, 211, 251]; % FB Onset
                 

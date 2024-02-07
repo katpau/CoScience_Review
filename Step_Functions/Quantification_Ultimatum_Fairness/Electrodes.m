@@ -1,11 +1,11 @@
-function  OUTPUT = Trials_MinNumber(INPUT, Choice)
+function  OUTPUT = Electrodes(INPUT, Choice)
 % Last Checked by KP 12/22
 % Planned Reviewer:
 % Reviewed by: 
 
 % This script does the following:
-% Script only marks the minimum number of trials necessary to calculate an 
-% ERP, however, nothing is done here as this will be used in a later 
+% Script only marks which Electrodes are used for quantification.
+% Nothing is done here as this will be used in a later
 % Step (Quantificiation ERP).
 
 %#####################################################################
@@ -31,15 +31,16 @@ function  OUTPUT = Trials_MinNumber(INPUT, Choice)
 % SaveInterim marks if the results of this preprocessing step should be
 % saved on the harddrive (in order to be loaded and forked from there).
 % Order determines when it should be run.
-StepName = "Trials_MinNumber";
-Choices = ["18", "9"]; 
-Conditional = ["NaN", "NaN"]; 
-SaveInterim = logical([1]); 
-Order = [18]; 
+StepName = "Electrodes";
+Choices = ["Fz,Fcz,Cz", "Fz, FCz, Cz, FC1, FC2", "FCz,Cz", "FCz", "Cz", "Fz"];
+Conditional = ["NaN", "NaN", "NaN", "NaN", "Cluster_Electrodes == ""no_cluster""", "Cluster_Electrodes == ""no_cluster""", ];
+SaveInterim = logical([0]);
+Order = [20];
 
 
 % ****** Updating the OUTPUT structure ******
 % No changes should be made here.
 INPUT.StepHistory.(StepName) = Choice;
 OUTPUT = INPUT;
-end 
+end
+

@@ -13,19 +13,30 @@ test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResu
   } else {DV = "EEG_Signal"}
   
   
-  # Aggregate if trialwise for Flanker
+  # Aggregate if trialwise for Flanker and Ultimatum
   if(length(unique(Subset$ID))*40 < nrow(Subset)) {
-    if("Electrode" %in% colnames(Subset)) {
+    if ("Congruency_notCentered" %in% colnames(Subset)){
       Groupings = c("ID", "Congruency_notCentered", "Electrode")
-    } else {
-      Groupings = c("ID", "Congruency_notCentered")  
+      Groupings = Groupings[Groupings %in% colnames(Subset)]
+    } else if ("Offer" %in% colnames(Subset)) {
+      Groupings = c("ID", "Offer", "Choice")
+      Groupings = Groupings[Groupings %in% colnames(Subset)]
+      Groupings = Groupings[!grepl(DV, Groupings)]
     }
+    if ("Personality" %in% names(DirectionEffect)) {
     Subset = Subset %>%
       group_by_at(Groupings) %>%
       summarise(DV = mean(get(DV), na.rm =T),
                 Personality = get(DirectionEffect$Personality)[1])
       colnames(Subset)[colnames(Subset) == "DV"] = DV
-      colnames(Subset)[colnames(Subset) == "Personality"] = DirectionEffect$Personality
+      colnames(Subset)[colnames(Subset) == "Personality"] = DirectionEffect$Personality 
+    } else {
+      Subset = Subset %>%
+        group_by_at(Groupings) %>%
+        summarise(DV = mean(get(DV), na.rm =T))
+      colnames(Subset)[colnames(Subset) == "DV"] = DV
+     
+    }
   }
   
   if (DirectionEffect$Effect == "main") {
