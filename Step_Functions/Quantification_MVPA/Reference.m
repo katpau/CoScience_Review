@@ -84,23 +84,23 @@ function OUTPUT = Reference(INPUT, Choice)
                 end
     
                 % ****** Apply new reference ******
-                % [ocs]: CHANGE Only re-reference if the reference channel is
-                % different. [KP: CAV better always as different number of Channels now, interpolated, Filtered, only Mastoids do not need to Change]
-                if strcmpi(Choice, "CAV")
+               if strcmpi(Choice, "CAV")
                     EEG = pop_select( EEG, 'nochannel',{'VOGabove','VOGbelow','HOGr','HOGl'}); 
                     EEG = pop_reref(EEG, []);
+                    LRP = EEG;
                 elseif strcmpi(Choice, "Mastoids")
                     Mastoids = find(contains({EEG.chanlocs.labels}, {'MAST'}));
                     EEG = pop_reref(EEG, {EEG.chanlocs(Mastoids).labels}, 'keepref', 'on');
+                    LRP = EEG;
                 elseif strcmpi(Choice, "CSD")
+                    % Rereference LRP Data never to CSD
+                    Mastoids = find(contains({EEG.chanlocs.labels}, {'MAST'}));
+		    LRP = pop_reref(EEG, {EEG.chanlocs(Mastoids).labels}, 'keepref', 'on');
                     EEG = pop_select( EEG, 'nochannel',{'VOGabove','VOGbelow','HOGr','HOGl', 'MASTl', 'MASTr'}); 
                     EEG.data = laplacian_perrinX(EEG.data, [EEG.chanlocs.X], [EEG.chanlocs.Y], [EEG.chanlocs.Z]);
-	    		    EEG.data = EEG.data/100;
-                end
-
-            
-            
-            end
+	    	    EEG.data = EEG.data/100;
+                end        
+          end
 
 
 
@@ -111,8 +111,9 @@ function OUTPUT = Reference(INPUT, Choice)
             % Script creates an OUTPUT structure. Assign here what should be saved
             % and made available for next step. Always save the EEG structure in
             % the OUTPUT.data field, overwriting previous EEG information.
-            OUTPUT.data.(Conditions{i_cond}) = EEG;
-        end
+            OUTPUT.data.EEG = EEG;
+            OUTPUT.data.LRP = LRP;
+    
 
 
         % ****** Error Management ******
