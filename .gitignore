@@ -46,6 +46,9 @@ xxx/
 **/Only_ForGit_To_TestRun/ForkingFiles/Error_GMA
 **/Only_ForGit_To_TestRun/Preproc_forked/Error_GMA
 
+# R and DataSpell
+.idea/
+.Rhistory
 
 # Some additions for MATLAB
 # Default autosave extension
@@ -108,3 +111,6 @@ octave-workspace
 *.rar
 *.tar
 *.zip
+.Rproj.user
+
+CoScience_Review.Rproj
