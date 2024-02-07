@@ -234,7 +234,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     DirectionEffect = list("Effect" = "interaction_correlation",
                            "Larger" = c("Offer", "5"),
                            "Smaller" = c("Offer", "1"),
-                           "Personality" = iPersonality)
+                           "Personality" = iPersonality,
+                           "DV" = "Choice")
     
     
     
@@ -264,7 +265,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                            "Personality" = "EEG_Signal",
                            "DV" = "Choice")
     
-    lm_formula =   paste( "Choice ~ ( Offer + Trial) ", 
+    lm_formula =   paste( "Choice ~ ( Offer + EEG_Signal + Trial) ", 
                           Covariate_Formula, additional_Factor_Formula)
     columns_to_keep = c("Offer", Covariate_Name, "EEG_Signal", "Choice", "Electrode", "Trial")
     
@@ -273,7 +274,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                       wrap_test_Hypothesis(Name_Test,lm_formula, output,
                                            Effect_of_Interest,
                                            DirectionEffect, 
-                                           columns_to_keep, "Behav",  "", "", "binominal"))
+                                           columns_to_keep, Component,  "", "", "binominal"))
     
  }
   
