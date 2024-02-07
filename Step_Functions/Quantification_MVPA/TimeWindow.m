@@ -43,7 +43,6 @@ try
     %%%%%%%%%%%%%%%% Routine for the analysis of this step
     % This functions starts from using INPUT and returns OUTPUT
     EEG = INPUT.data.EEG;
-    LRP = INPUT.data.LRP;
     
     % Condition Names and Triggers depend on analysisname
     if INPUT.AnalysisName == "Flanker_MVPA"
@@ -58,18 +57,12 @@ try
     
     Event_Window = [-0.300 0.300]; % Epoch length in seconds
     NrConditions = length(Condition_Names);
-    
-    % epoch data
-    for i_Cond = 1:NrConditions
-        %Condition_Names(i_Cond)
-        pop_epoch(EEG, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');     
-    end
-
-   % epoch lrp data
-   for i_Cond = 1:NrConditions
-        %Condition_Names(i_Cond)
-        pop_epoch(LRP, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');     
-    end
+    % 
+    % % Loop Through the conditions like this?
+    % for i_Cond = 1:NrConditions
+    %     (Condition_Names(i_Cond))
+    %     pop_epoch(EEG, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');     
+    % end
     
     % run first-level lrp and mvpa analyses    
    %  addpath(genpath(strcat(pwd, "/Analysis_Functions/Error_MVPA/")))
@@ -117,20 +110,18 @@ try
     
     %% LRP
     % Preprocessing 
-     ms_start = -300;
+    ms_start = -300;
     ms_end = 299;
     
-%     % Create EEG substructures from 3d EEGmatrix containing only trials from LRP electrodes (channels x dp x trials)
-%     chanlocs = struct2table(LRP.chanlocs);
+    % Create EEG substructures from 3d EEGmatrix containing only trials from LRP electrodes (channels x dp x trials)
+    chanlocs = struct2table(EEG.chanlocs);
     Electrodes = upper(strsplit(OUTPUT.StepHistory.Electrodes, ", ")); 
-%     lrp_chanlocs = [find(strcmp(chanlocs.labels, Electrodes(1))) find(strcmp(chanlocs.labels, Electrodes(2)))]; %only use LRP electrodes of interest
-%     
-%     EEG_lrp = pop_select(LRP, 'channel', lrp_chanlocs); %remove other channels from EEG structure
-%     
-%     clear chanlocs lrp_chanlocs
+    lrp_chanlocs = [find(strcmp(chanlocs.labels, Electrodes(1))) find(strcmp(chanlocs.labels, Electrodes(2)))]; %only use LRP electrodes of interest
     
-    EEG_lrp = LRP;    
-
+    EEG_lrp = pop_select(EEG, 'channel', lrp_chanlocs); %remove other channels from EEG structure
+    
+    clear chanlocs lrp_chanlocs
+    
     %select response types (correct and error)
     EEG_lrp.data = EEG_lrp.data(:,:,events_response.responsetype ~= 0);
     
