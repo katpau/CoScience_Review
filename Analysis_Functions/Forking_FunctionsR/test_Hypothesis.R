@@ -144,7 +144,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
           summarise(Subs = length(unique(ID)))
         nrSubs = min(nrSubs$Subs)
         
-        if (nrSubs<100) {
+        if (nrSubs<10) {
           Model_Result = c("Error_not_enough_Subjects", lm_formula, nrSubs)
         } else {
           Model_Result = tryCatch({
@@ -187,7 +187,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
   } else {  
     print("Using existing LMER")
     Model_Result = ModelProvided
-    if ((is.character(Model_Result) &&  grepl( "Error", Model_Result)) ) {
+    if (is.character(Model_Result)) { #&&   grepl("Error", (ModelResult[1]) )
       Model_Result = Model_Result[1]
       lm_formula = ModelProvided[2]
       nrSubs = ModelProvided[3]
@@ -215,7 +215,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
     print("Prepare Estimates")
     # Check if Model was calculated successfully
     #  If there were Problems with the Model, extract NAs
-    if (is.character(Model_Result) &&  grepl( "Error", Model_Result)) {
+    if (is.character(Model_Result)) { #&&  grepl( "Error", Model_Result)) {
       print("no Estimates since Error with Model ")
       lm_formula = ModelProvided[2]
       nrSubs = ModelProvided[3]

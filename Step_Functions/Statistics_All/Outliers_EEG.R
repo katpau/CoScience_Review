@@ -26,7 +26,11 @@ Outliers_EEG = function(input = NULL, choice = NULL) {
   SME_Outlier = input$stephistory["Outliers_SME"] 
   output$Outliers_EEG = 0
   output$Outliers_SME = 0
+  # replace all missing with NA
+  if (any(is.nan(output$EEG_Signal))) { output$EEG_Signal[is.nan(output$EEG_Signal)] = NA}
+  if (any(is.nan(output$SME))) {output$SME[is.nan(output$SME)] = NA}
   
+
   if (EEG_Outlier == "Applied" | SME_Outlier == "Applied" ) {
     GroupingVariables = input$stephistory[["GroupingVariables"]]
     

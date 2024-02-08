@@ -58,8 +58,6 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   additional_Factors_Name = "Electrode"
   additional_Factor_Formula = "+ Electrode"
   
-  # merge GMA and Component collumn
-  output$Component = as.character(output$GMA_Measure)
   #########################################################
   # (2) Initiate Functions for Hypothesis Testing
   #########################################################
@@ -75,7 +73,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     # GMA_Measure selects relevant Data
     # Task selects relevant Data
     # columns_to_keep lists all collumns that should be checked for completeness, array of str
-    
+
     # Create Subset
     Subset = Data[Data$Component == Component &
                     Data$Task == Task,
@@ -115,49 +113,74 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     return(Estimates)
   }
   
+
+  #########################################################
+  # (1) EEG Components
+  #########################################################
+  #5.1. We expect larger Ne/c amplitudes with higher PSP scores.
+  #5.2. We expect smaller Ne/c amplitudes with higher ECP scores.
+  #5.3. We expect larger Pe/c amplitudes with larger PSP scores
+  
   Estimates = data.frame()
-  #########################################################
-  # (3) All Effects for each GMA Measure
-  #########################################################
-  Names_GMA = c("rate",   "excess" ,"shape"  ,"skewness"  , "inflection1", "scaling", "inflection2")
-  GMA_colnames = c("rate",   "excess" ,"shape"  ,"skew"  , "ip1_ms", "yscale", "ip2_ms")
-  columns_to_keep = c("Condition", Covariate_Name, additional_Factors_Name,  "GMA_Measure", "EEG_Signal",
-                      "Personality_MPS_PersonalStandards", "Personality_MPS_ConcernOverMistakes")
-  lm_formula =   paste( "EEG_Signal ~  (Condition * Personality_MPS_PersonalStandards * Personality_MPS_ConcernOverMistakes) ", Covariate_Formula, additional_Factor_Formula)
-
   
-  for (i_GMA in 1:length(Names_GMA)) {
-    for (i_task in c("GoNoGo", "Flanker")) {
-    print(paste("Test ", i_task, Names_GMA[i_GMA]))
-    Name_Test = paste0(Names_GMA[i_GMA], "_", i_task)
+    columns_to_keep = c("Condition", Covariate_Name, 
+                        "Personality_MPS_PersonalStandards",
+                        "Personality_MPS_ConcernOverMistakes",
+                        "EEG_Signal", "Electrode")
+    lm_formula =   paste( "EEG_Signal ~ ( ( Condition * Personality_MPS_PersonalStandards * Personality_MPS_ConcernOverMistakes) )", 
+                          Covariate_Formula, additional_Factor_Formula)
+    
+    for (i_Component in c("ERN", "PE")) {
+      for (i_task in c("GoNoGo", "Flanker")) {
+        print(paste("Test ", i_task, i_Component))
+
+        Estimates = rbind(Estimates,
+                                wrap_test_Hypothesis(paste0(i_task, "_", i_Component),
+                                                     lm_formula, output, i_Component, i_task,
+                                                     columns_to_keep))
+        
+      }}
   
     
-   Estimates = rbind(Estimates,  
-                     wrap_test_Hypothesis(Name_Test,
-                                          lm_formula, output, GMA_colnames[i_GMA], i_task,
-                                          columns_to_keep))
-   
-
+  #########################################################
+  # (5) Behaviour
+  #########################################################
+    #5.4. We expect more Post-Response Accuracy with higher PSP scores.
+    #5.5. We expect less Post-Response Accuracy with higher ECP scores.
+    #5.6. We expect more Pre-Post-Response Reaction Time Differences with higher PSP scores.
+    #5.7. We expect less Pre-Post-Response Reaction Time Differences with higher ECP scores.
+    columns_to_keep = c("Condition", Covariate_Name, 
+                        "Personality_MPS_PersonalStandards",
+                        "Personality_MPS_ConcernOverMistakes",
+                        "Behav")
+    lm_formula =   paste( "Behav ~ ( ( Condition * Personality_MPS_PersonalStandards * Personality_MPS_ConcernOverMistakes) )", 
+                          Covariate_Formula)
     
-  }}
-  
-
-  
-  
+    for (i_Component in c("RTDiff", "post_ACC")) {
+      for (i_task in c("GoNoGo", "Flanker")) {
+        print(paste("Test ", i_task, i_Component))
+        
+        Estimates = rbind(Estimates,
+                          wrap_test_Hypothesis(paste0(i_task, "_", i_Component),
+                                               lm_formula, output, i_Component, i_task,
+                                               columns_to_keep))
+        
+      }}
   
   
   #########################################################
-  # (6) Correct for Multiple Comparisons for Hypothesis 1
+  # (6) Correct for Multiple Comparisons 
   #########################################################
-  Effects = c("Main_Condition","Main_Standards", "Main_Concerns", 
-              "ConditionxStandards", "ConditionxConcerns", "
+    # For every Effect 4 Tests?
+    Effects = c("Main_Condition","Main_Standards", "Main_Concerns", 
+                "ConditionxStandards", "ConditionxConcerns", "
                 StandardsxConcerns", "StandardsxConcernsxCondition")
   for (i_task in c("GoNoGo", "Flanker")) {
     for (i_Test in Effects) {
       Idx = grepl(i_Test, Estimates$Effect_of_Interest) &
         grepl(i_task, Estimates$Effect_of_Interest)
       Estimates$p_Value[Idx] = p.adjust(Estimates$p_Value[Idx],
-                                        method = tolower(choice), n = 7) # how many?
+                                       method = tolower(choice), n = 4)
       
     }
   }
