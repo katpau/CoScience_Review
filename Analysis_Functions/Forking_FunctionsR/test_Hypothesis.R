@@ -1,4 +1,4 @@
-test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided) {
+test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided, inclLab = TRUE) {
   # this function is used to export the relevant estimates from the tested model or the model (determined by SaveUseModel)
   # Name_Test is the Name that will be added as first collumn, to identify tests across forks, str (next to the actual interaction term)
   # lm_formula contains the formula that should be given to the lm, str
@@ -14,6 +14,9 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
   # Set relevant Input if not given
   if(missing(SaveUseModel)) { SaveUseModel = "default"  }
   if(missing(ModelProvided)) { ModelProvided = "none"  }
+  
+  # [OCS] Changed minimum n (participants to a lower arbitrary number)
+  minSubjects <- 40
   StopModel = 0
   
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,7 +39,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
   
   # Third make sure cases are complete
   Subset = Subset[complete.cases(Subset[,colnames(Subset) %in% relevant_collumns]), ]
-  
+
   classes_df = lapply(Subset[names(Subset)], class)
   make_Factor = names(classes_df[classes_df == "character"])
   Subset[make_Factor] = lapply(Subset[make_Factor], as.factor)
@@ -51,7 +54,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
   
   if (!SaveUseModel == "previousModel"){ 
     # check if data has been processed, otherwise don't proceed
-    if (length(unique(Subset$ID))<100) { # Change for final analysis!!
+    if (length(unique(Subset$ID))<minSubjects) { # Change for final analysis!!
       Model_Result = c("Error_data_seems_incomplete", lm_formula, length(unique(Subset$ID)))
       
     } else {
@@ -85,14 +88,16 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       Predictors = Predictors[!grepl("StateAnxiety", Predictors)]
       
       
-      # Add Lab Predictor
-      lm_formula = paste(lm_formula, "+ (1|Lab)")  
+      # Add Lab Predictor unless disabled
+      if(inclLab) {
+        lm_formula = paste(lm_formula, "+ (1|Lab)")
+      }
       
       
       # check how many levels per factor
       if (any(sapply(Subset[,Predictors], nlevels)>1)) {
         noRandomFactor = 0
-        lm_formula_noAdd_Random = lm_formula
+        # lm_formula_noAdd_Random = lm_formula
         lm_formula = paste(lm_formula, " + (1|ID)")  
         
         
@@ -119,13 +124,14 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       #####################################################################################
       # Calculate LM Model
       if (noRandomFactor == 1) {
-        if (length(unique(Subset$ID))<100) {
+        if (length(unique(Subset$ID))<minSubjects) {
           Model_Result = c("Error_not_enough_Subjects", lm_formula, length(unique(Subset$ID)))
         } else {
           Model_Result = tryCatch({
             Subset$Lab = as.numeric(Subset$Lab)
-            Model_Result = lm(as.formula(lm_formula), 
-                              Subset)
+            Model_Result = lm(as.formula(lm_formula),
+                              Subset,
+                              control = lmerControl(optimizer = "bobyqa"))
             Model_Result$formula = lm_formula
             Model_Result$nrSubs = length(unique(Subset$ID))
             Model_Result
@@ -139,15 +145,15 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
         
       } else {
         nrSubs = Subset %>% 
-          group_by_at(Predictors) %>%
+          group_by_at(all_of(Predictors)) %>%
           summarise(Subs = length(unique(ID)))
         nrSubs = min(nrSubs$Subs)
         
-        if (nrSubs<100) {
+        if (nrSubs<minSubjects) {
           Model_Result = c("Error_not_enough_Subjects", lm_formula, nrSubs)
         } else {
           Model_Result = tryCatch({
-            Model_Result = lmer(as.formula(lm_formula), 
+            Model_Result = lmer(as.formula(lm_formula),
                                 Subset,
                                 control = lmerControl(optimizer = "bobyqa")) 
             attributes(Model_Result)$formula = lm_formula
@@ -186,12 +192,12 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
   } else {  
     print("Using existing LMER")
     Model_Result = ModelProvided
-    if ((is.character(Model_Result) &&  grepl( "Error", Model_Result)) ) {
+    if (is.character(Model_Result)) { #&&   grepl("Error", (ModelResult[1]) )
       Model_Result = Model_Result[1]
       lm_formula = ModelProvided[2]
       nrSubs = ModelProvided[3]
-      
-      
+
+
     } else {
       if (class(Model_Result) == "lm") {
         lm_formula = Model_Result$formula
@@ -214,12 +220,12 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
     print("Prepare Estimates")
     # Check if Model was calculated successfully
     #  If there were Problems with the Model, extract NAs
-    if (is.character(Model_Result) &&  grepl( "Error", Model_Result)) {
+    if (is.character(Model_Result)) { #&&  grepl( "Error", Model_Result)) {
       print("no Estimates since Error with Model ")
       lm_formula = ModelProvided[2]
       nrSubs = ModelProvided[3]
       Estimates = cbind.data.frame(Name_Test, NA, NA, NA, NA, NA, NA, nrSubs,mean(Subset$Epochs, na.rm=TRUE),
-                                   sd(Subset$Epochs, na.rm=TRUE), NA, lm_formula, NA, NA, NA)
+                                   sd(Subset$Epochs, na.rm=TRUE), NA, lm_formula, NA, NA, NA,NA, NA, NA, NA, NA, NA)
       
     } else {
       # get Anova from model
@@ -239,15 +245,15 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       }
       
       
-      
-      
-      
+
+
+
       # Expand Effect of Interest by additional factors
       if ("Hemisphere" %in% keptcollumns) {
         Effect_of_Interest = c(Effect_of_Interest, "Hemisphere")  }
       if ("Localisation" %in% keptcollumns) {
         Effect_of_Interest = c(Effect_of_Interest, "Localisation")  }
-      # Add Electrode to effect of interest only if frontal/paripartial_Etal
+      # Add Electrode to effect of interest only if frontal/parietal
       if ("Electrode" %in% keptcollumns) {
         if (length(unlist(unique(Subset$Electrode))) == 6) {
           Effect_of_Interest = c(Effect_of_Interest, "Electrode")  }}
@@ -301,13 +307,33 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       }
       
       
+      # Get classic MLM infos (not Anova, but separate regressors)
+      SumModel = summary(Model_Result)
+      if ("vcov" %in% SumModel) {
+        PredicNames = SumModel[["vcov"]]@Dimnames[[1]]
+      } else {
+        PredicNames = rownames(SumModel$coefficients)
+      }
+      # Get Regressors including all Elements
+      PosIdx = which(rowSums(sapply(Effect_of_Interest, function(x) grepl(x, PredicNames))) == length(Effect_of_Interest))
+      # Remove Regressors with more Elements
+      PosIdx = PosIdx[which(sapply(PredicNames[PosIdx], function(x) {A = strsplit(x, ":"); length(unlist(A))}) == length(Effect_of_Interest))]
+      # Get last index (assuming that pne is the highest level most different from reference level
+      PosIdx = tail(PosIdx,1)
+      SumModel = c(PredicNames[PosIdx], SumModel$coefficients[PosIdx,])
+      if (length(SumModel)<6) {SumModel = c(SumModel[1:3], NA, SumModel[4:5])} # then no dfs!
+
+
+
       # prepare export
       if (length(Idx_Effect_of_Interest)>0) {
         Estimates = cbind.data.frame(Name_Test, StatTest, "partial_Eta", partial_Eta, p_Value,  nrSubs, mean(Subset$Epochs), sd(Subset$Epochs), 
-                                     Singularity, lm_formula, FStatInfo[1], FStatInfo[2], FStatInfo[3])
+                                     Singularity, lm_formula, FStatInfo[1], FStatInfo[2], FStatInfo[3],
+                                     t(SumModel))
       } else {
         print("Effect not found in Model")
-        Estimates = cbind.data.frame(Name_Test, NA, "partial_Eta", NA, NA, NA, NA,  NA, NA, NA, NA, lm_formula, NA, NA, NA)
+        Estimates = cbind.data.frame(Name_Test, NA, "partial_Eta", NA, NA, NA, NA,  NA, NA, NA, NA,
+                                     lm_formula, NA, NA, NA, NA, NA, NA, NA, NA, NA)
         
       }
       
@@ -317,7 +343,8 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       # effectsize::standardize_parameters(Model_Result)
     } 
     colnames(Estimates) = c("Effect_of_Interest", "Statistical_Test", "EffectSizeType" ,"value_EffectSize", "CI_low", "CI90_high", 
-                            "p_Value",  "n_participants", "av_epochs", "sd_epochs", "Singularity", "formula", "F_value", "dfN", "dfD")
+                            "p_Value",  "n_participants", "av_epochs", "sd_epochs", "Singularity", "formula", "F_value", "dfN", "dfD",
+                            "RegressorName", "Estimate_summary", "Std.Error_summary", "df_summary", "t_z_summary", "p_summary")
     
     
     return (Estimates)
