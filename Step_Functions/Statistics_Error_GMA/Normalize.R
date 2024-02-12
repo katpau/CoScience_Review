@@ -87,9 +87,9 @@ Normalize = function(input = NULL, choice = NULL) {
     output_EEG = output[output$Component == "Ne/c",]
     ChecknotNormal =   output_EEG %>%
       filter(!is.na("EEG_Signal")) %>%
-      group_by(Task, Condition, GMA_Measure) %>%
+      group_by(Task, Condition, GMA_Measure, Electrode) %>%
       summarise(notNormal = check_normality(EEG_Signal)) %>%
-      group_by(Task,  GMA_Measure) %>%
+      group_by(Task, GMA_Measure, Electrode) %>%
       summarise(notNormal = any(notNormal)) %>%
       filter(notNormal)
     
@@ -99,33 +99,7 @@ Normalize = function(input = NULL, choice = NULL) {
         output_EEG$GMA_Measure == ChecknotNormal$GMA_Measure[inn] 
       output_EEG$EEG_Signal[idx] = normalize_data(output_EEG$EEG_Signal[idx], choice)
     }
-    
-    
-    
-    #########################################################
-    # (3) Normalize Behav data per Task and Component
-    #########################################################
-    # Get Grouping Variables from previous step
-    output_Behav = output[output$Component == "RTDiff" |output$Component == "post_ACC",]
-    ChecknotNormal =   output_Behav %>%
-      filter(!is.na("Behav")) %>%
-      group_by(Task, Condition, Component) %>%
-      summarise(notNormal = check_normality(Behav)) %>%
-      group_by(Task, Component) %>%
-      summarise(notNormal = any(notNormal)) %>%
-      filter(notNormal)
-    
-    # Normalize always only within Task, Component, GMA_Measure, but across Electrodes/Condition
-    for (inn in 1:nrow(ChecknotNormal)) {
-      idx =  output_Behav$Task == ChecknotNormal$Task[inn] &
-        output_Behav$Component == ChecknotNormal$Component[inn] 
-      output_Behav$Behav[idx] = normalize_data(output_Behav$Behav[idx], choice)
-    }
-    
-    
-  # Combine again
-    output = bind_rows(output_EEG, output_Behav)
-    
+
   }
   
   
