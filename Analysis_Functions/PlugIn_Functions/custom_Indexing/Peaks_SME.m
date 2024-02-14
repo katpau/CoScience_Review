@@ -10,20 +10,13 @@
         electrodes = size(Subset,1);
         Peak_perTrial = NaN(electrodes,n_boots);
         % Bootstrap and create different ERPS, pick peaks
-        for i_bs = 1:n_boots
+        for i_bs = 1:n_boots % KP: Previously wrong index here
             rng(i_bs, 'twister')
             bs_trialidx = sort(randsample(1:trials,trials,replacement));
             bs_ERP = squeeze(mean(Subset(:,:,bs_trialidx),3));
             Peak_perTrial(:,i_bs) = Peaks_Detection(bs_ERP, Component);
         end
-        % [ocs] FIXED: if there were more trials than n_boots, the result would
-        % always be NaN, unless the "omitmissing" parameter is set (exclude
-        % missing values).
-        % Another simple fix would be to set n_boots to at least the number of
-        % trials (see above) or crop Peak_perTrial to the max. columns (of
-        % n_boots).
-        % Both fixes were left in the code, to decide later, as they are not competing.
         
         % use sd of this distribution for SME
-        SME = std(Peak_perTrial, [], 2, "omitmissing");
+        SME = std(Peak_perTrial, [], 2);
     end

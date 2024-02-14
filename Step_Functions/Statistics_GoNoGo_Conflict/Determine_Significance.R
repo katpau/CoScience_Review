@@ -146,20 +146,30 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   #########################################################
-  # (5) Test State Effects
+  # (5) Control for Arousal
   #########################################################
   print("Test Effect of Anxiety and Instruction on N2 controlling for Arousal")
   Name_Test = c("N2_Apprehension_controllingArousal")
   lm_formula =   paste( "EEG_Signal ~ (( Condition_Instruction  ", 
-                        Personality_Formula, "* StateAnxiety)", additional_Factor_Formula, ")", Covariate_Formula)
-  collumns_to_keep = c("Condition_Instruction", Personality_Name, "StateAnxiety", Covariate_Name, additional_Factors_Name) 
+                        Personality_Formula, "+ Condition_Instruction * Personality_RSTPQ_Flight)", additional_Factor_Formula, ")", Covariate_Formula)
+  collumns_to_keep = c("Condition_Instruction", Personality_Name, "Personality_RSTPQ_Flight", Covariate_Name, additional_Factors_Name) 
   Component = "N2"
+  H1_2a = wrap_test_Hypothesis(Name_Test,lm_formula, output,
+                               Effect_of_Interest,  DirectionEffect, 
+                               collumns_to_keep, Condition_Type, Component)
   
   
   
-  H1_2 = wrap_test_Hypothesis(Name_Test,lm_formula, output,
-                              Effect_of_Interest,  DirectionEffect, 
-                              collumns_to_keep, Condition_Type, Component)
+  Effect_of_Interest = c("Condition_Instruction",  "Personality_RSTPQ_Flight")
+  Name_Test = c("N2_Arousal_controllingApprehension")
+  DirectionEffect = list("Effect" = "interaction_correlation",
+                         "Larger" = c("Condition_Instruction", "Relaxed"),
+                         "Smaller" = c("Condition_Instruction", "Speed"),
+                         "Personality" = "Personality_RSTPQ_Flight")
+  H1_2b = wrap_test_Hypothesis(Name_Test,lm_formula, output,
+                               Effect_of_Interest,  DirectionEffect, 
+                               collumns_to_keep, Condition_Type, Component)
+  
   
   
   #########################################################
@@ -278,15 +288,18 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   if (choice == "Holm"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "holm", n = comparisons)
+    Estimates_to_Correct$p_summary = p.adjust(Estimates_to_Correct$p_summary, method = "holm", n = comparisons)
   }  else if (choice == "Bonferroni"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "bonferroni", n = comparisons)
+    Estimates_to_Correct$p_summary = p.adjust(Estimates_to_Correct$p_summary, method = "bonferroni", n = comparisons)
   } else if (choice == "FDR"){
     Estimates_to_Correct$p_Value = p.adjust(Estimates_to_Correct$p_Value, method = "fdr", n = comparisons)
+    Estimates_to_Correct$p_summary = p.adjust(Estimates_to_Correct$p_summary, method = "fdr", n = comparisons)
   }
   
   
   Estimates = rbind(Estimates_to_Correct,
-                    H1_1 , H2_1, H2_2 ) # Add other estimates here
+                    H1_1 , H2_1, H2_2, H1_2a, H1_2b , H3_1) # Add other estimates here
   
   
   #########################################################

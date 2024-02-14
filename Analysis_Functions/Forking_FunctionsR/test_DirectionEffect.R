@@ -35,7 +35,6 @@ test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResu
         group_by_at(Groupings) %>%
         summarise(DV = mean(get(DV), na.rm =T))
       colnames(Subset)[colnames(Subset) == "DV"] = DV
-
     }
   }
   

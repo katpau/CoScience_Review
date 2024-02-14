@@ -24,14 +24,13 @@
 **/Only_ForGit_To_TestRun/Preproc_forked/Ultimatum_Offer/Stats*
 **/Only_ForGit_To_TestRun/Preparing_PersonalityData/Test*
 
+
 # Also ignore incomplete/untested scripts
 **/Only_ForGit_To_TestRun/ForkingFiles/Flanker_Error*
 **/Only_ForGit_To_TestRun/ForkingFiles/Flanker_Error*
-**/Step_Functions/Quantification_Error_Perfectionism/*
 **/Step_Functions/Quantification_Flanker_Error/*
 **/Step_Functions/Quantification_Gambling_RewP_Relative/*
-**/Step_Functions/Quantification_Error_Perfectionism/*
-**/Step_Functions/Statistics_Error_Perfectionism/*
+
 
 # other files
 **/Only_ForGit_To_TestRun/Logs/*

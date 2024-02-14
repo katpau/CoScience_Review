@@ -67,7 +67,7 @@ eInfoDesc.value.Levels = [];
    eInfoDesc.value.Levels.(['x', num2str(EventTriggers(ifield))]) = EventLabels(ifield);
    end
 jsonwrite(char(strcat(Filepath, Filename, '_events.json')),eInfoDesc, struct('indent','  '));    
-   
+
 
 
 

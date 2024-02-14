@@ -21,6 +21,6 @@ EEG = pop_select( EEG, 'channel', Electrodes);
             Power_DB = Power ./ Power_BL; % add 10*log10() ??? or just for plotting
             
             % Reorder electrodes
-            ElectrodeIdx = findElectrodeIdx(EEG.chanlocs, Electrodes);
+            ElectrodeIdx = findElectrodeIdx(upper(EEG.chanlocs), upper(Electrodes));
             Power_DB = Power_DB(ElectrodeIdx,:,:);
 end

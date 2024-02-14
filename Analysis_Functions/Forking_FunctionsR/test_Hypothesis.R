@@ -129,7 +129,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
         } else {
           Model_Result = tryCatch({
             Subset$Lab = as.numeric(Subset$Lab)
-            Model_Result = lm(as.formula(lm_formula),
+            Model_Result = lm(as.formula(lm_formula), 
                               Subset,
                               control = lmerControl(optimizer = "bobyqa"))
             Model_Result$formula = lm_formula
@@ -225,7 +225,8 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       lm_formula = ModelProvided[2]
       nrSubs = ModelProvided[3]
       Estimates = cbind.data.frame(Name_Test, NA, NA, NA, NA, NA, NA, nrSubs,mean(Subset$Epochs, na.rm=TRUE),
-                                   sd(Subset$Epochs, na.rm=TRUE), NA, lm_formula, NA, NA, NA,NA, NA, NA, NA, NA, NA)
+                                   sd(Subset$Epochs, na.rm=TRUE), NA, lm_formula, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+
       
     } else {
       # get Anova from model
@@ -324,7 +325,6 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       if (length(SumModel)<6) {SumModel = c(SumModel[1:3], NA, SumModel[4:5])} # then no dfs!
 
 
-
       # prepare export
       if (length(Idx_Effect_of_Interest)>0) {
         Estimates = cbind.data.frame(Name_Test, StatTest, "partial_Eta", partial_Eta, p_Value,  nrSubs, mean(Subset$Epochs), sd(Subset$Epochs), 
@@ -332,7 +332,7 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
                                      t(SumModel))
       } else {
         print("Effect not found in Model")
-        Estimates = cbind.data.frame(Name_Test, NA, "partial_Eta", NA, NA, NA, NA,  NA, NA, NA, NA,
+        Estimates = cbind.data.frame(Name_Test, NA, "partial_Eta", NA, NA, NA, NA,  NA, NA, NA, NA, 
                                      lm_formula, NA, NA, NA, NA, NA, NA, NA, NA, NA)
         
       }

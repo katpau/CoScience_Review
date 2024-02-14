@@ -20,7 +20,7 @@ RT = function(input = NULL, choice = NULL) {
   # (1) Preparations 
   #########################################################
   # Collect all Choices
-  Select_Trials_RT = unlist(input$stephistory["Select_Trials_RT"])
+  Select_Trials_RT = unlist(input$stephistory["SelectTrialsRT"])
   
   
   # Read Behavioural Data

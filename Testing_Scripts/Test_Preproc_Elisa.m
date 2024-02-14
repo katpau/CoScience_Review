@@ -26,10 +26,14 @@ DesignFile=strcat(RootFolder, "Only_ForGit_To_TestRun/ForkingFiles/", AnalysisNa
 File_to_Import = strcat(SubjectName, "\eeg\", SubjectName, "_task-", ImportedTask, "_eeg.set");
 MatlabAnalysisName = strcat(ImportedTask, "_MVPA");
 % Add Relevant Paths including predefined functions and eeglab functions
-addpath(genpath(strcat(RootFolder, "Analysis_Functions/")))
-rmpath(genpath(strcat(RootFolder, "Analysis_Functions/eeglab2022.0")))
+addpath(genpath(strcat(RootFolder, "Analysis_Functions/Forking_Functions/")))
+addpath(genpath(strcat(RootFolder, "Analysis_Functions/Plugin_Functions/")))
+
 addpath(strcat(RootFolder, "Analysis_Functions/eeglab2022.0"))
 eeglab
+addpath(genpath(strcat(RootFolder, "Analysis_Functions/Error_MVPA/")))
+
+rmpath(genpath(strcat(RootFolder, "Analysis_Functions/Error_MVPA/MVPA/02_MVPA/toolboxes/eeglab13_4_3b/")))
 % Add Paths relevant for the Preprocessing of this specific Analysis 
 Step_Functions_To_Add = ["Preprocessing_All", Step_Functions_To_Add];
 for iStepFunction = 1:length(Step_Functions_To_Add)
@@ -90,5 +94,20 @@ INPUT = Bad_Epochs(INPUT, "FASTER"); %  "FASTER", "Threshold_100", "Threshold_12
 INPUT = Reference(INPUT, "CSD"); %  "CSD" "CAV"      "Mastoids"  
 INPUT = Trials_Performance(INPUT, "RTs"); %  "RTs", "None"
 INPUT = Electrodes(INPUT, "C3, C4"); % "C3, C4",        "FC3, FC4"
+INPUTBU = INPUT
+
+%%
+addpath(genpath(strcat(RootFolder, "Analysis_Functions/Error_MVPA/MVPA/02_MVPA/toolboxes/eeglab13_4_3b/")))
+
+INPUT = load("C:\Users\Paul\Downloads\HummelDownloads\sub-AHSAER12.mat")
+INPUT = INPUT.Data
 INPUT = TimeWindow(INPUT, "relative_peak"); %  "relative_peak", "absolute_criteria"
+INPUT
+
+
+
+
+
+
+
 
