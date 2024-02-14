@@ -128,12 +128,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   #########################################################
   # (2)  Main Effects for each GMA Measure
   #########################################################
-  # GMA: All complete cases (i.e., without any missing value caused by a failed GMA or with a missing EEG peak value)
-  GmaSet <- output %>%
-    filter(GMA_Measure %in% GMA_colnames) %>%
-    group_by(ID, Task, Electrode) %>%
-    filter(!any(is.na(EEG_Signal))) %>%
-    ungroup()
+
   
   
   # Even though it may seem redundant, the GMA main effects are tested separately, since
@@ -145,7 +140,12 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   lm_formula =   paste( "EEG_Signal ~  (Condition ) ", Covariate_Formula)
   
   
-  
+  # GMA: All complete cases (i.e., without any missing value caused by a failed GMA or with a missing EEG peak value)
+  GmaSet <- output %>%
+    filter(GMA_Measure %in% GMA_colnames) %>%
+    group_by(ID, Task, Electrode) %>%
+    filter(!any(is.na(EEG_Signal))) %>%
+    ungroup()
 
     for (i_task in c("GoNoGo", "Flanker")) {
       for (ch in allElectrodes) {
