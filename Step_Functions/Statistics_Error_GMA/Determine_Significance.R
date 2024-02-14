@@ -82,7 +82,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                   names(Data) %in% c("ID", "Lab", "Epochs", "SME", "Component", columns_to_keep)]
     
     # Run Model
-    ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, "exportModel")
+    ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, "exportModel", '', FALSE)
     
     # extract all Effects
     Estimates = rbind(
