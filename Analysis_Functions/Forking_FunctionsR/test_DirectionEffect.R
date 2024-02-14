@@ -29,13 +29,12 @@ test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResu
       summarise(DV = mean(get(DV), na.rm =T),
                 Personality = get(DirectionEffect$Personality)[1])
       colnames(Subset)[colnames(Subset) == "DV"] = DV
-      colnames(Subset)[colnames(Subset) == "Personality"] = DirectionEffect$Personality 
+      colnames(Subset)[colnames(Subset) == "Personality"] = DirectionEffect$Personality
     } else {
       Subset = Subset %>%
         group_by_at(Groupings) %>%
         summarise(DV = mean(get(DV), na.rm =T))
       colnames(Subset)[colnames(Subset) == "DV"] = DV
-     
     }
   }
   
