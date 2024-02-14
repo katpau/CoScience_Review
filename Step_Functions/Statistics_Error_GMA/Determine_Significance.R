@@ -108,7 +108,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                   names(Data) %in% c("ID", "Lab", "Epochs", "SME", "Component", columns_to_keep)]
     
     # Run Test
-    ModelResult <- test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided, FALSE)
+    # Add false as 7th parameter to not include Lab predictor
+    ModelResult <- test_Hypothesis(Name_Test, lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided, FALSE)
     
     # Test Direction
     if (SaveUseModel != "exportModel") {
