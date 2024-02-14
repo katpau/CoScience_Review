@@ -87,9 +87,9 @@ Normalize = function(input = NULL, choice = NULL) {
     output_EEG = output[output$Component == "Ne/c",]
     ChecknotNormal =   output_EEG %>%
       filter(!is.na("EEG_Signal")) %>%
-      group_by(Task, Condition, GMA_Measure) %>%
+      group_by(Task, Condition, GMA_Measure, Electrode) %>%
       summarise(notNormal = check_normality(EEG_Signal)) %>%
-      group_by(Task,  GMA_Measure) %>%
+      group_by(Task, GMA_Measure, Electrode) %>%
       summarise(notNormal = any(notNormal)) %>%
       filter(notNormal)
     
@@ -99,10 +99,7 @@ Normalize = function(input = NULL, choice = NULL) {
         output_EEG$GMA_Measure == ChecknotNormal$GMA_Measure[inn] 
       output_EEG$EEG_Signal[idx] = normalize_data(output_EEG$EEG_Signal[idx], choice)
     }
-    
-    
-    
-    
+
   }
   
   
