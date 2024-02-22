@@ -72,7 +72,6 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                    names(Data) %in% c("ID", "Lab", "Epochs", "SME", "Component", columns_to_keep)]
 
     # Run Model
-    #ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, "exportModel", '', FALSE) # Add false to not include Lab predictor
     ModelResult <- test_Hypothesis(Name_Test, lm_formula, Subset, Effect_of_Interest, "exportModel", , FALSE) # Add false to not include Lab predictor
 
     # extract all Effects
