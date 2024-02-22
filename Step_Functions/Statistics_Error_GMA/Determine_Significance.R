@@ -128,7 +128,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   # General GMA and electrode related
 
-  allElectrodes <- unique(input$data$Electrode)
+  allElectrodes <- unique(output$Electrode)
   allElectrodes <- allElectrodes[!is.na(allElectrodes)]
   
   # Keep track of p adjustment group (family)
@@ -202,9 +202,21 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   #########################################################
   # The models in including personality predictors will be p-adjusted per model.
 
+  # Add the Gamma onset and offset values for exploration
+  Names_GMA <- c(Names_GMA, "onset", "offset")
+  GMA_colnames <- c(GMA_colnames, "onset_ms", "offset_ms")
+  nGmaNames <- length(GMA_colnames)
+
   persColnames <- c("Personality_MPS_PersonalStandards", "Personality_MPS_ConcernOverMistakes")
   persLabels <- c("PSP", "ECP")
   nPersCols <- length(persColnames)
+
+  # GMA: All complete cases, this time including the onsets and offsets
+  GmaSet <- output %>%
+    filter(GMA_Measure %in% GMA_colnames) %>%
+    group_by(ID, Task, Electrode) %>%
+    filter(!any(is.na(EEG_Signal))) %>%
+    ungroup()
 
   for (i_task in c("GoNoGo", "Flanker")) {
     for (ch in allElectrodes) {
@@ -218,7 +230,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
         # One p-adjustment group per model (DV)
         testGroup <- testGroup + 1
 
-        Model <- wrap_test_Hypothesis("", lm_formula, GmaSet, GMA_colnames[i_GMA], i_task,
+        Model <- wrap_test_Hypothesis("", lm_formula, GmaSetElec, GMA_colnames[i_GMA], i_task,
                                      "", "", columns_to_keep,
                                      "exportModel")
 
