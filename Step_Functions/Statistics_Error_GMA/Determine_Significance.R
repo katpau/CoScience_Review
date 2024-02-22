@@ -100,7 +100,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
       )
 
     } else { # only Main Effect of Condition
-      Estimates <- test_Hypothesis("Main_Condition_NoPersonality_", lm_formula, Subset, "Condition", "previousModel", ModelResult, FALSE)
+      Estimates <- test_Hypothesis("Main_Condition_only", lm_formula, Subset, "Condition", "previousModel", ModelResult, FALSE)
     }
 
 
