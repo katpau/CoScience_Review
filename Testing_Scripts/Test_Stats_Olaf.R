@@ -77,7 +77,10 @@ choice = "Applied" #"Applied" "None"
 input = do.call(Attention_Checks_Personality, list(input_init, choice)) 
 
 choice = "None" # "None"     "Excluded"
-input = do.call(Outliers_Personality, list(input, choice)) 
+input = do.call(Outliers_Personality, list(input, choice))
+
+choice = "alls" # "all", "0.7 corr", "0.8 corr", "0.9 corr"
+input = do.call(GMA_Fit, list(input, choice))
 
 choice = "None" # "None","Age_MF","Age","AGG_Anger","BDI_Depression", "BFI_Extraversion"      
 # "BFI_OpenMindedness"       "BFI_Conscientiousness"    "BFI_Agreeableness"        "BFI_NegativeEmotionality" "Big5_OCEAN

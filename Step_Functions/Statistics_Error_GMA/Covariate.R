@@ -89,10 +89,25 @@ Covariate = function(input = NULL, choice = NULL) {
   #########################################################
   # (4) Prepare Output
   #########################################################
+
+  quantileMs <- function (p, shape, rate, srate, modeSmp, modeMs) {
+    frate <- 1000 / srate
+    # Calculate the measurement sample offset from a given transformation
+    xOff <- -(modeMs / frate - modeSmp)
+    qSmp <- qgamma(p, shape = shape, rate = rate)
+    return((qSmp - xOff) * frate)
+  }
+
+  output <- output %>% rowwise() %>% mutate(
+    onset_ms = quantileMs(0.025, shape, rate, eeg_srate, mode, mode_ms),
+    offset_ms = quantileMs(0.975, shape, rate, eeg_srate, mode, mode_ms),
+    .after = excess
+  )
+
   # Restructure wide into Long 
   output = output %>% 
-    select(subject,lab,experimenter,task,condition,channel,component,n_trials, shape, rate,yscale, ip1_ms, ip2_ms, skew, excess) %>% # any other or other than these?
-    gather(GMA_Measure, EEG_Signal, shape:excess)
+    select(subject,lab,experimenter,task,condition,channel,component,n_trials, shape, rate,yscale, ip1_ms, ip2_ms, skew, excess, onset_ms, offset_ms) %>%
+    gather(GMA_Measure, EEG_Signal, shape:offset_ms)
   colnames(output)[1:8] = str_to_title(colnames(output)[1:8])
   
   output = output %>%  # consistence across Projectss
