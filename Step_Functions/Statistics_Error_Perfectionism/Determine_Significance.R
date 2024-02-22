@@ -108,7 +108,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     )
 
     # Adjust Direction to estimates
-    Estimates$value_EffectSize[which(Estimates$Estimate_summary<0)] = Estimates$value_EffectSize[which(Estimates$Estimate_summary<0)]*-1
+    # [OCS] Disabled effect direction adjustment to harmonize the results
+    # Estimates$value_EffectSize[which(Estimates$Estimate_summary<0)] = Estimates$value_EffectSize[which(Estimates$Estimate_summary<0)]*-1
 
     # Add Info for Label
     Estimates$Effect_of_Interest = paste0(Name_Test, "_", Estimates$Effect_of_Interest)
@@ -203,7 +204,6 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     }
 
     # [OCS] KLUDGE: Extract the hypotheses' tests and assign them a separate group for p-adjustment.
-    #   Very inefficient/redundant, but I did not want to change the structure/function (wrap_test_Hypothesis) again.
     #   Hypothesis tests will be prefixed with "H_".
     for(hF in hypoExpr) {
       testGroup <- testGroup + 1L

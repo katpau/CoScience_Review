@@ -3,15 +3,15 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   Choices = c("Holm", "Bonferroni", "None")
   Order = 13
   output = input$data
-  
+
   ## Contributors
   # Last checked by KP 12/22
   # Planned/Completed Review by:
-  
+
   # Handles all Choices listed above 
   # Runs the statistical Test, corrects for multiple comparisons and 
   # Prepares Output Table
-  
+
   # (1) Get Names and Formulas of variable Predictors
   # (2) Initiate Functions for Hypothesis Testing
   # (3) Main Effects of Accuracy for different Tasks
@@ -20,58 +20,40 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # (6) Export as CSV file
 
 
-  # General notes for GMA
-  # - The analysis step which removes trials outside an RT window (RT.R) is not neccessary, since they were already
-  #   set as NA during  the GMA preprocessing.
-
-
   #########################################################
   # (1) Get Names and Formulas of variable Predictors
   #########################################################
   # Names are used to select relevant columns
   # Formula (parts) are used to be put together and parsed to the lm() function,
   # thats why they have to be added by a * or +
-  
-  
+
+
   # Get column Names and Formula for Covariates
-  if (input$stephistory["Covariate"] == "None") { 
-    Covariate_Formula = ""
-    Covariate_Name = vector()
-  } else if (input$stephistory["Covariate"] == "Gender_MF") { 
-    Covariate_Formula = "+ Covariate_Gender"
-    Covariate_Name = "Covariate_Gender"
-  } else if (input$stephistory["Covariate"] == "Age_MF") { 
-    Covariate_Formula = "+ Covariate_Age"
-    Covariate_Name = "Covariate_Age"
-  } else { 
-    Covariate_Name = names(output)[names(output) %like% "Covariate_"]
-    if (length(Covariate_Name)  > 1) {
-      Covariate_Formula = paste("*(", paste(Covariate_Name, collapse = " + "), ")")
+  if (input$stephistory["Covariate"] == "None") {
+    Covariate_Formula <- ""
+    Covariate_Name <- vector()
+  } else if (input$stephistory["Covariate"] == "Gender_MF") {
+    Covariate_Formula <- "+ Covariate_Gender"
+    Covariate_Name <- "Covariate_Gender"
+  } else if (input$stephistory["Covariate"] == "Age_MF") {
+    Covariate_Formula <- "+ Covariate_Age"
+    Covariate_Name <- "Covariate_Age"
+  } else {
+    Covariate_Name <- names(output)[names(output) %like% "Covariate_"]
+    if (length(Covariate_Name) > 1) {
+      Covariate_Formula <- paste("*(", paste(Covariate_Name, collapse = " + "), ")")
     } else {
-      Covariate_Formula = paste( "*", Covariate_Name)
+      Covariate_Formula <- paste("*", Covariate_Name)
     }
   }
-  
-  
-  # Get possible additional factors to be included in the GLM (depends on the forking
-  # these have been determined at earlier step (Covariate) when determining the grouping variables)
-  #additional_Factors_Name = input$stephistory[["additional_Factors_Name"]]
-  #additional_Factor_Formula = input$stephistory[["additional_Factor_Formula"]]
-  # not sure but always three electrodes?
 
-  # [OSC] Electrode factor removed
-  # additional_Factors_Name = "Electrode"
-  # additional_Factor_Formula = "+ Electrode"
-  additional_Factors_Name <- ""
-  additional_Factor_Formula <- ""
-  
+
   # merge GMA and Component collumn
   output$Component <- as.character(output$GMA_Measure)
   #########################################################
   # (2) Initiate Functions for Hypothesis Testing
   #########################################################
-  wrap_test_Hypothesis <- function (Name_Test, lm_formula, Data, Component, Task, Effect_of_Interest, DirectionEffect,
-                                   columns_to_keep, SaveUseModel, ModelProvided, t_group = NA) {
+  wrap_test_Hypothesis <- function(Name_Test, lm_formula, Data, Component, Task, columns_to_keep) {
     # wrapping function to parse specific Information to the test_Hypothesis Function
     # Does three things: (1) Select Subset depending on Conditions and Tasks ans Analysis Phase
     # (2) Test the Hypothesis/Calculate Model and 
@@ -82,55 +64,61 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     # Data contains data (that will be filtered), df
     # GMA_Measure selects relevant Data
     # Task selects relevant Data
-    # Effect_of_Interest is used to identify which estimate should be exported, array of str.
-    #             the effect is extended by any potential additional factors (hemisphere, electrode...)
-    # DirectionEffect is a list with the following named elements:
-    #               Effect - char to determine what kind of test, either main, interaction, correlation, interaction_correlation, interaction2_correlation
-    #               Personality - char name of personality collumn
-    #               Larger - array of 2 chars: first name of collumn coding condition, second name of factor with larger effect
-    #               Smaller - array of 2 chars: first name of collumn coding condition, second name of factor with smaller effect
-    #               Interaction - array of 3 chars: first name of collumn coding condition additional to Larger/Smaller, second name of factor with smaller effect, third with larger effect
     # columns_to_keep lists all collumns that should be checked for completeness, array of str
-    # Task lists the tasks included in this test, array of str
-    # SaveUseModel, can be added or left out, options are 
-    #           "default" (Model is calculated), 
-    #           "exportModel", then model (not estimates) are returned (and Effect of interest and Name_Test are not used)
-    #           "previousModel", then model is not recalculated but the provided one is used
-    
-    # ModelProvided only needed if SaveUseModel is set to "previousModel", output of lm()
-    if(missing(SaveUseModel)) { SaveUseModel <- "default"  }
-    if(missing(ModelProvided)) { ModelProvided <- "none"  }
-
 
     # Create Subset
     Subset <- Data[Data$Component == Component &
-                    Data$Task == Task,
-                  names(Data) %in% c("ID", "Lab", "Epochs", "SME", "Component", columns_to_keep)]
-    
-    # Run Test
-    ModelResult <- test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided, FALSE)
-    
-    # Test Direction
-    if (SaveUseModel != "exportModel") {
-      if (!is.na(ModelResult$value_EffectSize)) {
-        ModelResult <- test_DirectionEffect(DirectionEffect, Subset, ModelResult)
-      }
-      
-      # [OCS] Add group id for p adjustment
-      ModelResult <- ModelResult %>% mutate(t_group = as.integer(t_group))
-    }
-    
-    
-    return(ModelResult)
-  }
-  
-  
-  
-  # General GMA and electrode related
+                     Data$Task == Task,
+                   names(Data) %in% c("ID", "Lab", "Epochs", "SME", "Component", columns_to_keep)]
 
+    # Run Model
+    #ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, "exportModel", '', FALSE) # Add false to not include Lab predictor
+    ModelResult <- test_Hypothesis(Name_Test, lm_formula, Subset, Effect_of_Interest, "exportModel", , FALSE) # Add false to not include Lab predictor
+
+    # extract all Effects
+    if (any(grepl("Personality", columns_to_keep))) {
+      Estimates <- rbind(
+        # Main Condition
+        test_Hypothesis("Main_Condition", lm_formula, Subset, "Condition", "previousModel", ModelResult, FALSE),
+
+        # Main PersonalStandards
+        test_Hypothesis("Main_PSP", lm_formula, Subset, "Personality_MPS_PersonalStandards", "previousModel", ModelResult, FALSE),
+
+        # Main ConcernOverMistakes
+        test_Hypothesis("Main_ECP", lm_formula, Subset, "Personality_MPS_ConcernOverMistakes", "previousModel", ModelResult, FALSE),
+
+        #  Condition * PersonalStandards
+        test_Hypothesis("ConditionxPSP", lm_formula, Subset, c("Condition", "Personality_MPS_PersonalStandards"), "previousModel", ModelResult, FALSE),
+
+        #  Condition * ConcernOverMistakes
+        test_Hypothesis("ConditionxECP", lm_formula, Subset, c("Condition", "Personality_MPS_ConcernOverMistakes"), "previousModel", ModelResult, FALSE),
+
+        #  PersonalStandards * ConcernOverMistakes
+        test_Hypothesis("PSPxECP", lm_formula, Subset, c("Personality_MPS_PersonalStandards", "Personality_MPS_ConcernOverMistakes"), "previousModel", ModelResult, FALSE),
+
+        #  Condition *PersonalStandards * ConcernOverMistakes
+        test_Hypothesis("PSPxECPxCondition", lm_formula, Subset, c("Condition", "Personality_MPS_ConcernOverMistakes", "Personality_MPS_PersonalStandards"), "previousModel", ModelResult, FALSE)
+      )
+
+    } else { # only Main Effect of Condition
+      Estimates <- test_Hypothesis("Main_Condition_NoPersonality_", lm_formula, Subset, "Condition", "previousModel", ModelResult, FALSE)
+    }
+
+
+    # Adjust Direction to estimates
+    # [OCS] Disabled effect direction adjustment to harmonize the results
+    # Estimates$value_EffectSize[which(Estimates$Estimate_summary<0)] <- Estimates$value_EffectSize[which(Estimates$Estimate_summary<0)]*-1
+
+    # Add Info for Label
+    Estimates$Effect_of_Interest <- paste0(Name_Test, "_", Estimates$Effect_of_Interest)
+    return(Estimates)
+  }
+
+
+  # General GMA and electrode related
   allElectrodes <- unique(output$Electrode)
   allElectrodes <- allElectrodes[!is.na(allElectrodes)]
-  
+
   # Keep track of p adjustment group (family)
   # NOTE: (KLUDGE) While increasing the group ID in the model-test construction loops works, it is a bit complicated in
   # nested loops.
@@ -146,16 +134,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   Names_GMA <- c("rate", "excess", "shape", "skewness", "inflection1", "scaling", "inflection2")
   GMA_colnames <- c("rate", "excess", "shape", "skew", "ip1_ms", "yscale", "ip2_ms")
   nGmaNames <- length(GMA_colnames)
-  columns_to_keep <- c("Condition", Covariate_Name, additional_Factors_Name, "GMA_Measure", "EEG_Signal")
-  Effect_of_Interest <- "Condition"
-  lm_formula <- paste("EEG_Signal ~  Condition ", Covariate_Formula, additional_Factor_Formula)
-  # Electrode Fix or possible?
-  DirectionEffect_larger <- list("Effect" = "main",
-                                "Larger" = c("Condition", "error"),
-                                "Smaller" = c("Condition", "correct"))
-  DirectionEffect_smaller <- list("Effect" = "main",
-                                 "Larger" = c("Condition", "correct"),
-                                 "Smaller" = c("Condition", "error"))
+  columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal")
+  lm_formula <- paste("EEG_Signal ~  Condition ", Covariate_Formula)
 
   # GMA: All complete cases (i.e., without any missing value caused by a failed GMA or with a missing EEG peak value)
   GmaSet <- output %>%
@@ -166,35 +146,22 @@ Determine_Significance = function(input = NULL, choice = NULL) {
 
   for (i_task in c("GoNoGo", "Flanker")) {
     for (ch in allElectrodes) {
-
       testGroup <- testGroup + 1
 
       for (i_GMA in 1:nGmaNames) {
-        print(paste("=== Test ", i_task, Names_GMA[i_GMA]))
+        print(paste("Test ", i_task, Names_GMA[i_GMA]))
         Name_Test <- paste0("GMA_", Names_GMA[i_GMA], "_", i_task, "_", ch)
-        if (Names_GMA[i_GMA] %in% c("shape", "rate", "inflection1")) {
-          DirectionEffect <- DirectionEffect_larger
-        } else {
-          DirectionEffect <- DirectionEffect_smaller
-        }
 
-        tEstimate <- wrap_test_Hypothesis(
-          Name_Test, lm_formula,
-          GmaSet %>% filter(Electrode == ch),
-          GMA_colnames[i_GMA], i_task,
-          Effect_of_Interest, DirectionEffect, columns_to_keep,
-          ,, testGroup
-        )
+        Estimates <- rbind(Estimates,
+                           wrap_test_Hypothesis(Name_Test,
+                                                lm_formula, GmaSet %>% filter(Electrode == ch),
+                                                GMA_colnames[i_GMA], i_task,
+                                                columns_to_keep) %>%
+                             mutate(t_group = testGroup))
 
-        Estimates <- rbind(
-          Estimates,
-          tEstimate
-        )
       }
     }
   }
-
-
 
 
   #########################################################
@@ -207,9 +174,9 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   GMA_colnames <- c(GMA_colnames, "onset_ms", "offset_ms")
   nGmaNames <- length(GMA_colnames)
 
-  persColnames <- c("Personality_MPS_PersonalStandards", "Personality_MPS_ConcernOverMistakes")
-  persLabels <- c("PSP", "ECP")
-  nPersCols <- length(persColnames)
+  columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal",
+                       "Personality_MPS_PersonalStandards", "Personality_MPS_ConcernOverMistakes")
+  lm_formula <- paste("EEG_Signal ~  (Condition * Personality_MPS_PersonalStandards * Personality_MPS_ConcernOverMistakes) ", Covariate_Formula)
 
   # GMA: All complete cases, this time including the onsets and offsets
   GmaSet <- output %>%
@@ -220,116 +187,45 @@ Determine_Significance = function(input = NULL, choice = NULL) {
 
   for (i_task in c("GoNoGo", "Flanker")) {
     for (ch in allElectrodes) {
-
-      GmaSetElec <- GmaSet %>% filter(Electrode == ch)
-
-      lm_formula <- paste("EEG_Signal ~ Condition *", paste(persColnames, collapse = " * "), Covariate_Formula, additional_Factor_Formula)
-      columns_to_keep <- c("Condition", Covariate_Name, persColnames, additional_Factors_Name, "GMA_Measure", "EEG_Signal")
-
       for (i_GMA in 1:nGmaNames) {
         # One p-adjustment group per model (DV)
         testGroup <- testGroup + 1
 
-        Model <- wrap_test_Hypothesis("", lm_formula, GmaSetElec, GMA_colnames[i_GMA], i_task,
-                                     "", "", columns_to_keep,
-                                     "exportModel")
+        print(paste("Test ", i_task, Names_GMA[i_GMA], ch))
+        Name_Test <- paste0(Names_GMA[i_GMA], "_", i_task, "_", ch)
 
 
-
-        # Test personality main Effect
-        DirectionEffect_Main <- list("Effect" = "main",
-                                      "Larger" = c("Condition", "error"),
-                                      "Smaller" = c("Condition", "correct"))
-        Name_Test <- paste0("Condition_", Names_GMA[i_GMA], "_", i_task, "_", ch)
-        Estimates <- rbind(Estimates, wrap_test_Hypothesis(paste0("Main_", Name_Test),
-                                                           lm_formula,
-                                                           GmaSetElec,
-                                                           GMA_colnames[i_GMA], i_task,
-                                                           "Condition",
-                                                           DirectionEffect_Main, columns_to_keep,
-                                                           "previousModel", Model, testGroup))
-
-        for (i_pers in 1:nPersCols) {
-
-          persCol <- persColnames[i_pers]
-          persLabel <- persLabels[i_pers]
-
-          DirectionEffect_Main <- list("Effect" = "correlation",
-                                      "Personality" = persCol)
-
-          DirectionEffect_IA <- list("Effect" = "interaction_correlation",
-                                    "Larger" = c("Condition", "error"),
-                                    "Smaller" = c("Condition", "correct"),
-                                    "Personality" = persCol)
-
-
-
-          # Test personality main Effect
-          Name_Test <- paste0(persLabel, "_", Names_GMA[i_GMA], "_", i_task, "_", ch)
-          Estimates <- rbind(Estimates, wrap_test_Hypothesis(paste0("Main_", Name_Test),
-                                                            lm_formula,
-                                                            GmaSetElec,
-                                                            GMA_colnames[i_GMA], i_task,
-                                                            persCol,
-                                                            DirectionEffect_Main, columns_to_keep,
-                                                            "previousModel", Model, testGroup))
-
-          # Test main Effect of CEI
-          Estimates <- rbind(Estimates, wrap_test_Hypothesis(paste0("Interaction_", Name_Test),
-                                                            lm_formula,
-                                                            GmaSetElec,
-                                                            GMA_colnames[i_GMA], i_task,
-                                                            c("Condition", persCol),
-                                                            DirectionEffect_IA, columns_to_keep,
-                                                            "previousModel", Model, testGroup))
-
-        }
-
-
-        # Interaction of both personlity variables
-        Name_Test <- paste0(paste(persLabels, collapse = "_"), "_", Names_GMA[i_GMA], "_", i_task, "_", ch)
-        Estimates <- rbind(Estimates, wrap_test_Hypothesis(paste0("Interaction_", Name_Test),
-                                                           lm_formula,
-                                                           GmaSetElec,
-                                                           GMA_colnames[i_GMA], i_task,
-                                                           persColnames,
-                                                           DirectionEffect_IA, columns_to_keep,
-                                                           "previousModel", Model, testGroup))
-        # Interaction of condition and both personlity variables
-        Name_Test <- paste0("Condition_", paste(persLabels, collapse = "_"), "_", Names_GMA[i_GMA], "_", i_task, "_", ch)
-        Estimates <- rbind(Estimates, wrap_test_Hypothesis(paste0("Interaction_", Name_Test),
-                                                                    lm_formula,
-                                                                    GmaSetElec,
-                                                                    GMA_colnames[i_GMA], i_task,
-                                                                    c("Condition", persColnames),
-                                                                    DirectionEffect_IA, columns_to_keep,
-                                                                    "previousModel", Model, testGroup))
-
+        Estimates <- rbind(Estimates,
+                           wrap_test_Hypothesis(Name_Test,
+                                                lm_formula, GmaSet %>% filter(Electrode == ch),
+                                                GMA_colnames[i_GMA], i_task,
+                                                columns_to_keep) %>%
+                             mutate(t_group = testGroup))
       }
     }
   }
 
-  
+
   ######################################
   # (6) Correct for Multiple Comparisons
   ######################################
 
   allGroups <- unique(Estimates$t_group)
   allGroups <- allGroups[!is.na(allGroups)]
-  
+
   for (i_group in allGroups) {
     idx <- !is.na(Estimates$t_group) & Estimates$t_group == i_group
     nrTests <- sum(idx, na.rm = TRUE)
     Estimates$p_adj[idx] <- p.adjust(Estimates$p_Value[idx], method = tolower(choice), n = nrTests)
   }
-  
+
   #########################################################
   # (6) Export as CSV file
   #########################################################
   FileName <- input$stephistory[["Final_File_Name"]]
-  write.csv(Estimates,FileName, row.names = FALSE)
-  
-  
+  write.csv(Estimates, FileName, row.names = FALSE)
+
+
   #No change needed below here - just for bookkeeping
   stephistory <- input$stephistory
   stephistory[StepName] <- choice
