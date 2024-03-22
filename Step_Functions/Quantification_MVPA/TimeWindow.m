@@ -43,11 +43,46 @@ try
     %%%%%%%%%%%%%%%% Routine for the analysis of this step
     % This functions starts from using INPUT and returns OUTPUT
     EEG = INPUT.data.EEG;
+    LRP = INPUT.data.LRP;
+
+    % ****** Stimulus-locked Data: Define Triggers and Window based on Analysis ******
+        if  INPUT.AnalysisName == "Flanker_MVPA" 
+            Event_Window_SL = [-0.200 1.150]; % Epoch length in seconds (stimulus-locked)
+            Relevant_Triggers_SL = [ 104, 114, 124, 134 ]; %Target Onset Experimenter Absent
     
-    % Condition Names and Triggers depend on analysisname
+        elseif INPUT.AnalysisName == "GoNoGo_MVPA" 
+            Event_Window_SL = [-0.200 1.150]; % Epoch length in seconds (stimulus-locked)
+            Relevant_Triggers_SL = [201, 202 ]; %Target Onset Speed/Accuracy
+        end
+    
+    % ****** Epoch Data around predefined window ******
+        EEG = pop_epoch(EEG, num2cell(Relevant_Triggers_SL), Event_Window_SL, 'epochinfo', 'yes');
+        LRP = pop_epoch(LRP, num2cell(Relevant_Triggers_SL), Event_Window_SL, 'epochinfo', 'yes');
+
+    % ****** Apply Baseline Correction ******
+
+        EEG = pop_rmbase(EEG, [-200 0], []);
+        LRP = pop_rmbase(LRP, [-200 0], []);
+
+
+    % ****** Response-locked Data: Define Triggers and Window based on Analysis ******
+        if  INPUT.AnalysisName == "Flanker_MVPA" 
+              Event_Window_RL = [-0.300 0.300]; % Epoch length in seconds (response-locked)
+              Relevant_Triggers_RL = [ 107, 117, 127, 137, 109, 119, 129, 139 ]; %Responses Fast and Experimenter Absent
+    
+        elseif INPUT.AnalysisName == "GoNoGo_MVPA" 
+              Event_Window_RL = [-0.300 0.300]; % Epoch length in seconds (response-locked)
+              Relevant_Triggers_RL = [211, 220 ]; %Responses Speed/Acc emphasis
+        end
+    
+    % ****** Epoch Data around predefined window ******
+        EEG = pop_epoch(EEG, num2cell(Relevant_Triggers_RL), Event_Window_RL, 'epochinfo', 'yes');
+        LRP = pop_epoch(LRP, num2cell(Relevant_Triggers_RL), Event_Window_RL, 'epochinfo', 'yes');
+
+    % name Condition Triggers to save in OUTPUT structure    
     if INPUT.AnalysisName == "Flanker_MVPA"
-        Condition_Triggers = { 106, 116, 126,  136, 107, 117, 127, 137; ...
-            108, 118, 128, 138, 109, 119, 129, 139  }; %Responses Experimenter Absent
+        Condition_Triggers = { 107, 117, 127, 137; ...
+            109, 119, 129, 139  }; %Responses Experimenter Absent
         Condition_Names = ["Flanker_Correct", "Flanker_Error"];
         
     elseif INPUT.AnalysisName == "GoNoGo_MVPA"
@@ -55,18 +90,8 @@ try
         Condition_Names = ["GoNoGo_Correct", "GoNoGo_Error"];
     end
     
-    Event_Window = [-0.300 0.300]; % Epoch length in seconds
     NrConditions = length(Condition_Names);
-    % 
-    % % Loop Through the conditions like this?
-    % for i_Cond = 1:NrConditions
-    %     (Condition_Names(i_Cond))
-    %     pop_epoch(EEG, Condition_Triggers(i_Cond,:), Event_Window, 'epochinfo', 'yes');     
-    % end
-    
-    % run first-level lrp and mvpa analyses    
-   %  addpath(genpath(strcat(pwd, "/Analysis_Functions/Error_MVPA/")))
-    
+
     % Create vector containing the response types
     events = struct2table(EEG.event);
     
@@ -114,14 +139,9 @@ try
     ms_end = 299;
     
     % Create EEG substructures from 3d EEGmatrix containing only trials from LRP electrodes (channels x dp x trials)
-    chanlocs = struct2table(EEG.chanlocs);
     Electrodes = upper(strsplit(OUTPUT.StepHistory.Electrodes, ", ")); 
-    lrp_chanlocs = [find(strcmp(chanlocs.labels, Electrodes(1))) find(strcmp(chanlocs.labels, Electrodes(2)))]; %only use LRP electrodes of interest
-    
-    EEG_lrp = pop_select(EEG, 'channel', lrp_chanlocs); %remove other channels from EEG structure
-    
-    clear chanlocs lrp_chanlocs
-    
+    EEG_lrp = LRP;   
+      
     %select response types (correct and error)
     EEG_lrp.data = EEG_lrp.data(:,:,events_response.responsetype ~= 0);
     
@@ -344,7 +364,7 @@ try
 
     % Export should have format like this:
     % Subject, Lab, Experimenter, Condition (Correct/Error), Task, Onset (?) or DV, Component (LRP, MVPA, etc.), EpochCount ...
-    NrComponents = 2; % LRP and MVPA?
+    NrComponents = 1; % LRP 
     Subject_L = repmat(INPUT.Subject, NrConditions*NrComponents,1 );
     Lab_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrComponents,1 );
     Experimenter_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrComponents,1 );
@@ -354,9 +374,7 @@ try
     Export = [cellstr([Subject_L, Lab_L, Experimenter_L, Conditions_L]), ...
         num2cell(ACC)]; % add other
     OUTPUT.Export = Export;
-    
-    % rmpath(genpath(strcat(pwd, "/Analysis_Functions/Error_MVPA/")))
-    
+        
     % ****** Updating the OUTPUT structure ******
     % No changes should be made here.
     INPUT.StepHistory.(StepName) = Choice;

@@ -49,20 +49,25 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
     %### Start Preprocessing Routine                               #######
     %#####################################################################
     if ~strcmp(Choice, "None")
-        Conditions = fieldnames(INPUT.data);
-        for i_cond = 1:length(Conditions)
+
             % Get EEGlab EEG structure from the provided Input Structure
-            EEG = INPUT.data.(Conditions{i_cond});
+            EEG = INPUT.data.EEG;
+            LRP = INPUT.data.LRP;
             
             % Mark Trials with RTs faster than 0.1 and slower than 0.8s
-            IdxKeep = cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {EEG.event.RT});
+            IdxKeep_eeg = cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {EEG.event.RT});
+            IdxKeep_lrp = cellfun(@(x)~isempty(x) && x > 0.1 && x <0.8, {LRP.event.RT});
             
-            Epochs_to_Keep = {EEG.event.epoch};
-            Epochs_to_Keep = unique([Epochs_to_Keep{IdxKeep}]);
+            Epochs_to_Keep_eeg = {EEG.event.epoch};
+            Epochs_to_Keep_lrp = {LRP.event.epoch};
+
+            Epochs_to_Keep_eeg = unique([Epochs_to_Keep_eeg{IdxKeep_eeg}]);
+            Epochs_to_Keep_lrp = unique([Epochs_to_Keep_lrp{IdxKeep_lrp}]);
             
             % ****** Keep only marked Trials ******
-            EEG = pop_select( EEG, 'trial', Epochs_to_Keep);
-            
+            EEG = pop_select( EEG, 'trial', Epochs_to_Keep_eeg);
+            LRP = pop_select( LRP, 'trial', Epochs_to_Keep_lrp);
+
             %#####################################################################
             %### Wrapping up Preprocessing Routine                         #######
             %#####################################################################
@@ -70,8 +75,9 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
             % Script creates an OUTPUT structure. Assign here what should be saved
             % and made available for next step. Always save the EEG structure in
             % the OUTPUT.data field, overwriting previous EEG information.
-            OUTPUT.data.(Conditions{i_cond}) = EEG;
-        end
+            OUTPUT.data.EEG = EEG;
+            OUTPUT.data.LRP = LRP;
+  
     end
     
     
