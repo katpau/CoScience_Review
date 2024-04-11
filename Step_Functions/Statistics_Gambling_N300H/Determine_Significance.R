@@ -137,8 +137,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   # Test Anxiety * FB
   DirectionEffect = list("Effect" = "interaction_correlation",
-                          "Larger" = c("Condition", "Loss"),
-                          "Smaller" = c("Condition", "Win"),
+                          "Larger" = c("Condition", "high_loss"),  # Should only be loss and win?
+                          "Smaller" = c("Condition", "high_win"),
                           "Personality" = Anxiety)
   Effect_of_Interest = c( Anxiety, "Condition")
   Name_Test = "Anxiety_Condition"
@@ -150,8 +150,14 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   # Test Intercept?
-  
-  
+  Intercept = summary(HX_Model)$"coefficients"[1,]
+  Intercept =  cbind("Confirmation_N300H", "Intercept", "NA", "NA", "NA", "NA", 
+                 "NA", Estimates[1,8:12],
+                 "NA", "NA", "NA", "Intercept", t(Intercept)) 
+  colnames(Intercept) = colnames(Estimates)
+  Estimates = rbind(Estimates, 
+                    Intercept)
+
   #########################################################
   # (5) Correct for Multiple Comparisons for Hypothesis 1
   #########################################################

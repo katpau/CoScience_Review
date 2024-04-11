@@ -254,12 +254,12 @@ try
         if sum(EpochCount(contains(Conditions_L, 'loss'))) < ...
                 str2num(INPUT.StepHistory.Trials_MinNumber)
 
-            N300H(contains(Conditions_L, 'loss'),1) = NaN;
+            N300H(contains(Conditions_L, 'loss')) = NaN;
 
         elseif  sum(EpochCount(contains(Conditions_L, 'win'))) < ...
                 str2num(INPUT.StepHistory.Trials_MinNumber)
 
-            N300H(contains(Conditions_L, 'win'),1) = NaN;
+            N300H(contains(Conditions_L, 'win')) = NaN;
         end
 
         % ****** Prepare Table ******

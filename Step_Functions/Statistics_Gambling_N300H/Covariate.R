@@ -113,8 +113,8 @@ Covariate = function(input = NULL, choice = NULL) {
   # (5) Prepare Export
   #########################################################
   # Make sure everything is in correct format
-  NumericVariables = c("EEG_Signal", "SME", "Epochs", names(output)[grepl("Personality_|Covariate_|Behav_", names(output))])
-  FactorVariables = c("ID", "Condition", "Electrode",   "Bin",
+  NumericVariables = c("EEG_Signal", "Epochs", names(output)[grepl("Personality_|Covariate_|Behav_", names(output))])
+  FactorVariables = c("ID", "Condition", "Electrode",   
                       names(output)[grepl("Covariate_Gender", names(output))])
   
   
@@ -124,7 +124,6 @@ Covariate = function(input = NULL, choice = NULL) {
   # Unclear and still needs to be checked: Sometimes SME and EEG_Signal is Inf
   # Unclear why, but some EEG_Signal scores are -Inf
   output$EEG_Signal[abs(output$EEG_Signal)==Inf] = NA
-  output$SME[abs(output$SME)==Inf] = NA
   
   
   #########################################################
