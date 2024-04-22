@@ -60,10 +60,13 @@ try
         LRP = pop_epoch(LRP, num2cell(Relevant_Triggers_SL), Event_Window_SL, 'epochinfo', 'yes');
 
     % ****** Apply Baseline Correction ******
-
-        EEG = pop_rmbase(EEG, [-200 0], []);
-        LRP = pop_rmbase(LRP, [-200 0], []);
-
+        if EEG.srate == 500
+            EEG = pop_rmbase(EEG, [-200 0], []);
+            LRP = pop_rmbase(LRP, [-200 0], []);
+        elseif EEG.srate == 512
+            EEG = pop_rmbase(EEG, [EEG.xmin 0], []);
+            LRP = pop_rmbase(LRP, [LRP.xmin 0], []);
+        end
 
     % ****** Response-locked Data: Define Triggers and Window based on Analysis ******
         if  INPUT.AnalysisName == "Flanker_MVPA" 
