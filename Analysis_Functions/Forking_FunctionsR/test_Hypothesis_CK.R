@@ -1,4 +1,4 @@
-test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Effect_of_Interest, SaveUseModel, ModelProvided, lmFamily) {
+test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Effect_of_Interest, SaveUseModel, ModelProvided, lmFamily, Nullmodel) {
   # this function is used to export the relevant estimates from the tested model or the model (determined by SaveUseModel)
   # Name_Test is the Name that will be added as first column, to identify tests across forks, str (next to the actual interaction term)
   # lm_formula contains the formula that should be given to the lm, str
@@ -15,6 +15,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
   if(missing(SaveUseModel)) { SaveUseModel = "default"  }
   if(missing(ModelProvided)) { ModelProvided = "none"  }
   if(missing(lmFamily)) {lmFamily = "standard"}
+  if(missing(Nullmodel)) {Nullmodel = ""}
   StopModel = 0
   
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,8 +43,8 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
   # Prepare and Calculate LMer Model
   if (!SaveUseModel == "previousModel"){ 
     # check if data has been processed, otherwise don't proceed
-    if (length(unique(Subset$ID))<50) { # Change for final analysis
-      Model_Result = c("Error_when_computing_Model", lm_formula, lmFamily )
+    if (length(unique(Subset$ID))<10) { # Change for final analysis
+      Model_Result = c("Error_when_computing_Model", lm_formula, lmFamily, "To Few Subs" )
       
     } else {
       
@@ -63,8 +64,8 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
           }}
       }
       
-      # Also run 0 Model => DV can vary!
-      lm_formula_NULL = paste(DV, " ~ 1 + (1|ID)")
+ 
+     
       
 
       
@@ -79,9 +80,15 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
       lm_formula = paste(lm_formula, "+ (Congruency|ID)")  
       lm_formula_noAdd_Random = lm_formula
 
+      # Also run 0 Model => DV can vary!
+      if (Nullmodel == "") {
+        formula_NULL = paste(DV, " ~ 1 + (1|ID)")
+      } else {
+        formula_NULL = gsub(Nullmodel, "", lm_formula)
+      }
       
       # Remove Nas
-      Subset = Subset[,c(columns_to_keep, "ID", "Lab", DV)]
+      Subset = Subset[,c(columns_to_keep, "ID", "Lab", "Epochs", DV)]
       Subset = Subset[complete.cases(Subset),]
       
       
@@ -107,7 +114,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
           
         }, error = function(e) {
           print("Error with Model")
-          Model_Result = c("Error_when_computing_Model", lm_formula, lmFamily)
+          Model_Result = c("Error_when_computing_Model", lm_formula,lmFamily, Error_Message)
           return(Model_Result)
         })
         
@@ -120,7 +127,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
           Model_Result = lmer(as.formula(lm_formula), 
                               Subset,
                               control = lmerControl(optimizer = "bobyqa")) 
-          NullModel = lmer(as.formula(lm_formula_NULL), 
+          NullModel = lmer(as.formula(formula_NULL), 
                               Subset,
                               control = lmerControl(optimizer = "bobyqa")) 
           } else if(lmFamily == "binominal") {
@@ -128,7 +135,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
                                 Subset,
                                 family = binomial(link = "logit"),
                                 control = glmerControl(optimizer = "bobyqa")) 
-            NullModel = glmer(as.formula(lm_formula_NULL), 
+            NullModel = glmer(as.formula(formula_NULL), 
                                  Subset,
                                  family = binomial(link = "logit"),
                                  control = glmerControl(optimizer = "bobyqa")) 
@@ -136,10 +143,12 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
           attributes(Model_Result)$formula = lm_formula
           attributes(Model_Result)$lmFamily = lmFamily
           attributes(Model_Result)$NullModel =  NullModel
+          attributes(Model_Result)$formula_NULL = formula_NULL
           Model_Result
         }, error = function(e) {
           print("Error in Model")
-          Model_Result = c("Error_when_computing_Model", lm_formula,lmFamily)
+          Error_Message = conditionMessage(e)
+          Model_Result = c("Error_when_computing_Model", lm_formula,lmFamily, Error_Message)
           return(Model_Result)
         })
         
@@ -172,8 +181,9 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
     if ((is.character(Model_Result) &&  grepl( "Error", Model_Result[1])) ) {
       lm_formula = Model_Result[2]
       lmFamily = Model_Result[3]
+      Error_Message = Model_Result[4]
       Model_Result = Model_Result[1]
-
+      
       
     } else {
       if (class(Model_Result) == "lm") {
@@ -185,6 +195,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
         lm_formula = Model_Result@formula
         lmFamily = Model_Result@lmFamily
         NullModel = Model_Result@NullModel
+        formula_NULL = Model_Result@formula_NULL
         }
       
     }}
@@ -202,7 +213,8 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
     #  If there were Problems with the Model, extract NAs
     if (is.character(Model_Result) &&  grepl( "Error", Model_Result[1])) {
       print("no Estimates since Error with Model ")
-      Estimates = cbind.data.frame(Name_Test, "Error with Model", t(rep(NA, 32)) )
+      if (SaveUseModel == "default") {        Error_Message = Model_Result[4]       }
+      Estimates = cbind.data.frame(Name_Test, "Error with Model", t(rep(NA, 11)), lm_formula, t(rep(NA, 23)), Error_Message )
       
     
     } else {
@@ -214,7 +226,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
       
       # Compare against Nullmodel
       ModelComp = anova(Model_Result, NullModel )
-      ModelComp = c(ModelComp$`Pr(>Chisq)`[2] , ModelComp$AIC[1], ModelComp$AIC[2], ModelComp$BIC[1], ModelComp$BIC[2])
+      ModelComp = c(ModelComp$`Pr(>Chisq)`[2] , ModelComp$AIC[1], ModelComp$AIC[2], ModelComp$BIC[1], ModelComp$BIC[2], ModelComp$deviance[1], ModelComp$deviance[2] )
       
       var_Nullmodell = as.data.frame(VarCorr(NullModel))
       ICC = var_Nullmodell $vcov[1] / (var_Nullmodell $vcov[1] + var_Nullmodell $vcov[2])
@@ -271,7 +283,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
       
       
       # semi-partial (marginal) R squared for fixed effects
-      tryCatch(
+      R2 = tryCatch(
         {R2 = r2glmm::r2beta(Model_Result, method = "nsj")
         PredicNames = R2$Effect
         # Get Regressors including all Elements
@@ -305,7 +317,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
       
     
       ## for the whole model
-      r2_total <- MuMIn::r.squaredGLMM(Model_Result, pj2014 = T)
+      # r2_total <- MuMIn::r.squaredGLMM(Model_Result, pj2014 = T)
       
       # Get Results from Corinnas Function
       MLM_Result = mlm.table(Model_Result, Effect_of_Interest) 
@@ -341,39 +353,18 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
                                    PredicNames, t(SumModel),
                                    t(MLM_Result),
                                    t(R2),
+                                   formula_NULL,
                                    t(ModelComp),
-                                   t(ICC))
+                                   t(ICC),
+                                   NA)
       } else {
       print("Effect not found in Model")
-      Estimates = cbind.data.frame(Name_Test, "Effect not found in Model", t(rep(NA, 32)) )
+      Estimates = cbind.data.frame(Name_Test, "Effect not found in Model", t(rep(NA, 11)), lm_formula, t(rep(NA, 23)), "Effect Not Found in Model" )
+      
                                    
         
       }
       
-      
-      # is there a way to test the direction simply?
-      # CK: the direction is expressed in the positive or negative value of the estimate
-      # however, if interactions are significant, we might want to explore this interaction effect
-      # that would be possible with a simple slope analysis
-      # plot interactions
-      # library(interactions)
-      # # produce a plot
-      # rt_ia.plot <- interact_plot(model, pred = demand.cwc, modx = CEI.cgm, centered = "none", 
-      #                             x.label = "Demand", y.label = "Reaction Time in ms",
-      #                             legend.main = "Cognitive \nEffort \nInvestment",
-      #                             interval = F,
-      #                             colors = c("black", "black", "black", "black")) + ylim(335, 650) + theme_apa(legend.use.title = T) 
-      # 
-      # # perform simple slopes analysis
-      # rt.ss.d <- sim_slopes(model, pred = demand.cwc, modx = CEI.cgm, centered = "none",
-      #                       cond.int = T,                   # print conditional intercepts
-      #                       johnson_neyman = T,             # calculate Johnson Neyman intervals,
-      #                       jnplot = T, control.fdr = T,    # create plot, adjust false discovery rate
-      #                       confint = T)                    # get confidence intervals
-      # 
-      
-      # is there a way to extract estimates when more than 2 levels?
-      # effectsize::standardize_parameters(Model_Result)
     } }
     colnames(Estimates) = c("Effect_of_Interest", "Statistical_Test", 
                             "EffectSizeType" ,  "value_EffectSize", "CI_low", "CI90_high", "p_anova",  
@@ -383,7 +374,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
                             "RegressorName", "Estimate_summary", "Std.Error_summary", "df_summary", "t_z_summary", "p_summary",
                             "Beta", "SE", "p_MLM", "Rand_Eff_SD", 
                             "Rsq", "CI_low_Rsq", "CI_high_Rsq", 
-                            "ModelComparison_p", "AIC_0", "AIC_A", "BIC_0", "BIC_A","ICC")
+                            "formula_0", "ModelComparison_p", "AIC_0", "AIC_A", "BIC_0", "BIC_A", "deviance_0", "deviance_A", "ICC", "ErrorMessage")
   
     return (Estimates)
   }
