@@ -20,7 +20,7 @@ function ibi = ecg2ibi(ECG, filename, interpolation)
 % (ECG) channel. (EEGlab needs to be on the Matlab pathway).
 %
 % filename = string containing the filename, particpant code, etc.
-% interpolation = 'interpolation' vs. 'no_interpolations'
+% interpolation = 'interpolation' vs. 'no_interpolation'
 %                 'interpolation' -> artifacts are interpolated using linear interpolation 
 %                 'no_interpolation -> Artifacts are deleted and are
 %                 replaced by NaNs. Thus, the IBI signal contains NaN but

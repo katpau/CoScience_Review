@@ -90,11 +90,12 @@ INPUT = Bad_Epochs(INPUT, "FASTER"); %  "FASTER", "Threshold_100", "Threshold_12
 INPUT = Reference(INPUT, "CAV"); %  "CAV"      "Mastoids"  "CSD" 
 INPUT = Baseline(INPUT, "-200 0"); %  "-200 0", "-100 0", 
 
-INPUT = IBI_calculation(INPUT, "no interpolation"); % "no interpolation", interpolation 
+INPUT = IBI_calculation(INPUT, "no_interpolation"); % "no_interpolation", interpolation 
 INPUT = IBI_epoching(INPUT, "-500 0"); % "-500 0"    "firstTP"
 INPUT = ECG_TimeWindow(INPUT, "2000,5000" );  % "2000,5000"    "3500,4000"    "Relative_Group"
 INPUT = TimeWindow(INPUT,  "250,500" ); %  "250,500"    "200,400"    "300,350"    "Relative_Group"
 INPUT = Electrodes(INPUT, "Cz"); % "Cz"    "Fz,FCz,Cz"    "Fcz,Cz"    "FCz"
 INPUT = Cluster_Electrodes(INPUT, "no_cluster"); %    "no_cluster"    "cluster" "no_cluster_butAV"
 INPUT = Trials_MinNumber(INPUT, "51"); %  "51"    "68"
+%INPUT = Quantification_N300H_for_Multiverse(INPUT, "Mean"); % "Mean", "Bins", "Maximum"
 INPUT = Quantification_N300H(INPUT, "Mean"); % "Mean", "Bins", "Maximum"
