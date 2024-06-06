@@ -44,6 +44,9 @@ try
     % Update number of channels
     ECG.nbchan = ECG.nbchan + 1;
 
+    % save percentage of bad IBI points
+    OUTPUT.AC.ECG.artifactPercentage = IBI.artifacts.residuals.percentBadSignal;
+    
     % ****** Updating the OUTPUT structure ******
     % No changes should be made here.
     OUTPUT.StepHistory.(StepName) = Choice;

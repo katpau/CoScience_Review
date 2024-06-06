@@ -19,7 +19,7 @@ function [peakAmplitude,peakPosition, ECG] = Rpeaks(ECG, min_dis)
 % per second. 
 %
 % - 400 ms corresponds to a maximum heart frequency of 150 beats
-% per second. Seems to work quite well in experimentel settings 
+% per second. Seems to work well in experimentel settings 
 % (i.e., seated participants, no physical exertion)
 %
 % OUTPUT:
@@ -60,23 +60,16 @@ ecg_data_dsm = [NaN ecg_data_dsm];
 % minimum distance criteria for consecutive  peaks
 minpeakdist= ECG.srate/1000*min_dis; 
 
-%% Platzhalter: adaptiven Threshold einbauen (maybe Hilbert envelope?)
-% threshold = nanmean(ecg_data_dsm)/2;
 
 % discard artifactual ECG signal to determine reliable threshold
 artifact_thresh = quantile(ecg_data_dsm, 0.75) + 15*iqr(ecg_data_dsm);
 ecg_outliers = ecg_data_dsm(1,:);
 
-
-% Discard signal 3 seconds before extreme ECG values
-ecg_artifacts=...
-    [find(ecg_outliers > artifact_thresh)-3*ECG.srate ...
-    find(ecg_outliers > artifact_thresh)-ECG.srate + 3*ECG.srate];
+% Detect all extreme values
+ecg_artifacts = find(ecg_outliers > artifact_thresh);
 ecg_artifacts = unique(ecg_artifacts);
 
-% remove potential negative. PB 04.01.24
-ecg_artifacts((ecg_artifacts < 0))=[];
-
+% remove extreme values and calculate threshold
 artifact_free_ecg=ecg_data_dsm;artifact_free_ecg(1,ecg_artifacts)=NaN;
 threshold = mean(artifact_free_ecg,'omitnan');
 

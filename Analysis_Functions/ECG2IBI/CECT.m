@@ -64,6 +64,17 @@ else
         eeg_bins(:,b,:) =...
             squeeze(mean(eeg_bins1(:,eeg_bin_range(b):eeg_bin_range(b+1),:),2));
     end
+    
+    % if only one EEG electrode is selected for CECT analysis, add the
+    % electrode dimension again to the eeg_bins matrix.
+    % The electrode dimension got lost due to the squeeze function
+    % in the previous step 
+    if length(size(eeg_bins)) < 3
+        eeg_bins=eeg_bins';
+        eeg_bins=reshape(eeg_bins, [1, size(eeg_bins,1),  size(eeg_bins,2)]);
+       
+    else
+    end
 
 
     %% Calculate CECTs via within-subject correlations

@@ -56,6 +56,9 @@ try
     NrElectrodes = length(Electrodes);
     ElectrodeIdx = findElectrodeIdx(EEG.chanlocs, Electrodes);
 
+    % Discard non-relevant EEG electrodes
+    EEG = pop_select(EEG, 'channel', ElectrodeIdx);
+
     %% Calculate CECTs
 
     % Define settings for CECT analysis
@@ -82,7 +85,7 @@ try
     % Check if electrodes are averaged before extracting the N300H,
     % i.e. before calculating intra-individual correlations:
     if strcmp(INPUT.StepHistory.Cluster_Electrodes,"cluster")
-        EEG = pop_select(EEG, 'channel', ElectrodeIdx);
+        
         % Calculate average of electrodecluster and save it as channel 1 in
         % EEG.data matrix
         EEG.data(1,:,:) = squeeze(mean(EEG.data,1));
@@ -170,7 +173,7 @@ try
             tmp_data = NaN(1,BinsEEG(2)-BinsEEG(1)+1,BinsIBI(2)-BinsIBI(1)+1);
             tmp_data = (cect.results. ...
                 (Condition_Names{1,c})...
-                (ElectrodeIdx, BinsEEG(1):BinsEEG(2), BinsIBI(1):BinsIBI(2)));
+                (:, BinsEEG(1):BinsEEG(2), BinsIBI(1):BinsIBI(2)));
 
             % Fisher-Z transform CECTs
             tmp_data = atanh(tmp_data);
