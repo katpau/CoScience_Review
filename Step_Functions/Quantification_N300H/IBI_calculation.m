@@ -46,6 +46,10 @@ try
 
     % save percentage of bad IBI points
     OUTPUT.AC.ECG.artifactPercentage = IBI.artifacts.residuals.percentBadSignal;
+
+    if OUTPUT.AC.ECG.artifactPercentage > 20
+            error('More than 20% of IBIs were marked as bad and were interpolated');
+    end
     
     % ****** Updating the OUTPUT structure ******
     % No changes should be made here.
