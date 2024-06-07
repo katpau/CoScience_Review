@@ -47,7 +47,8 @@ try
     % save percentage of bad IBI points
     OUTPUT.AC.ECG.artifactPercentage = IBI.artifacts.residuals.percentBadSignal;
 
-    if OUTPUT.AC.ECG.artifactPercentage > 20
+    if OUTPUT.AC.ECG.artifactPercentage > 0.2 & strcmp(Choice,'interpolation')
+
             error('More than 20% of IBIs were marked as bad and were interpolated');
     end
     

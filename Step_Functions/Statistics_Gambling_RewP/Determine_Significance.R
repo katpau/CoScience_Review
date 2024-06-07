@@ -108,8 +108,10 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     # Test Direction
     if (!SaveUseModel == "exportModel") {
+     if (!is.na(ModelResult$value_EffectSize)){
       ModelResult = test_DirectionEffect(DirectionEffect, Subset, ModelResult) 
-    }
+      }
+      }
     
     return(ModelResult)
   }
