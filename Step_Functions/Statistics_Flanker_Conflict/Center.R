@@ -12,9 +12,19 @@ Center = function(input = NULL, choice = NULL) {
   # Normalizes the predictors (e.g. behavioral and personality) data within all conditions
   
 
+  # Create Variable for Block
+  output$Block = NA
+  output$Block[output$Trial < 96] = 1 
+  output$Block[output$Trial >= 96 & output$Trial < 192] = 2 
+  output$Block[output$Trial >= 192 & output$Trial < 288] = 3 
+  output$Block[output$Trial >= 288 & output$Trial < 384] = 1
+  output$Block[output$Trial >= 384 & output$Trial < 480] = 2 
+  output$Block[output$Trial >= 480 ] = 3  
+  # Should be real blocks or block used in analyses? Some have Experimenter Presence First, others Second half of block??
+  
+  output$Congruency_notCentered = output$Congruency # in case it is centered, use original labels
+  
   # (1) Center Personality Variables
-  if (choice == "Centered")  {
-    
     #########################################################
     # (1) Center Personality Variables
     #########################################################
@@ -24,29 +34,24 @@ Center = function(input = NULL, choice = NULL) {
     
     Personality = input$stephistory$output_Personality 
     Relevant_Collumns =  colnames(Personality)[grep(c("Personality_|Covariate_|IST"), names(Personality))] 
+    Relevant_Collumns = Relevant_Collumns[!grepl("Gender", Relevant_Collumns)]
     
     
+    
+    if (choice == "Centered")  {
     # Center
     Personality[,Relevant_Collumns] = lapply(Personality[,Relevant_Collumns], function(col) scale(col, scale = FALSE))
+    }
     
     # Merge with output
     output =  merge(output,  Personality, by = c("ID"),
                     all.x = TRUE,  all.y = FALSE )
     
     
+    if (choice == "Centered")  {
     #########################################################
     # (2) Center Within Participant
     #########################################################
-    # Create Variable for Block
-    output$Block = NA
-    output$Block[output$Trial < 96] = 1 
-    output$Block[output$Trial >= 96 & output$Trial < 192] = 2 
-    output$Block[output$Trial >= 192 & output$Trial < 288] = 3 
-    output$Block[output$Trial >= 288 & output$Trial < 384] = 1
-    output$Block[output$Trial >= 384 & output$Trial < 480] = 2 
-    output$Block[output$Trial >= 480 ] = 3  
-    # Should be real blocks or block used in analyses? Some have Experimenter Presence First, others Second half of block??
-    
     # (2) center level 1 predictors within cluster (CWC), i.e. group mean centering
     #  demand, electrode, block
     # sub.rt$demand - ave(sub.rt$demand, sub.rt$id_t2, FUN = function(x) mean(x, na.rm = T))

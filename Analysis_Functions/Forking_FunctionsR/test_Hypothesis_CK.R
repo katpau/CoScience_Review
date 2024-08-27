@@ -214,7 +214,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
     if (is.character(Model_Result) &&  grepl( "Error", Model_Result[1])) {
       print("no Estimates since Error with Model ")
       if (SaveUseModel == "default") {        Error_Message = Model_Result[4]       }
-      Estimates = cbind.data.frame(Name_Test, "Error with Model", t(rep(NA, 11)), lm_formula, t(rep(NA, 23)), Error_Message )
+      Estimates = cbind.data.frame(Name_Test, "Error with Model", t(rep(NA, 11)), lm_formula, t(rep(NA, 26)), Error_Message )
       
     
     } else {
@@ -263,9 +263,7 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
       
       # Get partial_Etas
       if (lmFamily == "binominal") {
-        partial_Eta = effectsize::standardize_parameters(Model_Result)
-        partial_Eta = partial_Eta[Idx_Effect_of_Interest,]
-        partial_Eta = cbind.data.frame( "std.coef", partial_Eta$Std_Coefficient, partial_Eta$CI_low, partial_Eta$CI_high) 
+        partial_Eta = t(c(NA, NA, NA, NA))
         # Get p value
         p_Value = NA # why no p-value here?
       } else {
@@ -276,7 +274,21 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
       # Get p value
       p_Value = AnovaModel$`Pr(>F)`[Idx_Effect_of_Interest]
       }
-
+      
+      # Get standardized parameter
+      std_param = tryCatch(
+        {std_param = effectsize::standardize_parameters(Model_Result)
+        std_param = std_param[Idx_Effect_of_Interest,]
+        std_param = c( std_param$Std_Coefficient, std_param$CI_low, std_param$CI_high) 
+        },
+        
+        error=function(cond) {
+          std_param = c(NA, NA, NA)
+          return(std_param)
+        })
+      
+      
+      
       
       # Get Name of Test
       StatTest = rownames(AnovaModel)[Idx_Effect_of_Interest]
@@ -351,15 +363,17 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
                                    Nr_Subs, mean(Epochs$Epochs), sd(Epochs$Epochs), Singularity,
                                    lm_formula, FStatInfo,
                                    PredicNames, t(SumModel),
+                                   t(std_param),
                                    t(MLM_Result),
                                    t(R2),
                                    formula_NULL,
                                    t(ModelComp),
                                    t(ICC),
+                                   
                                    NA)
       } else {
       print("Effect not found in Model")
-      Estimates = cbind.data.frame(Name_Test, "Effect not found in Model", t(rep(NA, 11)), lm_formula, t(rep(NA, 23)), "Effect Not Found in Model" )
+      Estimates = cbind.data.frame(Name_Test, "Effect not found in Model", t(rep(NA, 11)), lm_formula, t(rep(NA, 26)), "Effect Not Found in Model" )
       
                                    
         
@@ -368,10 +382,11 @@ test_Hypothesis_CK = function (Name_Test,lm_formula, Subset, columns_to_keep, Ef
     } }
     colnames(Estimates) = c("Effect_of_Interest", "Statistical_Test", 
                             "EffectSizeType" ,  "value_EffectSize", "CI_low", "CI90_high", "p_anova",  
-                            
                             "n_participants", "av_epochs", "sd_epochs", "Singularity",
                             "formula", "F_value", "dfN", "dfD",
-                            "RegressorName", "Estimate_summary", "Std.Error_summary", "df_summary", "t_z_summary", "p_summary",
+                            "RegressorName", 
+                            "Estimate_summary", "Std.Error_summary", "df_summary", "t_z_summary", "p_summary",
+                            "coefficient_std", "CI_low_std", "CI90_high_std",
                             "Beta", "SE", "p_MLM", "Rand_Eff_SD", 
                             "Rsq", "CI_low_Rsq", "CI_high_Rsq", 
                             "formula_0", "ModelComparison_p", "AIC_0", "AIC_A", "BIC_0", "BIC_A", "deviance_0", "deviance_A", "ICC", "ErrorMessage")

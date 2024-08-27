@@ -1,4 +1,4 @@
-Determine_Significance = function(input = NULL, choice = NULL) {
+Determine_Significance_Main = function(input = NULL, choice = NULL) {
   StepName = "Determine_Significance"
   Choices = c("Holm", "Bonferroni", "None")
   Order = 13
@@ -117,11 +117,11 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   for (Personality in c("Personality_CEI", "Personality_COM", "Personality_ESC")) {
     
     for (control_Lab in c("")) {
-      #    for (control_Lab in c("", "_withLabRand")) {
+      for (control_Lab in c("", "_withLabRand")) {
       for (test_Lab in c("")) {
-        # for (test_Lab in c("", "_withLabFix")) {
+        for (test_Lab in c("", "_withLabFix")) {
         for (control_Block in c( "_withBlock")) {
-          #for (control_Block in c("", "_withBlock")) {
+          for (control_Block in c("", "_withBlock")) {
           for (control_IST in c("", "_withIST")) {
             for (DV in c("RT", "ACC", "N2", "P3", "FMT")) {
               tryCatch({
@@ -239,12 +239,17 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                                                                    "previousModel", H_1_Model, lmFamily, Nullmodel)  )
                   
                   
-                }
-              })}}
+                
+
+                  }
+                FileName= '/work/bay2875/Flanker_Conflict/Stat_Results/Main_AllTests_Final.csv'
+                write.csv(Estimates,FileName, row.names = FALSE)
+                })
+              }}
         }}
       
       
-    }}
+    }}}}}
   
   
   #########################################################
@@ -257,10 +262,10 @@ Determine_Significance = function(input = NULL, choice = NULL) {
       nrTests = length(str_split_1(Subtests,  "\\|"))
       for (Test_of_interest in c("_CEI", "_Congruency", "CEI_Congruency")) {
 
-        #for (control_Lab in c("", "_withLabRand")) {
-        #  for (test_Lab in c("", "_withLabFix")) {
-        #    for (control_Block in c("", "_withBlock")) {
-        #      for (control_IST in c("", "_withIST")) {
+        for (control_Lab in c("", "_withLabRand")) {
+          for (test_Lab in c("", "_withLabFix")) {
+            for (control_Block in c("", "_withBlock")) {
+              for (control_IST in c("", "_withIST")) {
 
           Idx =  grepl(Subtests, Estimates$Effect_of_Interest) &
             endsWith(Estimates$Effect_of_Interest, paste0(Test_of_interest, control_IST, control_Block, test_Lab,control_Lab ))
@@ -271,49 +276,51 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                                             method = tolower(choice), n = nrTests)
           Estimates$pvalue[Idx2] = p.adjust(Estimates$pvalue[Idx2],
                                             method = tolower(choice), n = nrTests)
-        #}
-      #}
-    #}
-      #}
+        }
+      }
+    }
+      }
       }
     }
   }
+  FileName= '/work/bay2875/Flanker_Conflict/Stat_Results/Main_AllTests_Final_pCorrected.csv'
+  write.csv(Estimates,FileName, row.names = FALSE)
   
   
   ############################
   # (5) Hypthesis 4: Correlations
   ############################
-  # Personality = "Personality_CEI"
-  # Subset = output[,c("ID", "Personality_LE_Positiv", "Personality_NFC_NeedForCognition",  Personality)]
-  # Subset = Subset[!duplicated(Subset),]
-  # Subset = Subset[,-1]
-  # 
-  # Cors  = psych::corr.test(Subset) 
-  # p_s = Cors$ci$p[1:2]
-  # 
-  # 
-  # if (!choice == "None") {
-  #   p_s = p.adjust(p_s,
-  #            method = tolower(choice), n = 2)
-  # } 
-  # 
-  # 
-  # Cors_Estimates = cbind(
-  #   c("Correlation_LE_NFC",
-  #     "Correlation_LE_CEI")  ,
-  #   "pearsonR", "r",
-  #   Cors$ci$r[1:2], Cors$ci$lower[1:2], Cors$ci$upper[1:2], p_s,
-  #   nrow(Subset),
-  #   matrix(data=NA,nrow=2,ncol=30))
-  # colnames(Cors_Estimates) = colnames(Estimates)
-  # Estimates = rbind(Estimates,Cors_Estimates)
-  
-  
+  Personality = "Personality_CEI"
+  Subset = output[,c("ID", "Personality_LE_Positiv", "Personality_NFC_NeedForCognition",  Personality)]
+  Subset = Subset[!duplicated(Subset),]
+  Subset = Subset[,-1]
+
+  Cors  = psych::corr.test(Subset)
+  p_s = Cors$ci$p[1:2]
+
+
+  if (!choice == "None") {
+    p_s = p.adjust(p_s,
+             method = tolower(choice), n = 2)
+  }
+
+
+  Cors_Estimates = cbind(
+    c("Correlation_LE_NFC",
+      "Correlation_LE_CEI")  ,
+    "pearsonR", "r",
+    Cors$ci$r[1:2], Cors$ci$lower[1:2], Cors$ci$upper[1:2], p_s,
+    nrow(Subset),
+    matrix(data=NA,nrow=2,ncol=30))
+  colnames(Cors_Estimates) = colnames(Estimates)
+  Estimates = rbind(Estimates,Cors_Estimates)
+
+
 
   #########################################################
   # (6) Export as CSV file
   #########################################################
-  FileName= input$stephistory[["Final_File_Name"]]
+  FileName= '/work/bay2875/Flanker_Conflict/Stat_Results/Main_AllTests_Final_complete.csv'
   write.csv(Estimates,FileName, row.names = FALSE)
   
  

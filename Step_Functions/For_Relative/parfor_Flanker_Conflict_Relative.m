@@ -1,7 +1,7 @@
 function  parfor_Flanker_Conflict_Relative(IndexSubset, Parentfolder)
 % List all Folders
-Folders = [dir(fullfile(Parentfolder, '*21.4*'));...
-    dir(fullfile(Parentfolder, '*21.5*')) ];
+Folders = [dir(fullfile(Parentfolder, '*20.4'));...
+    dir(fullfile(Parentfolder, '*20.5')) ];
 
 % Subset Folders
 if strcmp(IndexSubset, "odd")
@@ -73,6 +73,7 @@ parfor iFolder = 1:length(Folders)
     % Go through each File, load and merge to AV
     for ifile = 1:length(Files_Fork)
         try
+            
             Data = load(fullfile( Parentfolder, Folder,Files_Fork(ifile).name));
             Data = Data.Data;
             
@@ -90,13 +91,19 @@ parfor iFolder = 1:length(Folders)
                 NewP3 = [];
                 NewFMT = [];
                 for iel = 1:size(DataN2,1)
-                    New = [New; interp1(1:size(DataN2,2), DataN2(iel,:,it), linspace(1, size(DataN2,2), DP), 'linear')];
+                    for it = 1:size(DataN2,3)
+                        New = [New; interp1(1:size(DataN2,2), DataN2(iel,:,it), linspace(1, size(DataN2,2), DP), 'linear')];
+                    end
                 end
                 for iel = 1:size(DataP3,1)
-                    NewP3 = [NewP3; interp1(1:size(DataP3,2), DataP3(iel,:,it), linspace(1, size(DataP3,2), DPP3), 'linear')];
+                    for it = 1:size(DataP3,3)
+                        NewP3 = [NewP3; interp1(1:size(DataP3,2), DataP3(iel,:,it), linspace(1, size(DataP3,2), DPP3), 'linear')];
+                    end
                 end
                 for iel = 1:size(DataFMT,1)
-                    NewFMT = [NewFMT; interp1(1:size(DataFMT,2), DataFMT(iel,:,it), linspace(1, size(DataFMT,2), DPFMT), 'linear')];
+                    for it = 1:size(DataFMT,3)
+                        NewFMT = [NewFMT; interp1(1:size(DataFMT,2), DataFMT(iel,:,it), linspace(1, size(DataFMT,2), DPFMT), 'linear')];
+                    end
                 end
                 DataN2 = New;
                 DataP3 = NewP3;
@@ -110,7 +117,7 @@ parfor iFolder = 1:length(Folders)
             
             
         catch e
-            fprintf('\n*ERROR GAV Subset: %s, FoldN2r: %i: %s \n  ', IndexSubset, iFolder, string(e.message))
+            fprintf('\n*ERROR GAV Subset: %s, FoldN2r: %i: Subject %s. %s \n  ', IndexSubset, iFolder, Files_Fork(ifile).name, string(e.message))
         end
     end
     
@@ -125,24 +132,26 @@ parfor iFolder = 1:length(Folders)
     % Extract Peaks and Determine new Time Window
     iFF = 1;
     while length(INPUT.data.For_Relative.Times_N2)>DP
-        iFF = iFF +1;
-        INPUT = load(fullfile( Parentfolder, Folder,Files_Fork(iFF).name))
-        INPUT = INPUT.Data;
+        try
+            iFF = iFF +1;
+            INPUT = load(fullfile( Parentfolder, Folder,Files_Fork(iFF).name))
+            INPUT = INPUT.Data;
+        end
     end
     
     % Extract new Latencies
     Times_N2 = INPUT.data.For_Relative.Times_N2;
     Times_P3 = INPUT.data.For_Relative.Times_P3;
     Times_FMT = INPUT.data.For_Relative.Times_FMT;
-    TimeIdx_N2 = findTimeIdx(Times_N2,0, 150);
-    TimeIdx_P3 = findTimeIdx(Times_P3, 250, 500);
+    TimeIdx_N2 = findTimeIdx(Times_N2,150, 400);
+    TimeIdx_P3 = findTimeIdx(Times_P3, 250, 600);
     TimeIdx_FMT = findTimeIdx(Times_FMT, 200, 500);
     [~, Latency_N2] = Peaks_Detection(mean(GAV_N2(:,TimeIdx_N2,:),1), "NEG");
     [~, Latency_P3] = Peaks_Detection(mean(GAV_P3(:,TimeIdx_P3,:),1), "POS");
     [~, Latency_FMT] = Peaks_Detection(10*log10(mean(GAV_FMT(:,TimeIdx_FMT,:),1)), "POS");
     if  contains(INPUT.StepHistory.TimeWindow, "wide")
         TimeWindow_N2 = [Times_N2(Latency_N2+(TimeIdx_N2(1))) - 50, Times_N2(Latency_N2+(TimeIdx_N2(1))) + 50];
-        TimeWindow_P3 = [Times_P3(Latency_P3+(TimeIdx_P3(1))) - 50, Times_P3(Latency_P3+(TimeIdx_P3(1))) + 100];
+        TimeWindow_P3 = [Times_P3(Latency_P3+(TimeIdx_P3(1))) - 50, Times_P3(Latency_P3+(TimeIdx_P3(1))) + 50];
         TimeWindow_FMT = [Times_N2(Latency_FMT+(TimeIdx_FMT(1))) - 50, Times_FMT(Latency_FMT+(TimeIdx_FMT(1))) + 50];
     else
         TimeWindow_N2 = [Times_N2(Latency_N2+(TimeIdx_N2(1))) - 25, Times_N2(Latency_N2+(TimeIdx_N2(1))) + 25];
@@ -209,10 +218,10 @@ parfor iFolder = 1:length(Folders)
             Single_TrialData_ERP = [colNames_ERP;Single_TrialData_ERP];
             
             OUTPUT.data.Export = [INPUT.data.For_Relative.Behav, Single_TrialData_ERP];
-
+            
             OUTPUT.data.ExportInfo = struct('TimeWindowN2', TimeWindow_N2, ...
                 'TimeWindowP3', TimeWindow_P3, ...
-               'TimeWindowFMT', TimeWindow_FMT );
+                'TimeWindowFMT', TimeWindow_FMT );
             
             
             % ****** Error Management ******
@@ -223,12 +232,13 @@ parfor iFolder = 1:length(Folders)
             for ierrors = 1:length(e.stack)
                 ErrorMessage = strcat(ErrorMessage, "//", num2str(e.stack(ierrors).name), ", Line: ",  num2str(e.stack(ierrors).line));
             end
-            
+ 
+            OUTPUT = INPUT;
             OUTPUT.Error = ErrorMessage;
             fprintf('\n*Subset: %s, FoldN2r: %i, Subject: %s - Error Extracting ERPs. \n ', IndexSubset, iFolder, INPUT.Subject)
-            OUTPUT = INPUT;
+
         end
-        parfor_save(fullfile(Parentfolder, Folder, Files_Fork(i_Files).name), OUTPUT)
+       parfor_save(fullfile(Parentfolder, Folder, Files_Fork(i_Files).name), OUTPUT)
     end
 end
 
@@ -239,7 +249,7 @@ end
 %%%%%%%% DO WHEN ONLY FMT IS RELATIVE, BUT ERPS ARE NOT %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % List all Folders
-Folders = dir(fullfile(Parentfolder, '*21.1*'));
+Folders = dir(fullfile(Parentfolder, '*20.1'));
 
 % Subset Folders
 if strcmp(IndexSubset, "odd")
@@ -267,9 +277,11 @@ parfor iFolder = 1:length(Folders)
     Files_Fork = Files_Fork(~contains({Files_Fork.name}, "error" ));
     
     % Get first File to have a starting point (order, timepoints etc)
+
+
     INPUT = load(fullfile(Parentfolder, Folder, Files_Fork(1).name));
     INPUT = INPUT.Data;
-    
+   
     % Nr Electrodes
     NrElectrodes_FMT = length(INPUT.data.For_Relative.Electrodes_FMT);
     
@@ -278,9 +290,9 @@ parfor iFolder = 1:length(Folders)
     if  strcmp(INPUT.StepHistory.Resampling, "500")
         DPFMT = 201;
     elseif  strcmp(INPUT.StepHistory.Resampling, "250")
-        DPFMT = 100;
+        DPFMT = 101;
     elseif  strcmp(INPUT.StepHistory.Resampling, "125")
-        DPFMT = 50;
+        DPFMT = 51;
     end
     
     
@@ -303,7 +315,9 @@ parfor iFolder = 1:length(Folders)
             if size(DataFMT,2)>DPFMT % downsample
                 NewFMT = [];
                 for iel = 1:size(DataFMT,1)
-                    NewFMT = [NewFMT; interp1(1:size(DataFMT,2), DataFMT(iel,:,it), linspace(1, size(DataFMT,2), DPFMT), 'linear')];
+                    for it = 1:size(DataFMT,3)
+                        NewFMT = [NewFMT; interp1(1:size(DataFMT,2), DataFMT(iel,:,it), linspace(1, size(DataFMT,2), DPFMT), 'linear')];
+                    end
                 end
                 DataFMT = NewFMT;
             end
@@ -326,9 +340,11 @@ parfor iFolder = 1:length(Folders)
     % Extract Peaks and Determine new Time Window
     iFF = 1;
     while length(INPUT.data.For_Relative.Times_FMT)>DPFMT
-        iFF = iFF +1;
-        INPUT = load(fullfile( Parentfolder, Folder,Files_Fork(iFF).name))
-        INPUT = INPUT.Data;
+        try
+            iFF = iFF +1;
+            INPUT = load(fullfile( Parentfolder, Folder,Files_Fork(iFF).name));
+            INPUT = INPUT.Data;
+        end
     end
     
     % Extract new Latencies
