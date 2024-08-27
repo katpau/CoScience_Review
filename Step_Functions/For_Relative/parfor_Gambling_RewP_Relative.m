@@ -1,7 +1,9 @@
 function  parfor_Gambling_RewP_Relative(IndexSubset, Parentfolder)
 % List all Folders
-Folders = dir(fullfile(Parentfolder, '1.*'));
+Folders = [dir(fullfile(Parentfolder, '*20.1*'));...
+    dir(fullfile(Parentfolder, '*20.2*')) ];
 
+IndexSubset=strrep(IndexSubset, " ", "");
 % Subset Folders
 if strcmp(IndexSubset, "odd")
     Folders = Folders(1:2:length(Folders));
@@ -74,6 +76,7 @@ parfor iFolder = 1:length(Folders)
     
     % Go through each File, load and merge to AV
     for ifile = 1:length(Files_Fork)
+        try
         Data = load(fullfile( Parentfolder, Folder,Files_Fork(ifile).name));
         Data = Data.Data;
         
@@ -102,6 +105,9 @@ parfor iFolder = 1:length(Folders)
             GAV.(Condition_Names{icond})(:,:,ifile) = DataRewP.(Condition_Names{icond});
             GAV_P3.(Condition_Names{icond})(:,:,ifile) = DataP3.(Condition_Names{icond});
         end
+        catch
+            fprintf("Careful: File %s could not be added to GAV\n", Files_Fork(ifile).name)
+        end
     end
     
     %% ********************************
@@ -125,7 +131,7 @@ parfor iFolder = 1:length(Folders)
     iFF = 1;
     while length(INPUT.data.For_Relative.Times_RewP)>DP
         iFF = iFF +1;
-        INPUT = load(Files_Fork(iFF).name);
+        INPUT = load(fullfile( Parentfolder, Folder,Files_Fork(iFF).name));
         INPUT = INPUT.Data;
     end
     
@@ -138,7 +144,7 @@ parfor iFolder = 1:length(Folders)
     [~, Latency_P3] = Peaks_Detection(mean(GAV_P3(:,TimeIdx_P3,:),1), "POS");
     if  contains(INPUT.StepHistory.TimeWindow, "wide")
         TimeWindow_RewP = [Times(Latency+(TimeIdx(1))) - 50, Times(Latency+(TimeIdx(1))) + 50];
-        TimeWindow_P3 = [Times_P3(Latency_P3+(TimeIdx_P3(1))) - 100, Times_P3(Latency_P3+(TimeIdx_P3(1))) + 100];
+        TimeWindow_P3 = [Times_P3(Latency_P3+(TimeIdx_P3(1))) - 50, Times_P3(Latency_P3+(TimeIdx_P3(1))) + 50];
     else
         TimeWindow_RewP = [Times(Latency+(TimeIdx(1))) - 25, Times(Latency+(TimeIdx(1))) + 25];
         TimeWindow_P3 = [Times_P3(Latency_P3+(TimeIdx_P3(1))) - 25, Times_P3(Latency_P3+(TimeIdx_P3(1))) + 25];
@@ -155,6 +161,7 @@ parfor iFolder = 1:length(Folders)
         INPUT = load(fullfile(Parentfolder, Folder,Files_Fork(i_Files).name));
         INPUT = INPUT.Data;
         OUTPUT = INPUT;
+        OUTPUT.data.Export=[];
         % Some Error Handling
         try
             Choice = INPUT.StepHistory.Quantification_ERP;
@@ -200,6 +207,8 @@ parfor iFolder = 1:length(Folders)
             for i_Cond = 1:NrConditions
                 Data_RewP = ConditionData_RewP.(Condition_Names{i_Cond});
                 Data_P3 = ConditionData_P3.(Condition_Names{i_Cond});
+                Data_RewP = Data_RewP(:, TimeIdx_RewP,:);
+                Data_P3 = Data_P3(:, TimeIdx_P3, :);
                 
                 
 %                 if INPUT.StepHistory.Cluster_Electrodes == "cluster"
@@ -237,18 +246,18 @@ parfor iFolder = 1:length(Folders)
                         TimeIdx_P2 = findTimeIdx(INPUT.data.For_Relative.Times_RewP, 150, 250);
                         
                         % Get data in which peaks should be found
-                        DataP2 = Data_RewP(:,TimeIdx_P2,:);
-                        DataRewP = Data_RewP(:,TimeIdx_RewP,:);
+                        DataP2 = ConditionData_RewP.(Condition_Names{i_Cond});
+                        DataP2 = DataP2(:,TimeIdx_P2,:);
                         
                         % Get peaks
                         P2 = Peaks_Detection(mean(DataP2,3), "POS");
-                        FRN = Peaks_Detection(mean(DataRewP,3), "NEG");
+                        FRN = Peaks_Detection(mean(Data_RewP,3), "NEG");
                         
                         % Substract peaks
                         ERP_RewP(:,i_Cond,1) = P2 - FRN;
                         
                         % Get SME
-                        SME_RewP(:,i_Cond,1) = Peaks_to_Peak_SME(DataRewP, "NEG", DataP2, "POS");
+                        SME_RewP(:,i_Cond,1) = Peaks_to_Peak_SME(Data_RewP, "NEG", DataP2, "POS");
                         
                         % For P3 take only Peak
                         [ERP_P3(:,i_Cond,1), ~] = Peaks_Detection(mean(Data_P3,3), "POS");
@@ -370,11 +379,11 @@ parfor iFolder = 1:length(Folders)
                 [cellstr([Subject_P3_L, Lab_P3_L, Experimenter_P3_L, Conditions_P3_L, Electrodes_P3_L, TimeWindow_P3_L]),...
                 num2cell([ERP_P3(:), SME_P3(:), EpochCount_P3(:)]), cellstr(Component_P3_L)]];
             
-            if isfield(INPUT.data, 'Export')
-                OUTPUT.data.Export = [INPUT.data.Export; Export];
-            else
+            %if isfield(INPUT.data, 'Export')
+            %    OUTPUT.data.Export = [INPUT.data.Export; Export];
+            %else
                 OUTPUT.data.Export = Export;
-            end
+            %end
             
             % ****** Error Management ******
         catch e
@@ -387,7 +396,6 @@ parfor iFolder = 1:length(Folders)
             
             OUTPUT.Error = ErrorMessage;
             fprintf('\n*Subset: %s, FolderNr: %i, Subject: %s - Error Extracting ERPs. \n ', IndexSubset, iFolder, INPUT.Subject)
-            OUTPUT = INPUT;
         end
         parfor_save(fullfile(Parentfolder, Folder, Files_Fork(i_Files).name), OUTPUT)
     end

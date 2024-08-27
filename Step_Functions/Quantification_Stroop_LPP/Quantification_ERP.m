@@ -52,7 +52,7 @@ try
     % ********************************************************************************************
     % Get Info on ** Electrodes **
     if strcmp(INPUT.StepHistory.Electrodes, "Relative")
-        Electrodes = upper(["AFz", "Fz", "Fcz", "Cz", "Cpz", "Pz", "Poz", "Oz", ...
+        Electrodes = upper(["Fz", "Fcz", "Cz", "Cpz", "Pz", "Poz", "Oz", ...
             "AF3", "F1", "FC1", "C1", "CP1", "P1", "PO3", "O1", ...
             "AF4", "F2", "FC2", "C2", "CP2", "P2", "PO4", "O2"]);
     else
@@ -233,7 +233,7 @@ try
         Lab_L = repmat(EEG.Info_Lab.RecordingLab, NrConditions*NrElectrodes*NrTimeWindows,1 );
         Experimenter_L = repmat(EEG.Info_Lab.Experimenter, NrConditions*NrElectrodes*NrTimeWindows,1 );
         Component_L = repmat("LPP", NrConditions*NrElectrodes*NrTimeWindows,1 );
-        
+        ACC_L = repmat(EEG.ACC, NrConditions*NrElectrodes*NrTimeWindows,1 );
         % Electrodes: if multiple electrodes, they simply alternate ABABAB
         Electrodes_L = repmat(Electrodes', NrConditions*NrTimeWindows, 1);
         
@@ -251,8 +251,8 @@ try
         
         
         % ****** Prepare Table ******
-        OUTPUT.data.Export = [cellstr([Subject_L, Lab_L, Experimenter_L, Conditions_L, Electrodes_L, TimeWindow_L]),...
-            num2cell([ERP(:), SME(:), EpochCount(:)]), cellstr(Component_L)];
+        OUTPUT.data.Export = [cellstr([Subject_L, Lab_L, Experimenter_L, Conditions_L(:), Electrodes_L, TimeWindow_L]),...
+            num2cell([ERP(:), SME(:), EpochCount(:)]), cellstr(Component_L), num2cell(ACC_L)];
         
     end
     

@@ -33,7 +33,7 @@ function  OUTPUT = TimeWindow(INPUT, Choice)
 % Order determines when it should be run.
 StepName = "TimeWindow";
 Choices = ["200,400", "Relative_Group_wide", "Relative_Group_narrow", "Relative_Subject"];
-Conditional = ["NaN", "NaN", "NaN", "NaN", "NaN"];
+Conditional = ["NaN", "NaN", "NaN", "NaN"];
 SaveInterim = logical([1]);
 Order = [21];
 

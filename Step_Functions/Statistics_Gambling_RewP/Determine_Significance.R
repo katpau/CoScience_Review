@@ -118,18 +118,16 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   Estimates = data.frame()
-  DirectionEffectMain = list("Effect" = "interaction_correlation",
-                         "Larger" = c("FB", "Loss"),
-                         "Smaller" = c("FB", "Win"))
-  DirectionEffectIA = list("Effect" = "interaction2_correlation",
-                         "Larger" = c("FB", "Loss"),
-                         "Smaller" = c("FB", "Win"),
-                         "Interaction" = c("Magnitude", "P0", "P50"))
+  DirectionEffectMain = list("Effect" = "diff_correlation",
+                         "Larger" = c("FB", "Win"),
+                         "Smaller" = c("FB", "Loss"))
+  DirectionEffectIA = list("Effect" = "diff2_correlation",
+                         "Larger" = c("FB", "Win"),
+                         "Smaller" = c("FB", "Loss"),
+                         "Smaller2" = c("Magnitude", "P0"),
+                         "Larger2" = c("Magnitude", "P50"))
   collumns_to_keep = c("FB", "Magnitude", Depression, Covariate_Name, additional_Factors_Name, Anhedonia, RewardSensitivity) 
-  
-  
-  
-  
+
   
   
   # Loop Through components
@@ -230,7 +228,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
 
-  }
+  
   
   #### For Exploratory Hypothesis Add Behav_StateSadness - Problem when interaction with Covariate
   # so it cannot be added to loop above... Drop Covariate and/or figure out problem
@@ -257,6 +255,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
                                          collumns_to_keep,  Component,
                                          "previousModel", HX1_Model))
   
+  }
   #########################################################
   # (8) Correct for Multiple Comparisons for Hypothesis 1
   #########################################################

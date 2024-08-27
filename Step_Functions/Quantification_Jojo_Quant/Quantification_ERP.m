@@ -205,10 +205,6 @@ try
             
             % Count Epochs
             EpochCount_FRN(:,i_Cond) = size(Data_FRN,3);
-            if size(Data_FRN,3) < 1 %  str2double(INPUT.StepHistory.Trials_MinNumber)
-                ERP_FRN(:,i_Cond) = NaN;
-                SME_FRN(:,i_Cond) = NaN;
-            else
                 % Calculate ERP if enough epochs there
                 if strcmp(Choice ,  "Mean")
                     ERP_FRN(:,i_Cond) = mean(mean(Data_FRN,3),2);
@@ -227,7 +223,6 @@ try
                     ERP_FRN(:,i_Cond) = P2 - FN;
                     SME_FRN(:,i_Cond) = Peaks_to_Peak_SME(DataP2, "NEG", DataFN, "POS");
                 end
-            end
         end
     end
     
