@@ -8,8 +8,7 @@ Outliers_ACC = function(input = NULL, choice = NULL) {
   # Last checked by KP 12/22
   # Planned/Completed Review by:
 
-  # if ACC is used as a predictor/DV, scan for outliers per Condition
-  # otherwise scan for outliers across all Conditions
+  # if ACC is available, scan for performance in task
   # identifies and removes outliers based on previous criteria (thresholds)
   # (1) Get previous choices about threshold and prepare function
   # (2) Identify and Remove outlier

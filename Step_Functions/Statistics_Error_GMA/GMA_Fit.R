@@ -9,8 +9,8 @@ GMA_Fit = function(input = NULL, choice = NULL) {
   # Planned/Completed Review by:
 
   # Handles all Choices listed above 
-  # Filters for all successful GMA fits with a PDF to data correlation oefficient equal to
-  # or above the threhold or uses all fits.
+  # Filters for all successful GMA fits with a PDF to data correlation coefficient equal to
+  # or above the threshold or uses all fits.
 
   if (grepl("corr", choice)) {
     minCorr <- as.numeric(str_split(choice, " ")[[1]][1])

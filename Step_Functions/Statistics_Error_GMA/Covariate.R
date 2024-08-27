@@ -110,7 +110,7 @@ Covariate = function(input = NULL, choice = NULL) {
     gather(GMA_Measure, EEG_Signal, shape:offset_ms)
   colnames(output)[1:8] = str_to_title(colnames(output)[1:8])
   
-  output = output %>%  # consistence across Projectss
+  output = output %>%  # consistence across Projects
     rename(ID = Subject,
            Electrode = Channel,
            Epochs = N_trials)
