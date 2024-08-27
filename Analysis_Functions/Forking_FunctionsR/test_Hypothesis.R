@@ -163,7 +163,8 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
             print("Error in Model")
             Model_Result = c("Error_when_computing_Model", lm_formula, nrSubs)
             return(Model_Result)
-          })}
+          })
+          }
         
         
         # only relevant if next to random ID also random IA with ID given 

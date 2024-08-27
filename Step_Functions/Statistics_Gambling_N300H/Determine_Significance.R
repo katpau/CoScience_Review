@@ -98,11 +98,13 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     
     # Run Test
     ModelResult = test_Hypothesis( Name_Test,lm_formula, Subset, Effect_of_Interest, SaveUseModel, ModelProvided)
-    
+
+   
     # Test Direction
     if (!SaveUseModel == "exportModel") {
+      if (!is.na(ModelResult$value_EffectSize)) { 
       ModelResult = test_DirectionEffect(DirectionEffect, Subset, ModelResult) 
-    }
+    }}
     
     return(ModelResult)
   }
@@ -137,8 +139,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   # Test Anxiety * FB
   DirectionEffect = list("Effect" = "interaction_correlation",
-                          "Larger" = c("Condition", "high_loss"),  # Should only be loss and win?
-                          "Smaller" = c("Condition", "high_win"),
+                          "Larger" = c("Condition", "loss"),  # Should only be loss and win?
+                          "Smaller" = c("Condition", "win"),
                           "Personality" = Anxiety)
   Effect_of_Interest = c( Anxiety, "Condition")
   Name_Test = "Anxiety_Condition"
@@ -150,13 +152,34 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   
   
   # Test Intercept?
+  if (is.character(HX_Model)) {
+  Intercept =  cbind("Confirmation_N300H", "Intercept", "NA", "NA", "NA", "NA", 
+                       "NA", Estimates[1,8:12],
+                       "NA", "NA", "NA", "Intercept", "NA", "NA", "NA", "NA", "NA") 
+  } else {
   Intercept = summary(HX_Model)$"coefficients"[1,]
   Intercept =  cbind("Confirmation_N300H", "Intercept", "NA", "NA", "NA", "NA", 
-                 "NA", Estimates[1,8:12],
-                 "NA", "NA", "NA", "Intercept", t(Intercept)) 
+                     "NA", Estimates[1,8:12],
+                     "NA", "NA", "NA", "Intercept", t(Intercept))  
+  
+  }
   colnames(Intercept) = colnames(Estimates)
   Estimates = rbind(Estimates, 
                     Intercept)
+  
+  # no Hypothesis but important to report
+  # Test Anxiety * FB
+  DirectionEffect = list("Effect" = "main",
+                         "Larger" = c("Condition", "loss"),  
+                         "Smaller" = c("Condition", "win"))
+  Effect_of_Interest = c("Condition")
+  Name_Test = "Condition"
+  Estimates = rbind(Estimates, 
+                    wrap_test_Hypothesis(Name_Test,lm_formula, output,
+                                         Effect_of_Interest,  DirectionEffect, 
+                                         collumns_to_keep,  
+                                         "previousModel", HX_Model))
+  
 
   #########################################################
   # (5) Correct for Multiple Comparisons for Hypothesis 1

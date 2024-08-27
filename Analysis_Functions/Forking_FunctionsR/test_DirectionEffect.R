@@ -22,6 +22,8 @@ test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResu
       Groupings = c("ID", "Offer", "Choice")
       Groupings = Groupings[Groupings %in% colnames(Subset)]
       Groupings = Groupings[!grepl(DV, Groupings)]
+    } else {
+      Groupings = c("ID", "Condition")
     }
     if ("Personality" %in% names(DirectionEffect)) {
     Subset = Subset %>%
@@ -91,9 +93,55 @@ test_DirectionEffect = function(DirectionEffect = NULL, Subset = NULL, ModelResu
     
     Test = ((LargerLCorr - LargerSCorr ) - (SmallerLCorr - SmallerSCorr)) >0
     
+  } else if (DirectionEffect$Effect == "diff_correlation") { 
+    Cond = DirectionEffect$Smaller[1]
+    Smaller = DirectionEffect$Smaller[2]
+    Larger = DirectionEffect$Larger[2]
+    Personality = DirectionEffect$Personality
     
+    SubsetWide <- Subset %>%
+      group_by(ID, .data[[Cond]]) %>%
+      summarise(EEG_Signal = mean(.data[[DV]], na.rm = TRUE),
+               Personality := first(!!sym(Personality))) %>%
+      #summarise(!!sym(DV) := mean(!!sym(DV), na.rm = TRUE),
+      #          Personality := first(!!sym(Personality))) %>%
+      pivot_wider(names_from = .data[[Cond]], values_from = DV) %>%
+      mutate(Diff = .data[[Larger]] - .data[[Smaller]]) 
+      CorrelationTest = cor(SubsetWide$Diff, SubsetWide$Personality, use = "complete.obs")
+      Test = CorrelationTest>0
+    
+  } else if (DirectionEffect$Effect == "diff2_correlation") { 
+    Cond = DirectionEffect$Smaller[1]
+    Cond2 = DirectionEffect$Smaller2[1]
+    Smaller = DirectionEffect$Smaller[2]
+    Larger = DirectionEffect$Larger[2]
+    Smaller2 = DirectionEffect$Smaller2[2]
+    Larger2 = DirectionEffect$Larger2[2]
+    Personality = DirectionEffect$Personality
+    DV2 = "Diff"
+    
+    SubsetWide <- Subset %>%
+      group_by(ID, !!!syms(c(Cond, Cond2))) %>%
+      summarise(EEG_Signal = mean(.data[[DV]], na.rm = TRUE),
+                Personality := first(!!sym(Personality))) %>%
+      #summarise(!!sym(DV) := mean(!!sym(DV), na.rm = TRUE),
+      #          Personality := first(!!sym(Personality))) %>%
+      pivot_wider(names_from = .data[[Cond]], values_from = DV) %>%
+      mutate(Diff = .data[[Larger]] - .data[[Smaller]]) %>%
+      select("ID", "Personality", Cond2, DV2) %>%
+      pivot_wider(names_from = .data[[Cond2]], values_from = DV2) %>%
+      mutate(Diff = .data[[Larger2]] - .data[[Smaller2]]) 
+    CorrelationTest = cor(SubsetWide$Diff, SubsetWide$Personality, use = "complete.obs")
+    Test = CorrelationTest>0
     
   }
+  
+  
+  DirectionEffectIA = list("Effect" = "diff2_correlation",
+                           "Larger" = c("FB", "Win"),
+                           "Smaller" = c("FB", "Loss"),
+                           "Smaller2" = c("Magnitude", "P0"),
+                           "Larger2" = c("Magnitude", "P50"))
   if (isFALSE(Test) & ModelResult$value_EffectSize > 0) {
     
     ModelResult$value_EffectSize = ModelResult$value_EffectSize * -1

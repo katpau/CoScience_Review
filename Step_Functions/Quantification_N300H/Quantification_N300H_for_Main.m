@@ -1,4 +1,4 @@
-function  OUTPUT = Quantification_N300H(INPUT, Choice)
+function  OUTPUT = Quantification_N300H_Main(INPUT, Choice)
 % Last Checked by
 % Planned Reviewer:
 % Reviewed by:
@@ -52,9 +52,12 @@ try
     ECG = INPUT.ECG;
 
     % Get Info on ** Electrodes **
-    Electrodes = strrep(upper(strsplit(INPUT.StepHistory.Electrodes , ",")), " ", "");
-    NrElectrodes = length(Electrodes);
-    ElectrodeIdx = findElectrodeIdx(EEG.chanlocs, Electrodes);
+    %Electrodes = strrep(upper(strsplit(INPUT.StepHistory.Electrodes , ",")), " ", "");
+    %NrElectrodes = length(Electrodes);
+    %ElectrodeIdx = findElectrodeIdx(EEG.chanlocs, Electrodes);
+    Electrodes = {EEG.chanlocs.labels};
+    ElectrodeIdx = 1: length(EEG.chanlocs);
+    NrElectrodes = length(EEG.chanlocs);
 
     %% Calculate CECTs
 
@@ -140,7 +143,7 @@ try
 
         % Translate given time windows from ms into CECT bins
         % IBI_window as well as the ibi- and eegbin size are given in ms
-        BinsEEG = EEG_window/cfg.eegbinsize; BinsEEG(1) = BinsEEG(1)+1;
+        BinsEEG = EEG_Window/cfg.eegbinsize; BinsEEG(1) = BinsEEG(1)+1;
     end
 
 
@@ -281,6 +284,8 @@ try
         % save cect analsis for all conditions and electrodes
         % (for plotting the temporal and spatial dynamics of the N300H)
         OUTPUT.data.cect = cect;
+        OUTPUT.data.cect.chanlocs = EEG.chanlocs;
+        OUTPUT = rmfield(OUTPUT,'ECG');
     end
 
     % ****** Error Management ******

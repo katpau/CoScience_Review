@@ -136,12 +136,12 @@ Covariate = function(input = NULL, choice = NULL) {
   
   if (length(unlist(unique(output$Electrode)))>1) {
     additional_Factors_Name = c(additional_Factors_Name, "Electrode")
-    additional_Factor_Formula =  paste(additional_Factor_Formula, "* Electrode") 
+    additional_Factor_Formula =  paste(additional_Factor_Formula, "+ Electrode") 
   }
   
   if (length(unlist(unique(output$Bin)))>1) {
     additional_Factors_Name = c(additional_Factors_Name, "Bin")
-    additional_Factor_Formula =  paste(additional_Factor_Formula, "* Bin") 
+    additional_Factor_Formula =  paste(additional_Factor_Formula, "+ Bin") 
   }
   
   # Grouping Variables in all Files and Merge with additional Factors

@@ -59,33 +59,12 @@ try
     % Discard non-relevant EEG electrodes
     EEG = pop_select(EEG, 'channel', ElectrodeIdx);
 
-    %% Calculate CECTs
-
-    % Define settings for CECT analysis
-    cfg.segsizeIBI = [-0.5, 5];
-    cfg.segsizeEEG = [-0.2, 2];
-    cfg.ibibins = [0, 5];
-    cfg.eegbins = [0, 1];
-    cfg.srateEEG = EEG.srate;
-    cfg.srateIBI = ECG.srate;
-    cfg.ibibinsize = 500;
-    cfg.eegbinsize = 10;
-
-    % ***********************************************************************************
-    % calculate CECTs for each condition ************************************************
-    % ***********************************************************************************
-
-    % prepare markers and triggers
-    Condition_Names = {'loss', 'win' };
-    Condition_Triggers = {'100' '110' '150';...
-        '101'  '111' '151'}';
-    NrConditions = length(Condition_Names);
 
 
     % Check if electrodes are averaged before extracting the N300H,
     % i.e. before calculating intra-individual correlations:
     if strcmp(INPUT.StepHistory.Cluster_Electrodes,"cluster")
-        
+
         % Calculate average of electrodecluster and save it as channel 1 in
         % EEG.data matrix
         EEG.data(1,:,:) = squeeze(mean(EEG.data,1));
@@ -96,76 +75,86 @@ try
         Electrodes = append('cluster: ', join(Electrodes));
     end
 
-    for i = 1:size(Condition_Triggers,2)
+    %% Calculate CECTs
 
-        % find index of relevant condition triggers within the EEG.event structure
-        idx = []; idx=find(contains({EEG.event.type}, Condition_Triggers(:,i)));
-
-        % get number of epochs
-        Epochs(i,1) = length(idx);
-
-        % calculate CECTS via CECT.m and save results for each condition in
-        % a "cect results" structure
-        cect.results.(Condition_Names{i}) = ...
-            CECT(EEG.data(:,:,idx), squeeze(ECG.data(2,:,idx)), cfg);
-
-    end
-    % save the employed CECT settings into the cect results structure
-    cect.settings = cfg;
 
     % ****** Get Info on TimeWindow of EEG and IBI data ******
     % Get choices for the time window of interest in which the N300H is defined
 
-    % For the IBI data
-    if ~contains(INPUT.StepHistory.ECG_TimeWindow ,"Relative_Group")
-        IBI_window = [str2num(INPUT.StepHistory.ECG_TimeWindow)];
-        % Translate given time windows from ms into CECT bins
-        % IBI_window as well as the ibi- and eegbin size are given in ms
-        BinsIBI = IBI_window/cfg.ibibinsize; BinsIBI(1) = BinsIBI(1)+1;
-    else
-        IBI_window = [1500 5500];
-        % Translate given time windows from ms into CECT bins
-        % IBI_window as well as the ibi- and eegbin size are given in ms
-        BinsIBI = IBI_window/cfg.ibibinsize; BinsIBI(1) = BinsIBI(1)+1;
-    end
+    % For the IBI and EEG data
 
-    % For the EEG data
-    if ~contains(INPUT.StepHistory.TimeWindow ,"Relative_Group")
-
-        EEG_window = [str2num(INPUT.StepHistory.TimeWindow)];
-
-        % Translate given time windows from ms into CECT bins
-        % IBI_window as well as the ibi- and eegbin size are given in ms
-        BinsEEG = EEG_window/cfg.eegbinsize; BinsEEG(1) = BinsEEG(1)+1;
-    else
-
-        EEG_Window = [150 500];
-
-        % Translate given time windows from ms into CECT bins
-        % IBI_window as well as the ibi- and eegbin size are given in ms
-        BinsEEG = EEG_window/cfg.eegbinsize; BinsEEG(1) = BinsEEG(1)+1;
-    end
-
-
-    % ********************************************************************************************
-    % **** Extract N300H Data and prepare Output Table    ****************************************
-    % ********************************************************************************************
-
-    % ****** Get Info on N300H extraction method of EEG and IBI data ******
-    % Get choices for the time window of interest in which the N300H is defined
-
-    % if any Time window is dependent on group, do not continue but save
-    % relevant data
     if contains(INPUT.StepHistory.TimeWindow, "Relative_Group") || ...
             contains(INPUT.StepHistory.ECG_TimeWindow, "Relative_Group")
         For_Relative.RecordingLab = EEG.Info_Lab.RecordingLab;
         For_Relative.Experimenter = EEG.Info_Lab.Experimenter;
         For_Relative.DataEEG = EEG;
         For_Relative.DataECG = ECG;
-        For_Relative.Times = EEGData.times(TimeIdx_EEG);
         For_Relative.Electrodes = Electrodes;
+    else
 
-    else % Extract N300H
+        % Define settings for CECT analysis
+        cfg.segsizeIBI = [-0.5, 5];
+        cfg.segsizeEEG = [-0.2, 2];
+        cfg.ibibins = [0, 5];
+        cfg.eegbins = [0, 1];
+        cfg.srateEEG = EEG.srate;
+        cfg.srateIBI = ECG.srate;
+        cfg.ibibinsize = 500;
+        cfg.eegbinsize = 10;
+
+        % ***********************************************************************************
+        % calculate CECTs for each condition ************************************************
+        % ***********************************************************************************
+
+        % prepare markers and triggers
+        Condition_Names = {'loss', 'win' };
+        Condition_Triggers = {'100' '110' '150';...
+            '101'  '111' '151'}';
+        NrConditions = length(Condition_Names);
+
+        for i = 1:size(Condition_Triggers,2)
+
+            % find index of relevant condition triggers within the EEG.event structure
+            idx = []; idx=find(contains({EEG.event.type}, Condition_Triggers(:,i)));
+
+            % get number of epochs
+            Epochs(i,1) = length(idx);
+
+            % calculate CECTS via CECT.m and save results for each condition in
+            % a "cect results" structure
+            cect.results.(Condition_Names{i}) = ...
+                CECT(EEG.data(:,:,idx), squeeze(ECG.data(2,:,idx)), cfg);
+
+        end
+        % save the employed CECT settings into the cect results structure
+        cect.settings = cfg;
+
+
+        % IBI
+        IBI_window = [str2num(INPUT.StepHistory.ECG_TimeWindow)];
+        % Translate given time windows from ms into CECT bins
+        % IBI_window as well as the ibi- and eegbin size are given in ms
+        BinsIBI = IBI_window/cfg.ibibinsize; BinsIBI(1) = BinsIBI(1)+1;
+        % EEG
+        EEG_window = [str2num(INPUT.StepHistory.TimeWindow)];
+        % Translate given time windows from ms into CECT bins
+        % IBI_window as well as the ibi- and eegbin size are given in ms
+        BinsEEG = EEG_window/cfg.eegbinsize; BinsEEG(1) = BinsEEG(1)+1;
+
+
+
+        % ********************************************************************************************
+        % **** Extract N300H Data and prepare Output Table    ****************************************
+        % ********************************************************************************************
+
+        % ****** Get Info on N300H extraction method of EEG and IBI data ******
+        % Get choices for the time window of interest in which the N300H is defined
+
+        % if any Time window is dependent on group, do not continue but save
+        % relevant data
+
+
+        % Extract N300H
         N300H = []; % electrodes x conditions x bins
         for c = 1:NrConditions
 
@@ -194,7 +183,7 @@ try
 
             end
         end
-    end
+    
 
     % Update Nr on Electrodes for Final OutputTable if Clustered after N300H
     if INPUT.StepHistory.Cluster_Electrodes == "no_cluster_butAV"
@@ -215,15 +204,17 @@ try
     InitSize = [NrElectrodes,NrConditions, NrBins];
     EpochCount = NaN(InitSize);
     EpochCount =  repmat(Epochs', NrElectrodes, NrBins);
-
+    end
     % ********************************************************************************************
     % **** Prepare Output Table    ***************************************************************
     % ********************************************************************************************
+    
 
     if contains(INPUT.StepHistory.TimeWindow, "Relative_Group") || ...
             contains(INPUT.StepHistory.ECG_TimeWindow, "Relative_Group")
         % Add Relative Data and Relative Info
         OUTPUT.data.For_Relative = For_Relative;
+        OUTPUT = rmfield(OUTPUT,'ECG');
     else
         % Prepare Final Export with all Values
         % ****** Prepare Labels ******
@@ -257,7 +248,7 @@ try
                 str2num(INPUT.StepHistory.Trials_MinNumber)
 
             N300H(contains(Conditions_L, 'loss')) = NaN;
-        else 
+        else
         end
 
         if  sum(EpochCount(contains(Conditions_L, 'win'))) < ...
@@ -284,6 +275,7 @@ try
         % save cect analsis for all conditions and electrodes
         % (for plotting the temporal and spatial dynamics of the N300H)
         OUTPUT.data.cect = cect;
+        OUTPUT = rmfield(OUTPUT,'ECG');
     end
 
     % ****** Error Management ******
