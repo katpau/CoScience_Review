@@ -31,7 +31,7 @@ function  OUTPUT = Trials_Performance(INPUT, Choice)
 % Order determines when it should be run.
 StepName = "Trials_Performance";
 Choices = ["all", "RTs"];
-Conditional = ["NaN", "NaN"];
+Conditional = ["NaN", "NaN", "NaN"];
 SaveInterim = logical([0]);
 Order = [16];
 

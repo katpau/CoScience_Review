@@ -242,7 +242,7 @@ Determine_Significance_Main = function(input = NULL, choice = NULL) {
                 
 
                   }
-                FileName= '/work/bay2875/Flanker_Conflict/Stat_Results/Main_AllTests_Final.csv'
+                FileName= '/work/bay2875/Flanker_Conflict/Stat_Results/Main_AllTests_Final2.csv'
                 write.csv(Estimates,FileName, row.names = FALSE)
                 })
               }}
@@ -283,7 +283,7 @@ Determine_Significance_Main = function(input = NULL, choice = NULL) {
       }
     }
   }
-  FileName= '/work/bay2875/Flanker_Conflict/Stat_Results/Main_AllTests_Final_pCorrected.csv'
+  FileName= '/work/bay2875/Flanker_Conflict/Stat_Results/Main_AllTests_Final_pCorrected2.csv'
   write.csv(Estimates,FileName, row.names = FALSE)
   
   
@@ -320,7 +320,7 @@ Determine_Significance_Main = function(input = NULL, choice = NULL) {
   #########################################################
   # (6) Export as CSV file
   #########################################################
-  FileName= '/work/bay2875/Flanker_Conflict/Stat_Results/Main_AllTests_Final_complete.csv'
+  FileName= '/work/bay2875/Flanker_Conflict/Stat_Results/Main_AllTests_Final_complete2.csv'
   write.csv(Estimates,FileName, row.names = FALSE)
   
  

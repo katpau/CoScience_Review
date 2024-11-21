@@ -92,5 +92,5 @@ INPUT = Baseline(INPUT, "-200 0"); %  "-200 0"    "-500 0"    "-100 0"
 
 INPUT = Cluster_Electrodes(INPUT, "no_cluster"); %    "no_cluster"    "cluster"
 INPUT = Electrodes(INPUT, "Fz,Fcz,Cz"); % "Fz,Fcz,Cz"    "Fz, FCz, Cz, FC1, FC2"    "Fcz,Cz"    "Fcz"    "Cz"    "Fz"
-INPUT = TimeWindow(INPUT, "200,400"); %  ["Relative_Group_wide", "Relative_Group_narrow", "Relative_Subject", "200,400", "250,350"];
+INPUT = TimeWindow(INPUT, "Relative_Group_wide"); %  ["Relative_Group_wide", "Relative_Group_narrow", "Relative_Subject", "200,400", "250,350"];
 INPUT1 = Quantification_ERP(INPUT, "Mean"); %  "250,500"    "200,400"    "300,350"    "Relative_Group"

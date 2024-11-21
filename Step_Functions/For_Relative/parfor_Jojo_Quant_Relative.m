@@ -34,11 +34,11 @@ parfor iFolder = 1:length(Folders)
     
     % Get correct DP for each Component
     if  strcmp(INPUT.StepHistory.Resampling, "500")
-        DP = 201;
-        DPFRN = 151;
+        DP = 151;
+        DPFRN = 101;
     elseif  strcmp(INPUT.StepHistory.Resampling, "250")
-        DP = 100;
-        DPFRN = 125;
+        DP = 38;
+        DPFRN = 50;
     elseif  strcmp(INPUT.StepHistory.Resampling, "125")
         DP = 50;
         DPFRN = 25;
@@ -112,7 +112,7 @@ parfor iFolder = 1:length(Folders)
     Trials_MinNumber =1;
 
 %% ********************************
-% LOAD EACH FILE AND EXPORT P3AK/MEAN IN TIME WINDOW
+% LOAD EACH FILE AND EXPORT PEAK/MEAN IN TIME WINDOW
 % *********************************
 
 for i_Files = 1 : length(Files_Fork)

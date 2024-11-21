@@ -132,7 +132,7 @@ parfor iFolder = 1:length(Folders)
         GAV_PE.(Condition_Names{4})),3);
     
     % Extract Peaks and Determine new Time Window
-    iFF = 1;
+    iFF = 0;
     while length(INPUT.data.For_Relative.Times_ERN)>DP
         iFF = iFF +1;
         INPUT = load(fullfile( Parentfolder, Folder,Files_Fork(iFF).name))
@@ -272,8 +272,8 @@ parfor iFolder = 1:length(Folders)
             
             % Conditions are blocked across electrodes, but alternate across
             % time windows AABBAABB
-            Conditions_ERN_L = repelem(Condition_Names', NrElectrodes_ERN,1)';
-            Conditions_PE_L = repelem(Condition_Names', NrElectrodes_PE,1)';
+            Conditions_ERN_L = repelem(Condition_Names, NrElectrodes_ERN,1);
+            Conditions_PE_L = repelem(Condition_Names, NrElectrodes_PE,1);
             
             
             % Time Window are blocked across electrodes and conditions AAAAABBBB

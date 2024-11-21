@@ -189,9 +189,9 @@ try
         For_Relative.Times_FMT = EEG.times(TimeIdx_FMT);
         For_Relative.RecordingLab = EEG.Info_Lab.RecordingLab;
         For_Relative.Experimenter = EEG.Info_Lab.Experimenter;
-        For_Relative.Electrodes = Electrodes_FRN;
+        For_Relative.Electrodes = Electrodes;
         
-        TrialInfo = cell(size(ConditionData_FRN,1), 4);
+        TrialInfo = cell(size(EEG.epoch,2), 4);
         for iep = 1:length(TrialInfo)
             TrialInfo(iep,:) = [ EEG.epoch(iep).eventTrial{1,1}, ...
                 EEG.epoch(iep).eventOfferSelf{1,1}, ...
@@ -205,9 +205,13 @@ try
     else
         % ****** Extract Amplitude per Trial ******
         Export_Header = {'ID', 'Lab', 'Experimenter', 'Trial', 'Offer', 'Choice', 'RT', 'Component',  'Electrode', 'EEG_Signal'};
-        
-        ConditionData_FRN = squeeze(mean(ConditionData_FRN, 2))';
-        ConditionData_FMT = squeeze(mean(ConditionData_FMT, 2))';
+        ConditionData_FRN = mean(ConditionData_FRN, 2);
+        ConditionData_FRN = reshape(ConditionData_FRN, size(ConditionData_FRN, 1), size(ConditionData_FRN, 3));
+        ConditionData_FRN = ConditionData_FRN';
+        ConditionData_FMT = mean(ConditionData_FMT, 2);
+        ConditionData_FMT = reshape(ConditionData_FMT, size(ConditionData_FMT, 1), size(ConditionData_FMT, 3));
+        ConditionData_FMT = ConditionData_FMT';
+
         Electrode_Labels = repmat(Electrodes, size(ConditionData_FRN,1), 1);
         Constants = repmat({INPUT.Subject, EEG.Info_Lab.RecordingLab, EEG.Info_Lab.Experimenter}, ...
             size(ConditionData_FRN,1)*size(ConditionData_FRN,2),1);

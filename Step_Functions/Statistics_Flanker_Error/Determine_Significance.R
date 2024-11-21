@@ -53,14 +53,8 @@ suppress = lapply(list.of.packages, require, character.only = TRUE)
   # Calculate Simple Model split for (1) Subset, (2), Present/Absent, (3) PSWQ Original/SortMin/SortAv
   Estimates = data.frame()
   AllQuestLevels = c("_Orig",
-                     paste0("_sortedMin", seq(10, 70, 5)),
-                     paste0("_sortedAV", seq(10, 70, 5)),
-                     paste0("_sortedAVnoCSD", seq(10, 70, 5)))
-  
-  AllQuestLevels = c(paste0("_sortedAV", c(10, 20, 70)),
-                     paste0("_sortedAVnoCSD", c(10, 20, 70)))
-  
-  
+                     # paste0("_sortedMin", c(10, 15, 20, 25, 30, 70)),
+                     paste0("_sortedAV", c(10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 30, 70) ))
   for (iQuest in AllQuestLevels) {
     use_Personality = paste0("Personality_PSWQ_Concerns", iQuest)
     if (input$stephistory["Covariate"] == "None") { 
@@ -80,10 +74,9 @@ suppress = lapply(list.of.packages, require, character.only = TRUE)
     DirectionEffect = list("Effect" = "correlation",
                            "Personality" = use_Personality)
     
-    #for (iSubset in 1:2) {
-      iSubset = 1 
-     # for (iCondition in c("Present", "Absent")) {
-        iCondition = "Absent" 
+    for (iSubset in 1:2) {
+      for (iCondition in c("Present", "Absent")) {
+	print(paste(iQuest, iSubset, iCondition))
         
         Name_Test = paste(iQuest, "_PSWQ_", iCondition, "inSubset", iSubset)
         
@@ -132,7 +125,8 @@ suppress = lapply(list.of.packages, require, character.only = TRUE)
         
         
         Estimates = rbind(Estimates, ModelResult)
-   
+      }
+    }
   }
   
   

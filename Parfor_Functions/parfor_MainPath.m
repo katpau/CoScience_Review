@@ -1,4 +1,4 @@
-function  parfor_MainPath(IndexSubjects, SubjectListFile, DESIGN, OUTPUT, OutputFolder, ImportFolder, AnalysisName, SubsetSize, RetryError, LogFolder, ParPools, PrintLocation)
+function  parfor_MainPath(IndexSubjects, SubjectListFile, DESIGN, OUTPUT, OutputFolder, ImportFolder, AnalysisName, SubsetSize, RetryError, LogFolder, ParPools, PrintLocation, StepsToSave)
 
 % for each Subject, carries out all RDF combinatins as defined in
 % OUTPUT(a .mat file)
@@ -31,9 +31,9 @@ function  parfor_MainPath(IndexSubjects, SubjectListFile, DESIGN, OUTPUT, Output
 
 tic
 
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â° Preparations Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+% °°°°°°° Preparations °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 %% Load Design
 RetryLoad = 0; SuccessfulLoad = 0;
 while RetryLoad <200 & SuccessfulLoad == 0% Parfor sometimes has problems with loading
@@ -57,15 +57,12 @@ for iStep = 1:length(Steps)
 end
 Order = sortrows(Order,2);
 Steps = Steps(Order(:,1));
+MaxStep = length(Steps);
+
 
 
 %% Load OUTPUT File with List of Forks
-
-% [elisa] COMMENTED to solve dir issue line 200
-%OUTPUT_Name = OUTPUT;
-
-% [elisa] ADDED to solve dir issue line 200
-[~, OUTPUT_Name] = fileparts(OUTPUT);
+OUTPUT_Name = OUTPUT;
 if isstring(OUTPUT) || ischar(OUTPUT)
     RetryLoad = 0; SuccessfulLoad = 0;
     while RetryLoad <200 & SuccessfulLoad == 0% Parfor sometimes has problems with loading
@@ -88,11 +85,12 @@ OutputFolder = fullfile(OutputFolder);
 if ~exist(OutputFolder, 'dir'); mkdir(OutputFolder); end
 ErrorFolder = strcat(LogFolder, "ErrorMessages/");
 if ~exist(ErrorFolder, 'dir'); mkdir(ErrorFolder); end
-CompletionFolder =strcat(LogFolder, "CompletionStatus/"); % [elisa] REMOVED Slash before CompletionStatus to solve dir issue line 200
+CompletionFolder =strcat(LogFolder, "/CompletionStatus/");
 if ~exist(CompletionFolder, 'dir'); mkdir(CompletionFolder); end
 
 
 %% Show input to this function
+disp("Input ParforFunction")
 disp(OutputFolder)
 disp(ImportFolder)
 disp(AnalysisName)
@@ -107,7 +105,8 @@ if nargin<9;   RetryError = "0"; end
 if nargin<10;  LogFolder = OutputFolder; end
 if nargin<11;   ParPools = "16"; end
 if nargin<12;    PrintLocation = "0"; end
-MaxStep = length(Steps);
+if nargin < 13; StepsToSave = "0"; end
+
 
 % make input numeric
 RetryError = str2double(RetryError);
@@ -115,6 +114,7 @@ ParPools = str2double(ParPools);
 PrintLocation = str2double(PrintLocation);
 IndexSubjects = str2double(IndexSubjects);
 SubsetSize = str2double(SubsetSize);
+StepsToSave = str2double(StepsToSave);
 
 %% Prepare List of Subjects to be Processed
 Subjects = table2cell(readtable( SubjectListFile, 'ReadVariableNames', false));  % read csv file with subject Ids to be run
@@ -127,8 +127,7 @@ if max(IndexSubjects) > length(Subjects)
     IndexSubjects = IndexSubjects(ismember(IndexSubjects, 1:length(Subjects)));
 end
 
-%[elisa] CHANGED length == 0 to isempty for faster processing
-if isempty(IndexSubjects)
+if length(IndexSubjects) == 0
     fprintf('Index for Subset %d does not contain any subjects.\n', IndexSubjects);
     return
 end
@@ -137,9 +136,9 @@ end
 Subjects = Subjects(IndexSubjects);
 
 
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â° Translate Choices into numeric ForkCombinations Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+% °°°°°°° Translate Choices into numeric ForkCombinations °°°°°°
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 %% PREPARE Step COMBINATION and test if to run
 % Loop throgh each Step and get the Index of that Step/Choice
 % combination. Concatenate all of them together to create the
@@ -152,7 +151,7 @@ OUTPUT_Choices = split(OUTPUT(1,1), '%')';
 
 % Initate Name of Folder
 OUTPUT_FolderName = repmat("FF", size(OUTPUT_Choices));
-for iStep = 1:length(Steps)
+for iStep = 1:MaxStep
     Choices = DESIGN.(Steps{iStep}).Choices;
     for iChoice = 1:length(Choices)
         OUTPUT_FolderName(strcmp(OUTPUT_Choices(:, iStep), Choices{iChoice}),iStep) = iStep + "." + iChoice ;
@@ -175,9 +174,9 @@ parpool(ParPools);
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â° Run Forking Path Combination Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
-% Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°Â°
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+% °°°°°°° Run Forking Path Combination °°°°°°°°°°°°°°°°°°°°°°°°°
+% °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 % This was put into a function to reduce the output text printed to the logfiles
 % Since some combinations might in in progress at the first time of trying
 % to run it, a note is created to retry it again (RetryFork). However, the
@@ -194,7 +193,7 @@ while sum(RetryFork)>1 && Retry_Loop_Max < 50
         OUTPUT_Choices, OUTPUT_FolderName, OUTPUT_Name, ...
         ImportFolder, OutputFolder, LogFolder, ErrorFolder,   ...
         Steps, MaxStep, Dummy,  RetryError, PrintLocation, ParPools,  ...
-        CountErrors, CountCompleted, CountPreviouslyCompleted, RetryFork);
+        CountErrors, CountCompleted, CountPreviouslyCompleted, RetryFork, StepsToSave);
     fprintf('Subset %d. Run_Steps Loop: %d finished after %d. \n', IndexSubjectsIN, Retry_Loop_Max, toc);
     Retry_Loop_Max = Retry_Loop_Max + 1;
     
@@ -218,7 +217,7 @@ function [CountErrorsOUT, CountCompletedOUT, CountPreviouslyCompletedOUT ...
     OUTPUT_Choices, OUTPUT_FolderName, OUTPUT_Name, ...
     ImportFolder, OutputFolder, LogFolder, ErrorFolder,   ...
     Steps, MaxStep, Dummy,  RetryError, PrintLocation, ParPools,  ...
-    CountErrorsIN,  CountCompletedIN, CountPreviouslyCompletedIN, RetryFork)
+    CountErrorsIN,  CountCompletedIN, CountPreviouslyCompletedIN, RetryFork, StepsToSave)
 if PrintLocation == 1; fprintf('Line 216\n'); end
 
 % Work only through the combinations that need to be retried (had to be
@@ -233,7 +232,7 @@ CountPreviouslyCompletedOUT = zeros(size(RetryForkOUT));
 
 % Loop through all Forking Combinations
 % change to for (instead of parfor if checking manualy)
-for iSubject = 1:length(Subjects) % [elisa] CHANGED parfor to for to test mainpath
+parfor iSubject = 1:length(Subjects)
     try
         Subject = Subjects{iSubject};
         iPath = 1;
@@ -355,7 +354,7 @@ for iSubject = 1:length(Subjects) % [elisa] CHANGED parfor to for to test mainpa
                     % if not first Step
                     
                     % should interim be saved? If yes save also "running"
-                    Save_Interim =  DESIGN.(Steps{iStep}).SaveInterim == 1 || iStep == MaxStep;
+                    Save_Interim =  DESIGN.(Steps{iStep}).SaveInterim == 1 || iStep == MaxStep || iStep == StepsToSave;
                     
                     % Save Running File
                     if Save_Interim == 1
@@ -371,7 +370,7 @@ for iSubject = 1:length(Subjects) % [elisa] CHANGED parfor to for to test mainpa
                 if ~isfield (Data, 'Error')
                     %% Step run correctly
                     % save Interim Step
-                    if Save_Interim == 1
+                    if Save_Interim == 1 
                         if ~exist(InterimFolder, 'dir'); mkdir(InterimFolder); end
                         parfor_save(InterimFileName, Data);
                         if isfile(RunningFileName)

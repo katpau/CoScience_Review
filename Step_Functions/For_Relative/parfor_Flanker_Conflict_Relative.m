@@ -132,11 +132,9 @@ parfor iFolder = 1:length(Folders)
     % Extract Peaks and Determine new Time Window
     iFF = 1;
     while length(INPUT.data.For_Relative.Times_N2)>DP
-        try
-            iFF = iFF +1;
-            INPUT = load(fullfile( Parentfolder, Folder,Files_Fork(iFF).name))
-            INPUT = INPUT.Data;
-        end
+        iFF = iFF +1;
+        INPUT = load(fullfile( Parentfolder, Folder,Files_Fork(iFF).name))
+        INPUT = INPUT.Data;
     end
     
     % Extract new Latencies
@@ -238,7 +236,7 @@ parfor iFolder = 1:length(Folders)
             fprintf('\n*Subset: %s, FoldN2r: %i, Subject: %s - Error Extracting ERPs. \n ', IndexSubset, iFolder, INPUT.Subject)
 
         end
-       parfor_save(fullfile(Parentfolder, Folder, Files_Fork(i_Files).name), OUTPUT)
+        parfor_save(fullfile(Parentfolder, Folder, Files_Fork(i_Files).name), OUTPUT)
     end
 end
 
@@ -277,11 +275,9 @@ parfor iFolder = 1:length(Folders)
     Files_Fork = Files_Fork(~contains({Files_Fork.name}, "error" ));
     
     % Get first File to have a starting point (order, timepoints etc)
-
-
     INPUT = load(fullfile(Parentfolder, Folder, Files_Fork(1).name));
     INPUT = INPUT.Data;
-   
+    
     % Nr Electrodes
     NrElectrodes_FMT = length(INPUT.data.For_Relative.Electrodes_FMT);
     
@@ -340,11 +336,9 @@ parfor iFolder = 1:length(Folders)
     % Extract Peaks and Determine new Time Window
     iFF = 1;
     while length(INPUT.data.For_Relative.Times_FMT)>DPFMT
-        try
-            iFF = iFF +1;
-            INPUT = load(fullfile( Parentfolder, Folder,Files_Fork(iFF).name));
-            INPUT = INPUT.Data;
-        end
+        iFF = iFF +1;
+        INPUT = load(fullfile( Parentfolder, Folder,Files_Fork(iFF).name));
+        INPUT = INPUT.Data;
     end
     
     % Extract new Latencies

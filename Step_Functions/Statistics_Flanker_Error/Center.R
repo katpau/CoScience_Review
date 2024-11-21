@@ -12,7 +12,7 @@ Center = function(input = NULL, choice = NULL) {
   # Handles all Choices listed above 
   # Normalizes the predictors (e.g. behavioral and personality) data within all conditions
   # (1) Center Personality Variables
-  
+  choice = "None"
   if (choice == "Centered")  {
     
     #########################################################
