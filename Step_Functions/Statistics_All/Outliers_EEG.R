@@ -70,7 +70,7 @@ Outliers_EEG = function(input = NULL, choice = NULL) {
     # Outliers EEG
     if (EEG_Outlier == "Applied") {
       output = output %>%
-        group_by(across(all_of(GroupingVariables ) ))%>%
+        group_by(across(all_of(GroupingVariables)))%>%
         mutate(Outliers_EEG = outlierfunction(Threshold, EEG_Signal,  0))  %>%
         ungroup()
     } 
@@ -100,12 +100,22 @@ Outliers_EEG = function(input = NULL, choice = NULL) {
       
       # Exclude Value
     } else if (Treatment == "Exclude" & EEG_Outlier == "Applied") {
-      output$EEG_Signal[as.logical(output$Outliers_EEG)] = NA  }
-    
+      output$EEG_Signal[as.logical(output$Outliers_EEG)] = NA  
+      # [Elisa 24/01/25] remove subjects with incomplete cases from further analyses
+      output <- output %>%
+        group_by(ID, Task, Electrode) %>% # for other labs, different grouping variables might be relevant (e.g. if electrodes are clustered)
+        filter(!any(is.na(EEG_Signal))) %>%
+        ungroup()
+      }
     
     if (SME_Outlier == "Applied") {
       ## Remove EEG if SME out of Range
       output$EEG_Signal[as.logical(output$Outliers_SME)] = NA 
+      # [Elisa 24/01/25] remove subjects with incomplete cases from further analyses
+      output <- output %>%
+        group_by(ID, Task, Electrode) %>%
+        filter(!any(is.na(EEG_Signal))) %>%
+        ungroup()
     }
     
     
