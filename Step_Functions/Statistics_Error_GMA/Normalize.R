@@ -84,20 +84,23 @@ Normalize = function(input = NULL, choice = NULL) {
     # (3) Normalize EEG data per Task and Measure
     #########################################################
     # Get Grouping Variables from previous step
-    output_EEG = output[output$Component == "Ne/c",]
-    ChecknotNormal =   output_EEG %>%
-      filter(!is.na("EEG_Signal")) %>%
-      group_by(Task, Condition, GMA_Measure, Electrode) %>%
+    
+    # [Elisa 22/01/25] normalize EEG data in orig data frame (has not been merged to output before)
+    #output_EEG = output[output$Component == "Ne/c",]
+    GroupingVariables = input$stephistory[["GroupingVariables"]] 
+    ChecknotNormal =   output %>%
+      group_by(across(all_of(GroupingVariables))) %>%
       summarise(notNormal = check_normality(EEG_Signal)) %>%
-      group_by(Task, GMA_Measure, Electrode) %>%
-      summarise(notNormal = any(notNormal)) %>%
+      #group_by(across(all_of(GroupingVariables))) %>%
+      #summarise(notNormal = any(notNormal)) %>%
       filter(notNormal)
     
     # Normalize always only within Task, Component, GMA_Measure, but across Electrodes/Condition
+    # [Elisa 01/25] why across electrodes? No clusters but analysed separately
     for (inn in 1:nrow(ChecknotNormal)) {
-      idx =  output_EEG$Task == ChecknotNormal$Task[inn] &
-        output_EEG$GMA_Measure == ChecknotNormal$GMA_Measure[inn] 
-      output_EEG$EEG_Signal[idx] = normalize_data(output_EEG$EEG_Signal[idx], choice)
+      idx =  output$Task == ChecknotNormal$Task[inn] & output$Electrode == ChecknotNormal$Electrode[inn] & 
+        output$Component == ChecknotNormal$Component[inn] & output$GMA_Measure == ChecknotNormal$GMA_Measure[inn] 
+      output$EEG_Signal[idx] = normalize_data(output$EEG_Signal[idx], choice)
     }
 
   }
