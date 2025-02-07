@@ -16,6 +16,8 @@ Center = function(input = NULL, choice = NULL) {
     #########################################################
     # (1) Center Personality Variables
     #########################################################
+    
+    # Center Covariates
     if (input$stephistory["Covariate"] != "None" & !grepl("Gender", input$stephistory["Covariate"])) {
     # this is done across all subjects and there should be only one value per Subject when normalizing
     Relevant_Collumns =  names(output)[grep(c("Covariate_"), names(output))]
@@ -33,7 +35,20 @@ Center = function(input = NULL, choice = NULL) {
     # Merge again with output
     output =  merge(output,  Personality, by = c("ID"),
                     all.x = TRUE,  all.y = FALSE )
-  }}
+    }
+    
+    # [Elisa 17/01/25] Center Personality Variables
+    Predictors <- output %>%
+      group_by(ID) %>% 
+      summarise_at(vars(Personality_MPS_PersonalStandards, Personality_MPS_ConcernOverMistakes), list(~first(.))) %>% 
+      ungroup() %>% 
+      mutate_at(vars(Personality_MPS_PersonalStandards, Personality_MPS_ConcernOverMistakes),
+                list("z" = ~as.numeric(scale(., T, F))))
+    
+    # [Elisa 17/01/25] Merge  with output
+    output =  merge(output,  Predictors[,c("ID","Personality_MPS_PersonalStandards_z", "Personality_MPS_ConcernOverMistakes_z")], by = "ID")
+    
+  }
   
   #No change needed below here - just for bookkeeping
   stephistory = input$stephistory
