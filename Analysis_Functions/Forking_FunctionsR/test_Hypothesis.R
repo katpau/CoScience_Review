@@ -146,7 +146,9 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       } else {
         nrSubs = Subset %>% 
           group_by_at(all_of(Predictors)) %>%
-          summarise(Subs = length(unique(ID)))
+          summarise(Subs = length(unique(ID))) %>%
+          #[Elisa 29.01.25] added ungroup
+          ungroup()
         nrSubs = min(nrSubs$Subs)
         
         if (nrSubs<minSubjects) {
@@ -204,7 +206,8 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
         nrSubs = Model_Result$nrSubs
       } else {
         lm_formula = Model_Result@formula
-        nrSubs = Model_Result@nrSubs}
+        nrSubs = Model_Result@nrSubs
+        }
       
     }}
   
@@ -310,7 +313,8 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
       
       # Get classic MLM infos (not Anova, but separate regressors)
       SumModel = summary(Model_Result)
-      if ("vcov" %in% SumModel) {
+      # [Elisa 29.01.25] added names() as otherwise if statement is false even if actually true
+      if ("vcov" %in% names(SumModel)) {
         PredicNames = SumModel[["vcov"]]@Dimnames[[1]]
       } else {
         PredicNames = rownames(SumModel$coefficients)

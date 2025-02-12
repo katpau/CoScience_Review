@@ -106,11 +106,13 @@ Covariate = function(input = NULL, choice = NULL) {
 
   # Restructure wide into Long 
   output = output %>% 
-    select(subject,lab,experimenter,task,condition,channel,component,n_trials, shape, rate,yscale, ip1_ms, ip2_ms, skew, excess, onset_ms, offset_ms) %>%
-    gather(GMA_Measure, EEG_Signal, shape:offset_ms)
+    # [Elisa 01/2025] added eeg_mean_win, mode, removed shape, rate, yscale
+    select(subject,lab,experimenter,task,condition,channel,component,n_trials, eeg_mean_win, 
+           skew, excess, mode, mode_ms, ip1_ms, ip2_ms, onset_ms, offset_ms) %>%
+    gather(GMA_Measure, EEG_Signal, eeg_mean_win:offset_ms)
   colnames(output)[1:8] = str_to_title(colnames(output)[1:8])
   
-  output = output %>%  # consistence across Projectss
+  output = output %>%  # consistence across Projects
     rename(ID = Subject,
            Electrode = Channel,
            Epochs = N_trials)
@@ -137,14 +139,16 @@ Covariate = function(input = NULL, choice = NULL) {
   
   # Make sure everything is in correct format
   NumericVariables = c("EEG_Signal", "Epochs", names(output)[grepl("Covariate_", names(output))])
-  GroupingVariables = c("ID", "Condition",  "Component", "Task",  "GMA_Measure", names(output)[grepl("Covariate_Gender", names(output))])
+  # [Elisa 01/25] removed ID, added Electrode as Grouping Variable as we do not compute Clusters
+  GroupingVariables = c("Task", "Condition", "Electrode", "Component",  "GMA_Measure", names(output)[grepl("Covariate_Gender", names(output))])
   
   output[GroupingVariables] = lapply(output[GroupingVariables], as.factor)
   output[NumericVariables] = lapply(output[NumericVariables], as.numeric)
   
   
   # Grouping Variables in all Files and Merge with additional Factors
-  GroupingVariables = c("Condition", "Component", "Task", "GMA_Measure")
+  # [Elisa 01/25] commented line below bc it's redundant
+  #GroupingVariables = c("Condition", "Component", "Task", "GMA_Measure")
   input$stephistory$GroupingVariables = GroupingVariables
   
   #No change needed below here - just for bookkeeping

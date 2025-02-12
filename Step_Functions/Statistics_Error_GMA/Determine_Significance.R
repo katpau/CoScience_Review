@@ -130,8 +130,9 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # a) we want to keep the groups sizes independent of the presence of personality measures, and
   # b) we want to correct the p-values for the whole group of parameters — as opposed to the correction per model.
 
-  Names_GMA <- c("rate", "excess", "shape", "skewness", "inflection1", "scaling", "inflection2")
-  GMA_colnames <- c("rate", "excess", "shape", "skew", "ip1_ms", "yscale", "ip2_ms")
+  # [Elisa 29.01.25] removed rate, shape, scaling/yscale, added mode
+  Names_GMA <- c("excess", "skewness", "mode", "mode_ms", "inflection1", "inflection2", "Ne")
+  GMA_colnames <- c("excess", "skew","mode", "mode_ms", "ip1_ms", "ip2_ms", "eeg_mean_win")
   nGmaNames <- length(GMA_colnames)
   columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal")
   lm_formula <- paste("EEG_Signal ~  Condition ", Covariate_Formula)
@@ -174,9 +175,9 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   nGmaNames <- length(GMA_colnames)
 
   columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal",
-                       "Personality_MPS_PersonalStandards", "Personality_MPS_ConcernOverMistakes")
-  lm_formula <- paste("EEG_Signal ~  (Condition * Personality_MPS_PersonalStandards * Personality_MPS_ConcernOverMistakes) ", Covariate_Formula)
-
+                       "Personality_MPS_PersonalStandards_z", "Personality_MPS_ConcernOverMistakes_z")
+  lm_formula <- paste("EEG_Signal ~  (Condition * Personality_MPS_PersonalStandards_z * Personality_MPS_ConcernOverMistakes_z) ", Covariate_Formula)
+  
   # GMA: All complete cases, this time including the onsets and offsets
   GmaSet <- output %>%
     filter(GMA_Measure %in% GMA_colnames) %>%
@@ -196,8 +197,10 @@ Determine_Significance = function(input = NULL, choice = NULL) {
 
         Estimates <- rbind(Estimates,
                            wrap_test_Hypothesis(Name_Test,
-                                                lm_formula, GmaSet %>% filter(Electrode == ch),
-                                                GMA_colnames[i_GMA], i_task,
+                                                lm_formula, 
+                                                GmaSet %>% filter(Electrode == ch),
+                                                GMA_colnames[i_GMA], 
+                                                i_task,
                                                 columns_to_keep) %>%
                              mutate(t_group = testGroup))
       }
