@@ -169,10 +169,9 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   #########################################################
   # The models in including personality predictors will be p-adjusted per model.
 
-  # Add the Gamma onset and offset values for exploration
-  Names_GMA <- c(Names_GMA, "onset", "offset")
-  GMA_colnames <- c(GMA_colnames, "onset_ms", "offset_ms")
-  nGmaNames <- length(GMA_colnames)
+  persColnames <- c("Personality_MPS_PersonalStandards", "Personality_MPS_ConcernOverMistakes")
+  persLabels <- c("PSP", "ECP")
+  nPersCols <- length(persColnames)
 
   columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal",
                        "Personality_MPS_PersonalStandards_z", "Personality_MPS_ConcernOverMistakes_z")
@@ -185,8 +184,9 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     filter(!any(is.na(EEG_Signal))) %>%
     ungroup()
 
-  for (i_task in c("GoNoGo", "Flanker")) {
-    for (ch in allElectrodes) {
+      lm_formula <- paste("EEG_Signal ~ Condition *", paste(persColnames, collapse = " * "), Covariate_Formula, additional_Factor_Formula)
+      columns_to_keep <- c("Condition", Covariate_Name, persColnames, additional_Factors_Name, "GMA_Measure", "EEG_Signal")
+
       for (i_GMA in 1:nGmaNames) {
         # One p-adjustment group per model (DV)
         testGroup <- testGroup + 1
