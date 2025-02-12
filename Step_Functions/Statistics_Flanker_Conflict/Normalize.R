@@ -53,7 +53,7 @@ Normalize = function(input = NULL, choice = NULL) {
     #########################################################
     Personality = input$stephistory$output_Personality 
     Relevant_Collumns =  colnames(Personality)[grep(c("Personality_|Covariate_|IST"), names(Personality))] 
-
+    Relevant_Collumns = Relevant_Collumns[!grepl("Gender", Relevant_Collumns)]
     Not_Normal = sapply(Personality[,Relevant_Collumns], function(col) check_normality(col)) 
     Not_Normal_CollumnNames = Relevant_Collumns[as.logical(Not_Normal)]
 

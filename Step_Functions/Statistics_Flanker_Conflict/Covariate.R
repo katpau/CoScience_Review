@@ -99,7 +99,7 @@ Covariate = function(input = NULL, choice = NULL) {
       CovariateData,
       by = c("ID"),
       all.x = TRUE,
-      all.y = FALSE
+      all.y = TRUE
     )}
   input$stephistory$output_Personality = output_Personality
 
@@ -110,7 +110,7 @@ Covariate = function(input = NULL, choice = NULL) {
   columnstoChange2 = colnames(output)[length(colnames(output))]
   
   # Rename Subject Variable
-  colnames(output)[5] = "ID"
+  colnames(output)[colnames(output)=="Subject"] = "ID"
   
   output = output %>%
     gather(Component_Electrode, EEG_Signal, !!as.character(columnstoChange1):!!as.character(columnstoChange2)) %>%
@@ -128,12 +128,12 @@ Covariate = function(input = NULL, choice = NULL) {
   FactorVariables = c("ID",  "Electrode", "Component")
   
   NumericPersonalityVariables = c(names(output_Personality)[grepl("Personality_|Covariate_", names(output_Personality))])
-  FactorPersonalityVariables = c("ID",  names(output)[grepl("Covariate_Gender", names(output_Personality))])
+  FactorPersonalityVariables = c("ID",  names(output_Personality)[grepl("Covariate_Gender", names(output_Personality))])
 
   output[,NumericVariables] = lapply(output[,NumericVariables], as.numeric)
   output[,FactorVariables] = lapply(output[,FactorVariables], as.factor)
   output_Personality[,NumericPersonalityVariables] = lapply(output_Personality[,NumericPersonalityVariables], as.numeric)
-  if (!AddCovariate == 0) {
+  if (length(FactorPersonalityVariables)>1) {
   output_Personality[,FactorPersonalityVariables] = lapply(output_Personality[,FactorPersonalityVariables], as.factor) 
   } else {
     output_Personality[,FactorPersonalityVariables] = as.factor(output_Personality[,FactorPersonalityVariables])

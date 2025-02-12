@@ -22,16 +22,18 @@ if (choice == "Centered")  {
 
 # this is done across all subjects and there should be only one value per Subject when normalizing
 Relevant_Collumns =  c(names(output)[grep(c("Personality_|Covariate_|Behav_"), colnames(output))])
-Personality = unique(output[,c("ID", Relevant_Collumns )])
+Personality = unique(output[,c("ID", Relevant_Collumns ,
+                               "Experimenter_Sex", "Participant_Sex")]) # keep last two for centering within cells!
 # Remove from output file
-output = output[,-which(names(output) %in% Relevant_Collumns)]
+output = output[,-which(names(output) %in% c(Relevant_Collumns,
+                                             "Experimenter_Sex", "Participant_Sex"))]
 
 # Center
-if (length(Relevant_Collumns)>1) {
-Personality[,Relevant_Collumns] = lapply(Personality[,Relevant_Collumns], function(col) scale(col, scale = FALSE))
-} else {
-  Personality[,Relevant_Collumns] = scale(Personality[,Relevant_Collumns], scale =FALSE)
-}
+Personality <- Personality %>%
+    group_by(Experimenter_Sex, Participant_Sex) %>%
+    mutate(across(all_of(Relevant_Collumns), ~ . - mean(.), .names = "{col}")) %>%
+    ungroup()
+
 
 # Merge again with output
 output =  merge(output,  Personality, by = c("ID"),

@@ -125,7 +125,8 @@ test_HypothesisBU = function (Name_Test,lm_formula, Subset, Effect_of_Interest, 
           Model_Result = tryCatch({
             Subset$Lab = as.numeric(Subset$Lab)
             Model_Result = lm(as.formula(lm_formula), 
-                              Subset)
+                              Subset,
+                              control = lmerControl(optimizer = "bobyqa"))
             Model_Result$formula = lm_formula
             Model_Result$nrSubs = length(unique(Subset$ID))
             Model_Result
@@ -219,7 +220,7 @@ test_HypothesisBU = function (Name_Test,lm_formula, Subset, Effect_of_Interest, 
       lm_formula = ModelProvided[2]
       nrSubs = ModelProvided[3]
       Estimates = cbind.data.frame(Name_Test, NA, NA, NA, NA, NA, NA, nrSubs,mean(Subset$Epochs, na.rm=TRUE),
-                                   sd(Subset$Epochs, na.rm=TRUE), NA, lm_formula, NA, NA, NA)
+                                   sd(Subset$Epochs, na.rm=TRUE), NA, lm_formula, NA, NA, NA,NA, NA, NA,NA, NA, NA)
       
     } else {
       # get Anova from model
@@ -247,7 +248,7 @@ test_HypothesisBU = function (Name_Test,lm_formula, Subset, Effect_of_Interest, 
         Effect_of_Interest = c(Effect_of_Interest, "Hemisphere")  }
       if ("Localisation" %in% keptcollumns) {
         Effect_of_Interest = c(Effect_of_Interest, "Localisation")  }
-      # Add Electrode to effect of interest only if frontal/paripartial_Etal
+      # Add Electrode to effect of interest only if frontal/parietal
       if ("Electrode" %in% keptcollumns) {
         if (length(unlist(unique(Subset$Electrode))) == 6) {
           Effect_of_Interest = c(Effect_of_Interest, "Electrode")  }}
@@ -301,13 +302,33 @@ test_HypothesisBU = function (Name_Test,lm_formula, Subset, Effect_of_Interest, 
       }
       
       
+      # Get classic MLM infos (not Anova, but separate regressors)
+      SumModel = summary(Model_Result)
+      if ("vcov" %in% SumModel) {      
+        PredicNames = SumModel[["vcov"]]@Dimnames[[1]]
+      } else {
+        PredicNames = rownames(SumModel$coefficients)
+      }
+      # Get Regressors including all Elements
+      PosIdx = which(rowSums(sapply(Effect_of_Interest, function(x) grepl(x, PredicNames))) == length(Effect_of_Interest))
+      # Remove Regressors with more Elements
+      PosIdx = PosIdx[which(sapply(PredicNames[PosIdx], function(x) {A = strsplit(x, ":"); length(unlist(A))}) == length(Effect_of_Interest))]
+      # Get last index (assuming that pne is the highest level most different from reference level
+      PosIdx = tail(PosIdx,1)
+      SumModel = c(PredicNames[PosIdx], SumModel$coefficients[PosIdx,])
+      if (length(SumModel)<6) {SumModel = c(SumModel[1:3], NA, SumModel[4:5])} # then no dfs!
+
+      
+      
       # prepare export
       if (length(Idx_Effect_of_Interest)>0) {
         Estimates = cbind.data.frame(Name_Test, StatTest, "partial_Eta", partial_Eta, p_Value,  nrSubs, mean(Subset$Epochs), sd(Subset$Epochs), 
-                                     Singularity, lm_formula, FStatInfo[1], FStatInfo[2], FStatInfo[3])
+                                     Singularity, lm_formula, FStatInfo[1], FStatInfo[2], FStatInfo[3],
+                                     t(SumModel))
       } else {
         print("Effect not found in Model")
-        Estimates = cbind.data.frame(Name_Test, NA, "partial_Eta", NA, NA, NA, NA,  NA, NA, NA, NA, lm_formula, NA, NA, NA)
+        Estimates = cbind.data.frame(Name_Test, NA, "partial_Eta", NA, NA, NA, NA,  NA, NA, NA, NA, 
+                                     lm_formula, NA, NA, NA, NA, NA, NA, NA, NA, NA)
         
       }
       
@@ -317,7 +338,8 @@ test_HypothesisBU = function (Name_Test,lm_formula, Subset, Effect_of_Interest, 
       # effectsize::standardize_parameters(Model_Result)
     } 
     colnames(Estimates) = c("Effect_of_Interest", "Statistical_Test", "EffectSizeType" ,"value_EffectSize", "CI_low", "CI90_high", 
-                            "p_Value",  "n_participants", "av_epochs", "sd_epochs", "Singularity", "formula", "F_value", "dfN", "dfD")
+                            "p_Value",  "n_participants", "av_epochs", "sd_epochs", "Singularity", "formula", "F_value", "dfN", "dfD",
+                            "RegressorName", "Estimate_summary", "Std.Error_summary", "df_summary", "t_z_summary", "p_summary")
     
     
     return (Estimates)

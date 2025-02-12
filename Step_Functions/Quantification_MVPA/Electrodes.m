@@ -37,7 +37,14 @@ Conditional = ["NaN", "NaN",  "NaN", "NaN"];
 SaveInterim = logical([0]); 
 Order = [20]; 
 
+% Create EEG substructures from 3d EEGmatrix containing only trials from LRP electrodes (channels x dp x trials)
+chanlocs = struct2table(INPUT.data.LRP.chanlocs);
+Electrodes = upper(strsplit(Choice, ", ")); 
+lrp_chanlocs = [find(strcmp(chanlocs.labels, Electrodes(1))) find(strcmp(chanlocs.labels, Electrodes(2)))]; %only use LRP electrodes of interest
 
+INPUT.data.LRP = pop_select(INPUT.data.LRP, 'channel', lrp_chanlocs); %remove other channels from EEG structure
+
+clear chanlocs lrp_chanlocs
 
 % ****** Updating the OUTPUT structure ******
 % No changes should be made here.

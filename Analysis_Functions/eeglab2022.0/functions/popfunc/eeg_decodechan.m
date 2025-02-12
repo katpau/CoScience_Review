@@ -139,7 +139,7 @@ else
                 else 
                 end
             catch
-x                error([ 'Channel ''' chanlist{ind} ''' not found' ]);
+                error([ 'Channel ''' chanlist{ind} ''' not found' ]);
             end
         end
     end

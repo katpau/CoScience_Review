@@ -189,7 +189,7 @@ Covariate = function(input = NULL, choice = NULL) {
   Levels_H = length(unlist(unique(output$Hemisphere)))
   Levels_L = length(unlist(unique(output$Localisation)))
   Levels_E = length(unlist(unique(output$Electrode)))
-  Levles_F = length(unlist(unique(output$FrequencyBand)))
+  Levels_F = length(unlist(unique(output$FrequencyBand)))
   
   additional_Factors_Name = vector()
   additional_Factor_Formula = vector()
@@ -197,7 +197,7 @@ Covariate = function(input = NULL, choice = NULL) {
     additional_Factors_Name = "Hemisphere"
     additional_Factor_Formula = "* Hemisphere" 
   }
-  if (Levels_L == 2 & Levels_E == 2) {
+  if (Levels_L == 2 ) {
     additional_Factors_Name = c(additional_Factors_Name, "Localisation")
     additional_Factor_Formula = paste(additional_Factor_Formula, "* Localisation") 
   }
@@ -207,9 +207,9 @@ Covariate = function(input = NULL, choice = NULL) {
   }
   if (Levels_E == 6 & Levels_L == 2) { 
     additional_Factors_Name = c(additional_Factors_Name, "Electrode")
-    additional_Factor_Formula = paste(additional_Factor_Formula, "* Electrode") 
+    additional_Factor_Formula = paste(additional_Factor_Formula, "+ Electrode") 
   }
-  if (Levles_F == 2) {
+  if (Levels_F == 2) {
     additional_Factors_Name = c(additional_Factors_Name, "FrequencyBand")
     additional_Factor_Formula = paste(additional_Factor_Formula, "+ FrequencyBand")
   }

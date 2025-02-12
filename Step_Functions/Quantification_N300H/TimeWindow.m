@@ -35,7 +35,7 @@ StepName = "TimeWindow";
 Choices = ["250,500", "200,400", "300,350", "Relative_Group"];
 Conditional = ["NaN", "NaN", "NaN", "NaN" ]; 
 SaveInterim = logical([1]);
-Order = [17];
+Order = [20];
 
 
 % ****** Updating the OUTPUT structure ******

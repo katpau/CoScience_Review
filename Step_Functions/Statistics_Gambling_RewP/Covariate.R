@@ -82,10 +82,11 @@ Covariate = function(input = NULL, choice = NULL) {
       )
     } else if(Covariate_choice == "Anxiety_Age_Gender_State") {
       Covariate_Variable = c(
-        "PSWQ_Concerns",
+        "BFI_Anxiety",
         "Age",
-        "BFI_Gender"
+        "Gender"
       )
+      
     } else  {
       Covariate_Variable = Covariate_choice
     }
@@ -172,7 +173,7 @@ Covariate = function(input = NULL, choice = NULL) {
   #########################################################
   # Get possible additional factors to be included in the GLM
   
-  if (length(unlist(unique(output$Electrode)))>1) {additional_Factors_Name = c("Electrode")
+  if (length(unlist(unique(output$Electrode)))>1 & !any(grepl("Cluster", unique(output$Electrode)))) {additional_Factors_Name = c("Electrode")
   additional_Factor_Formula = paste("+ Electrode") 
   } else {
     additional_Factors_Name = vector()

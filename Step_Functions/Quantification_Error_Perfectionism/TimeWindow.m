@@ -30,7 +30,7 @@ function  OUTPUT = TimeWindow(INPUT, Choice)
 StepName = "TimeWindow";
 Choices = ["0,100", "0,50", "0,150", "Relative_Group_wide", "Relative_Group_narrow", "Relative_Subject"];
 Conditional = ["NaN", "NaN", "NaN", "NaN", "NaN", "NaN"];
-SaveInterim = logical([1]);
+SaveInterim = logical([0]);
 Order = [21];
 
 

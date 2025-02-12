@@ -292,7 +292,8 @@ try
                 % Array of Electrodes : Frequencies : Trials
             end
         end
-        power_AllConditions(:,1:NrFreqs, 1:Trials(i_cond), i_cond) = 2*abs(FreqData(:, 1:NrFreqs, :)); % take only frequencies of Nyquist plus DC
+        %power_AllConditions(:,1:NrFreqs, 1:Trials(i_cond), i_cond) = 2*abs(FreqData(:, 1:NrFreqs, :)); % take only frequencies of Nyquist plus DC
+        power_AllConditions(:,1:NrFreqs, 1:Trials(i_cond), i_cond) = 2*(abs(FreqData(:, 1:NrFreqs, :)).^2); % take only frequencies of Nyquist plus DC and square to get power
     end
     
     

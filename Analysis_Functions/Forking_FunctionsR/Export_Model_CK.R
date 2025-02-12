@@ -8,6 +8,7 @@ mlm.table <- function(Model_Result, Effect_of_Interest) {
   
   if (length(Effect_of_Interest)>1) {
     Idx = which(rowSums(sapply(X = Effect_of_Interest, FUN = grepl, rownames(fixef))) == length(Effect_of_Interest))
+    Idx = Idx[          str_count(rownames(fixef)[Idx] , ":")  <  length(Effect_of_Interest)             ]
   }  else {
     Idx = rownames(fixef) == Effect_of_Interest
   }

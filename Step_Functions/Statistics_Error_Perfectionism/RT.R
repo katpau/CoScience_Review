@@ -9,11 +9,12 @@ RT = function(input = NULL, choice = NULL) {
   # Planned/Completed Review by:
 
   # Handles how RTs are defined
-  # Handles all Choices listed above as well as choices from previous Step (StateAnxiety)
-  # (1) Get Choices abotu which Trials to be included, from previous Steps and load Data
-  # (2) Drop Trials based on selection criteria
-  # (3) Calculate RT based on choice
-  # (4) Merge for Export
+  # Handles all Choices listed above as well as choices from previous Step 
+  # (1) Read Behavioral Data
+  # (2) Drop Trials based on selection criteria in EEG
+  # (3) Calculate RT difference to next trial
+  # (4) Calculate ACC difference to next trial
+  # (5) Merge with EEG data
   
   
   #########################################################
@@ -48,7 +49,7 @@ RT = function(input = NULL, choice = NULL) {
   }
 
   #########################################################
-  # (2) Calculate RT Diff
+  # (3) Calculate RT Diff
   #########################################################
   # Calculate Difference to NEXT trial: negative means becoming slower
   BehavData$RTDiff = c(BehavData$RT[1:(nrow(BehavData)-1)] -
@@ -93,7 +94,7 @@ RT = function(input = NULL, choice = NULL) {
   
   
   #########################################################
-  # (3) Calculate Post Accuracy
+  # (4) Calculate Post Accuracy
   #########################################################
   # only response not inhibition conditions
   BehavData$Post_Trial[BehavData$Post_Trial == "post_correct_resp"] = "post_correct"
@@ -113,7 +114,7 @@ RT = function(input = NULL, choice = NULL) {
   
   
   #########################################################
-  # (4) Export [Add as new Rows]
+  # (5) Export [Add as new Rows]
   #########################################################
   # Merge Behav Data together with import info
   Data_to_ADD = output[,c("ID", "Lab", "Task", "Condition","Experimenter", colnames(output)[grepl("Covariate_|Personality_", colnames(output))])]

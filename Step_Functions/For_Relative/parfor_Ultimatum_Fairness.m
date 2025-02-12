@@ -16,6 +16,10 @@ fprintf('\nNumber of Paths to analyse: %i. \n  ', length(Folders))
 %parpool(12);
 
 % In parallel way, for every Forking Combination extract GAV and ERP Values
+par
+
+
+
 for iFolder = 1:length(Folders)
     fprintf('\n*Subset: %s, FoldN2r: %i - Calculating GAV. \n  ', IndexSubset, iFolder)
     %% ********************************
@@ -33,14 +37,14 @@ for iFolder = 1:length(Folders)
    
     % Get correct DP for each Component
     if  strcmp(INPUT.StepHistory.Resampling, "500")
-        DP = 201;
-        DPFRN = 151;
+        DP = 164;
+        DPFRN = 124;
     elseif  strcmp(INPUT.StepHistory.Resampling, "250")
-        DP = 100;
-        DPFRN = 125;
+        DP =82;
+        DPFRN = 62;
     elseif  strcmp(INPUT.StepHistory.Resampling, "125")
-        DP = 50;
-        DPFRN = 25;
+        DP = 41;
+        DPFRN = 31;
     end
     
     
@@ -140,30 +144,32 @@ for i_Files = 1 : length(Files_Fork)
         Export_Header = {'ID', 'Lab', 'Experimenter', 'Trial', 'Offer', 'Choice', 'RT', 'Component',  'Electrode', 'EEG_Signal'};
   
         
-        ConditionData_FRN = squeeze(mean(ConditionData_FRN, 2))';
-        ConditionData_FMT = squeeze(mean(ConditionData_FMT, 2))';
-        Electrode_Labels = repmat(INPUT.data.For_Relative.Electrodes, size(ConditionData_FRN,1), 1);
+        ConditionData_FRN = (mean(ConditionData_FRN, 2));
+        ConditionData_FMT = (mean(ConditionData_FMT, 2));
+
+        TrialInfo = INPUT.data.For_Relative.TrialInfo;
+        NrElectrodes = size(Electrodes,2);
+        NrTrials = size(TrialInfo,1);
+
+
+        Electrode_Labels = repmat(INPUT.data.For_Relative.Electrodes, NrTrials, 1);
         Constants = repmat({INPUT.Subject, INPUT.data.For_Relative.RecordingLab, ...
             INPUT.data.For_Relative.Experimenter}, ...
-            size(ConditionData_FRN,1)*size(ConditionData_FRN,2),1);
-  
-        
-        
-        TrialInfo = INPUT.data.For_Relative.TrialInfo;
-        NrElectrodes = length(Electrodes)
+            NrTrials*NrElectrodes,1);
+
         Export = [Export_Header; ...
             [Constants,  ...
-            repmat(TrialInfo, NrElectrodes, 1), ...
-            repmat("FRN", size(ConditionData_FRN,1)*NrElectrodes, 1), ...
+            repelem(TrialInfo, NrElectrodes, 1), ...
+            repmat("FRN", NrTrials*NrElectrodes, 1), ...
             Electrode_Labels(:), ConditionData_FRN(:)];
             [Constants,  ...
-            repmat(TrialInfo, NrElectrodes, 1), ...
-            repmat("FMT", size(ConditionData_FRN,1)*NrElectrodes, 1), ...
+            repelem(TrialInfo, NrElectrodes, 1), ...
+            repmat("FMT", NrTrials*NrElectrodes, 1), ...
             Electrode_Labels(:), ConditionData_FMT(:)]];
         
         
         OUTPUT.data.Export = Export;
-        parfor_save(fullfile(Parentfolder, Folder,Files_Fork(i_Files).name), OUTPUT)
+      %  parfor_save(fullfile(Parentfolder, Folder,Files_Fork(i_Files).name), OUTPUT)
         
         
         % ****** Error Management ******

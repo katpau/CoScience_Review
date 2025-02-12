@@ -75,14 +75,18 @@ try % For Error Handling, all steps are positioned in a try loop to capture erro
                 
 
             elseif AnalysisName == "Flanker_MVPA" 
-                  Event_Window = [-0.300 0.300]; % Epoch length in seconds
-                  Relevant_Triggers = [ 106, 116, 126,  136, ...
-                      107, 117, 127, 137, 108, 118, 128, 138, ...
-                      109, 119, 129, 139  ]; %Responses Experimenter Absent
+                    Event_Window = [-0.200 1.150]; % Epoch length in seconds (stimulus-locked)
+                    Relevant_Triggers = [ 104, 114, 124, 134 ]; %Target Onset Experimenter Absent
+%                   Event_Window = [-0.300 0.300]; % Epoch length in seconds
+%                   Relevant_Triggers = [ 106, 116, 126,  136, ...
+%                       107, 117, 127, 137, 108, 118, 128, 138, ...
+%                       109, 119, 129, 139  ]; %Responses Experimenter Absent
 
               elseif AnalysisName == "GoNoGo_MVPA" 
-                  Event_Window = [-0.300 0.300]; % Epoch length in seconds
-                  Relevant_Triggers = [211, 220 ]; %Responses Speed/Acc emphasis
+                    Event_Window = [-0.200 1.150]; % Epoch length in seconds (stimulus-locked)
+                    Relevant_Triggers = [201, 202 ]; %Targets Speed
+%                   Event_Window = [-0.300 0.300]; % Epoch length in seconds
+%                   Relevant_Triggers = [211, 220 ]; %Responses Speed/Acc emphasis
 
               elseif AnalysisName == "Flanker_GMA" || AnalysisName == "Flanker_Perfectionism" 
                   Event_Window = [-0.500 0.800]; % Epoch length in seconds

@@ -99,6 +99,12 @@ end
     % add ECG if needed
     if INPUT.AnalysisName == "Gambling_N300H"
         Common_Channels = [Common_Channels, {'ECG_bipolar', 'ECG_1', 'ECG_2'}];
+        % manual check showed no data for ECG! exclude subjects
+        if ismember(INPUT.Subject , {'sub-DT05EV26','sub-ER06FL20','sub-ER06NG02','sub-ER07RE13',...
+                                    'sub-ER09GO30','sub-ER09NZ11','sub-IN06RZ26','sub-KE06RK19',...
+                                    'sub-KI05ER17','sub-LD05ER13','sub-NN07ID18','sub-NN08ER22','sub-ER06CA28'})
+           error('ECG trace bad - checked manually');
+        end
     end
     Common_Channels = Common_Channels(ismember(Common_Channels, {EEG.chanlocs.labels})); % some labs miss e.g. VOGabove
     EEG = pop_select( EEG, 'channel',Common_Channels);

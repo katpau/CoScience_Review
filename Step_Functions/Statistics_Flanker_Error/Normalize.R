@@ -3,7 +3,7 @@ Normalize = function(input = NULL, choice = NULL) {
   Choices = c("Rankit", "Log", "None")
   Order = 11
   output = input$data
-
+choice = "None"
   ## Contributors
   # Last checked by KP 12/22
   # Planned/Completed Review by:

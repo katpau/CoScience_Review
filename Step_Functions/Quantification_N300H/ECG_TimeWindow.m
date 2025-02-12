@@ -35,7 +35,7 @@ StepName = "ECG_TimeWindow";
 Choices = ["2000,5000","3500,4000","Relative_Group"];
 Conditional = ["NaN", "NaN", "NaN"];
 SaveInterim = logical([1]);
-Order = [22];
+Order = [19];
 
 
 % ****** Updating the OUTPUT structure ******

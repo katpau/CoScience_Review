@@ -72,6 +72,11 @@ source_Design = function (ListOfStepFunctionFolders) {
     design[[i]] = eval(parse(text = FunctionNames[i]))
   }
   names(design) = FunctionNames
+
+  # for some Analyses no SME!
+  if (any(grepl("Error_GMA|N300H", ListOfStepFunctionFolders))) {
+  design = design[-which(FunctionNames == "Outliers_SME")]
+}
   return(design)
 }
 
@@ -82,15 +87,15 @@ combine_Choices = function(design, PreviousStep) {
   # This can easily result in sizes extending the available RAM
   # One Solution is to Fork everything till Outliers, clean up, then merge with Rest
   
-  highest_outlier = max(which(grepl("Outliers_", names(design))))
+  highest_outlier = max(which(grepl("Outliers", names(design))))
   
   Forking_List1 = do.call(expand.grid, design[1:highest_outlier])
   
   # Drop outlier combinations that cannot be
   # Get Indexes of Nones
-  outlier_collumns = names(design)[grepl("Outliers_", names(design))]
+  outlier_collumns = names(design)[grepl("Outliers", names(design))]
   outlier_collumns = outlier_collumns[!grepl("Personality", outlier_collumns)]
-  outlier_collumns_variable = outlier_collumns[!grepl("_Threshold|_Treatment", outlier_collumns)]
+  outlier_collumns_variable = outlier_collumns[!grepl("Threshold|Treatment", outlier_collumns)]
   
   # All Fields related to Thresholds are None
   Idx_None = Forking_List1[outlier_collumns_variable] == "None"
@@ -112,7 +117,7 @@ combine_Choices = function(design, PreviousStep) {
   
   # Drop Duplicates
   Forking_List1 = Forking_List1[!duplicated(Forking_List1),]
-  Forking_List1 
+  #Forking_List1 
   
   # Fork second part and merge
   Forking_List2 = do.call(expand.grid, design[(highest_outlier+1):length(design)])
@@ -123,26 +128,28 @@ combine_Choices = function(design, PreviousStep) {
   fac_cols = sapply(Forking_List, is.factor)
   Forking_List[fac_cols] <-
     lapply(Forking_List[fac_cols], as.character)
-  Combination_Name = apply(Forking_List, 2, function(col)
-    as.numeric(format(
-      factor(
-        col,
-        levels = unique(col),
-        labels = 1:length(unique(col))
-      )
-    )))
+  
+ #Combination_Name = apply(Forking_List, 2, function(col)
+  #  as.numeric(format(
+  #    factor(
+  #      col,
+  #      levels = unique(col),
+  #      labels = 1:length(unique(col))
+  #    )
+  #  )))
   
   # Create Output Numbering
-  Combination_Number = ""
-  for (i_Step in 1:ncol(Combination_Name)) {
-    Combination_Number = paste0(Combination_Number,
-                                "_",
-                                i_Step + PreviousStep,
-                                ".",
-                                Combination_Name[, i_Step])
-  }
-  CombinedForks = list(Forks_Table = Forking_List, Forks_Nr = Combination_Number)
-  return(CombinedForks)
+  # Combination_Number = ""
+  # for (i_Step in 1:ncol(Combination_Name)) {
+  #  Combination_Number = paste0(Combination_Number,
+  #                              "_",
+  #                              i_Step + PreviousStep,
+  #                              ".",
+  #                              Combination_Name[, i_Step])
+  #}
+  #CombinedForks = list(Forks_Table = Forking_List, Forks_Nr = Combination_Number)
+  #return(CombinedForks)
+  return(Forking_List)
 }
 
 
@@ -352,10 +359,17 @@ run_Steps_parallel = function (i_Fork, OUTPUT, Path_to_Merged_Files, Path_to_Exp
     input$stephistory <- sapply(Step_Names, function(x) NULL)
     input$stephistory["Inputfile"] = filename_input
     input$stephistory["Final_File_Name"] = filename_output
+    if (grepl("header", collumnNamesEEGData[1] )) {
+    input$data = read.table(filename_input,  sep = ",", header = TRUE)
+    } else {
     input$data = read.table(filename_input,  sep = ",", header = FALSE)
+    colnames(input$data) = collumnNamesEEGData 
+    }
+
+    
     input$stephistory["Root_Behavior"] = paste0(Root, "/BehaviouralData/")
     input$stephistory["Root_Personality"] =  paste0(Root, "/QuestionnaireData/", AnalysisName, "/")
-    colnames(input$data) = collumnNamesEEGData 
+   
     
     # Run in Try Catch to parse Error Messages to Parloop
     Error_Subjects = tryCatch({

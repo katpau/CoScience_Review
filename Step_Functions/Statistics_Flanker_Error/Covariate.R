@@ -3,7 +3,7 @@ Covariate = function(input = NULL, choice = NULL) {
   Choices = c("None", "Gender", "Age", "BDI_Depression", "BFI_OpenMindedness","BFI_Conscientiousness","BFI_Agreeableness","BFI_Extraversion", "Big5_OCEA")
   Order = 4
   output = input$data
-  
+  choice = "None"
   ## Contributors
   # Last checked by KP 12/22
   # Planned/Completed Review by:
@@ -20,7 +20,45 @@ Covariate = function(input = NULL, choice = NULL) {
   
   
   
-  
+   From = strsplit(output$TimeWindow, " ")
+   From = as.numeric(  lapply(From, `[[`, 1))
+   ERN =    From < 100
+   PE = From >= 100
+   output$Component = NA
+   output$Component[ERN] = "ERN"
+   output$Component[PE] = "PE"
+
+output = output[which(output$Component == "ERN"),]
+
+
+
+output  = output  %>% 
+        group_by(ID, Condition) %>%
+        summarise(EEG_Signal = mean(EEG_Signal, na.rm =TRUE),
+	Lab = Lab[1],
+	Experimenter = Experimenter[1],
+	Electrode = Electrode[1],
+	TimeWindow = TimeWindow[1],
+	SME = SME[1],
+	Epochs = Epochs[1],
+	Component=Component[1])
+
+
+if(grepl("_15.3_", input$stephistory["Inputfile"])){
+output$EEG_Signal = output$EEG_Signal/100}
+
+remove_extremes = function(Signal) {
+  Min = mean(Signal, na.rm=T) - 3.29*sd(Signal, na.rm=T)
+  Max = mean(Signal, na.rm=T) + 3.29*sd(Signal, na.rm=T)
+  Signal[which(Signal<Min)] = NA
+  Signal[which(Signal>Max)] = NA
+  return(Signal)
+}
+output$EEG_Signal = remove_extremes(output$EEG_Signal)
+output$EEG_Signal = remove_extremes(output$EEG_Signal)
+
+
+
   
   #########################################################
   # (1) Preparations 
@@ -46,8 +84,8 @@ Covariate = function(input = NULL, choice = NULL) {
   #########################################################
   # (3) Extract Personality  (not forked)  + Covariates
   #########################################################
-  PersonalityData = ScoreData[, c("ID", "Subset","Personality_MPS_TotalPerfectionism", "Personality_PSWQ_Concerns", 
-                                  "Personality_PSWQ_Concerns_sortedAV", "Personality_PSWQ_Concerns_sortedMin")]
+  PersonalityData = ScoreData[, c("ID", "Subset",
+                                  colnames(ScoreData)[grepl( "PSWQ", colnames(ScoreData))])]
  
 
   # Select only Relevant Covariate
@@ -59,12 +97,14 @@ Covariate = function(input = NULL, choice = NULL) {
       Covariate_Variable = "Age"
       
     } else if (Covariate_choice == "Big5_OCEA") {
-      Covariate_Variable = c(
-        "BFI_OpenMindedness",
-        "BFI_Conscientiousness",
-        "BFI_Agreeableness",
-        "BFI_Extraversion"
-      )
+     # Covariate_Variable = c(
+    #    "BFI_OpenMindedness",
+    #    "BFI_Conscientiousness",
+    #    "BFI_Agreeableness",
+    #    "BFI_Extraversion"
+    #  )
+      choice = "BFI_Extraversion"
+      Covariate_Variable = "BFI_Extraversion"
     } else  {
       Covariate_Variable = Covariate_choice
     }

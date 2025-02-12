@@ -72,7 +72,7 @@ if (choice == "Applied"){
     
     
     #########################################################
-    # (3) Treat Outliers RT
+    # (3) Treat Outliers 
     #########################################################
     if (Treatment == "Replace" ){
       # Save Min/Max in collumn for later

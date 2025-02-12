@@ -52,7 +52,7 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
   if (!SaveUseModel == "previousModel"){ 
     # check if data has been processed, otherwise don't proceed
     if (length(unique(Subset$ID))<100) { # Change for final analysis!!
-      Model_Result = c("Error_data_seems_incomplete", lm_formula, length(unique(Subset$ID)))
+      Model_Result = c("Error_when_computing_Model", lm_formula,  "To Few Subs" )
       
     } else {
       
@@ -87,13 +87,23 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       
       # Add Lab Predictor
       lm_formula = paste(lm_formula, "+ (1|Lab)")  
-      
+      noRandomFactor = 0
       
       # check how many levels per factor
       if (any(sapply(Subset[,Predictors], nlevels)>1)) {
         noRandomFactor = 0
         lm_formula_noAdd_Random = lm_formula
         lm_formula = paste(lm_formula, " + (1|ID)")  
+        
+        nrSubs = Subset %>%
+          filter(complete.cases(.)) %>%
+          group_by(ID) %>%
+          summarise(Fields = length(EEG_Signal)) %>%
+          ungroup() %>%
+          mutate(Max = max(Fields))
+        
+        completeSubs = nrSubs$ID[nrSubs$Fields == nrSubs$Max]
+        nrSubs= length(completeSubs)
         
         
         # # check how many levels per predictor 
@@ -105,8 +115,9 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
         # AddPredictors = Predictors[Levels>1 &  Levels < EntriesPerSub ]
         # 
       } else {
-        noRandomFactor = 1
+        # noRandomFactor = 1
         AddPredictors = NULL
+        nrSubs = length(unique(Subset$ID))
       }
       
       # Add random slope per predictor - but often fails to converge and makes things slow
@@ -119,7 +130,7 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       #####################################################################################
       # Calculate LM Model
       if (noRandomFactor == 1) {
-        if (length(unique(Subset$ID))<100) {
+        if (nrSubs<100) {
           Model_Result = c("Error_not_enough_Subjects", lm_formula, length(unique(Subset$ID)))
         } else {
           Model_Result = tryCatch({
@@ -132,26 +143,14 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
             
           }, error = function(e) {
             print("Error with Model")
-            Model_Result = c("Error_when_computing_Model", lm_formula, length(unique(Subset$ID)))
+            Model_Result = c("Error_when_computing_Model", lm_formula, Error_Message)
             return(Model_Result)
           })}
         
         
       } else {
-        nrSubs = Subset %>%
-          filter(complete.cases(.)) %>%
-          group_by(ID) %>%
-          summarise(Fields = length(EEG_Signal)) %>%
-          ungroup() %>%
-          mutate(Max = max(Fields))
-        
-          completeSubs = nrSubs$ID[nrSubs$Fields == nrSubs$Max]
-          nrSubs= length(completeSubs)
-          
-
-        
         if (nrSubs<100) {
-          Model_Result = c("Error_not_enough_Subjects", lm_formula, nrSubs)
+          Model_Result = c("Error_when_computing_Model", lm_formula,  "To Few Subs", nrSubs )
         } else {
           # Take only complete
           Model_Result = tryCatch({
@@ -164,7 +163,8 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
             Model_Result
           }, error = function(e) {
             print("Error in Model")
-            Model_Result = c("Error_when_computing_Model", lm_formula, nrSubs)
+            Error_Message = conditionMessage(e)
+            Model_Result = c("Error_when_computing_Model", lm_formula, Error_Message)
             return(Model_Result)
           })}
         
@@ -195,10 +195,11 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
   } else {  
     print("Using existing LMER")
     Model_Result = ModelProvided
-    if ((is.character(Model_Result) &&  grepl( "Error", Model_Result)) ) {
+    if ((is.character(Model_Result) &&  any(grepl( "Error", Model_Result))) ) {
+      lm_formula = Model_Result[2]
+      Error_Message = Model_Result[3]
       Model_Result = Model_Result[1]
-      lm_formula = ModelProvided[2]
-      nrSubs = ModelProvided[3]
+      NrSubs = ModelProvided[4]
       
       
     } else {
@@ -226,10 +227,12 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
     if (is.character(Model_Result) &&  grepl( "Error", Model_Result)) {
       print("no Estimates since Error with Model ")
       lm_formula = ModelProvided[2]
-      nrSubs = ModelProvided[3]
-      Estimates = cbind.data.frame(Name_Test, t(rep(NA, 6)), nrSubs, nrSubs,
+      nrSubs = ModelProvided[4]
+      
+      if (SaveUseModel == "default") {        Error_Message = Model_Result[3]       }
+      Estimates = cbind.data.frame(Name_Test, t(rep(NA, 6)),  nrSubs,
                                    mean(Subset$Epochs, na.rm=TRUE), 
-                                   sd(Subset$Epochs, na.rm=TRUE), NA, lm_formula, t(rep(NA, 16)))
+                                   sd(Subset$Epochs, na.rm=TRUE), NA, lm_formula, t(rep(NA, 12)), Error_Message)
       
       
     } else {
@@ -258,15 +261,9 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
         Effect_of_Interest = c(Effect_of_Interest, "Hemisphere")  }
       if ("Localisation" %in% keptcollumns) {
         Effect_of_Interest = c(Effect_of_Interest, "Localisation")  }
-      # Add Electrode to effect of interest only if frontal/parietal
-      if ("Electrode" %in% keptcollumns) {
-        if (length(unlist(unique(Subset$Electrode))) == 6) {
-          Effect_of_Interest = c(Effect_of_Interest, "Electrode")  }}
-      
       Effect_of_Interest = unique(Effect_of_Interest)
-      # Do not add other factors (Frequency Band)
-      # These are different hypotheses. We are only focused 
-      # on frontal alpha asymmetry.)
+      # Do not add other factors (Frequency Band, Electrodes)
+      # These are different hypotheses.
       
       
       # Find index of effect of interest (and the indicated Conditions)
@@ -321,30 +318,46 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       SumModel = SumModel$coefficients[PosIdx,]
       
       # Get info from partial R2
-      R2=r2glmm::r2beta(Model_Result, partial =TRUE)
-      PredicNames = R2$Effect
-      # Get Regressors including all Elements
-      PosIdx = which(rowSums(sapply(Effect_of_Interest, function(x) grepl(x, PredicNames))) == length(Effect_of_Interest))
-      # Remove Regressors with more Elements
-      PosIdx = PosIdx[which(sapply(PredicNames[PosIdx], function(x) {A = strsplit(x, ":"); length(unlist(A))}) == length(Effect_of_Interest))]
-      # Get last index (assuming that pne is the highest level most different from reference level
-      PosIdx = tail(PosIdx,1)
-      R2 = R2[PosIdx,]
-      R2 = unlist(R2)[6:8]
+      R2 = tryCatch({
+        R2=r2glmm::r2beta(Model_Result, partial =TRUE) 
+        PredicNames = R2$Effect      
+        # Get Regressors including all Elements
+        PosIdx = which(rowSums(sapply(Effect_of_Interest, function(x) grepl(x, PredicNames))) == length(Effect_of_Interest))
+        # Remove Regressors with more Elements
+        PosIdx = PosIdx[which(sapply(PredicNames[PosIdx], function(x) {A = strsplit(x, ":"); length(unlist(A))}) == length(Effect_of_Interest))]
+        # Get last index (assuming that pne is the highest level most different from reference level
+        PosIdx = tail(PosIdx,1)
+        R2 = R2[PosIdx,]
+        R2 = unlist(R2)[6:8]
+        R2 = list("R2" = R2,
+                  "PredicNames" = PredicNames[PosIdx])
+        
+      }, error = function(e) {
+        R2 = list("R2" = c(NA, NA, NA),
+                  "PredicNames" = NA)
+        return(R2)
+      })
+
       
       
       
       
       # prepare export
       if (length(Idx_Effect_of_Interest)>0) {
-        Estimates = cbind.data.frame(Name_Test, StatTest, "partial_Eta", partial_Eta, p_Value,  nrSubs, mean(Subset$Epochs), sd(Subset$Epochs), 
+        Estimates = cbind.data.frame(Name_Test, StatTest, "partial_Eta", partial_Eta, 
+                                     p_Value,  nrSubs, mean(Subset$Epochs), sd(Subset$Epochs), 
                                      Singularity, lm_formula, FStatInfo[1], FStatInfo[2], FStatInfo[3],
-                                     PredicNames[PosIdx],
+                                     R2$PredicNames,
                                      t(SumModel),
-                                     t(R2))
+                                     t(R2$R2),
+                                     NA)
       } else {
         print("Effect not found in Model")
-        Estimates = cbind.data.frame(Name_Test, NA, "partial_Eta",t(rep(NA, 8)), lm_formula, t(rep(NA, 16)))
+        Estimates = cbind.data.frame(Name_Test, NA, "partial_Eta",
+                                     t(rep(NA, 8)), 
+                                     lm_formula, 
+                                     t(rep(NA, 12)), 
+                                     "Effect Not Found in Model")
         
       }
       
@@ -354,12 +367,16 @@ test_Hypothesis_V2 = function (Name_Test,lm_formula, Subset, Effect_of_Interest,
       # effectsize::standardize_parameters(Model_Result)
     } 
     colnames(Estimates) = c("Effect_of_Interest", "Statistical_Test", "EffectSizeType_anova" ,"value_EffectSize", "CI_low", "CI90_high", 
-                            "p_Value",  "n_participants", "av_epochs", "sd_epochs", "Singularity", "formula", "F_value", "dfN", "dfD",
-                            "RegressorName", "Estimate_sum", "Std.Error_sum", "df_sum", "t_sum", "p_sum",
-                            "Rsq", "CI_low_Rsq", "CI_high_Rsq")
+                            "p_Value",  "n_participants", "av_epochs", "sd_epochs", 
+                            "Singularity", "formula", "F_value", "dfN", "dfD",
+                            "RegressorName", 
+                            "Estimate_sum", "Std.Error_sum", "df_sum", "t_sum", "p_sum",
+                            "Rsq", "CI_low_Rsq", "CI_high_Rsq", 
+                            "ErrorMessage")
     
     
     return (Estimates)
+    
   }
 }
 

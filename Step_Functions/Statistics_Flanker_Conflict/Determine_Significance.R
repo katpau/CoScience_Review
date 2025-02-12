@@ -60,7 +60,7 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # (2) Initiate Functions for Hypothesis Testing      ####
   #########################################################
   wrap_test_Hypothesis = function (Name_Test,lm_formula,  Data, Effect_of_Interest, DirectionEffect,
-                                   columns_to_keep, Component, SaveUseModel, ModelProvided, lmFamily ) {
+                                   columns_to_keep, Component, SaveUseModel, ModelProvided, lmFamily , Nullmodel) {
     
     # wrapping function to parse specific Information to the test_Hypothesis Function
     # Does three things: 
@@ -90,18 +90,19 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     if(missing(SaveUseModel)) { SaveUseModel = "default"  }
     if(missing(ModelProvided)) { ModelProvided = "none"  }
     if(missing(lmFamily)) {lmFamily = "standard"}
+    if(missing(Nullmodel)) {Nullmodel = "standard"}
     
     
     # Create Subset
     Subset = as.data.frame(Data[Data$Component %in% Component, names(Data) %in% c("ID", "Lab", "Epochs", 
-                                                                    "SME", "EEG_Signal", columns_to_keep)])
+                                                                                  columns_to_keep)])
     
     # Run Test
-    ModelResult = test_Hypothesis_CK( Name_Test,lm_formula, Subset, columns_to_keep, Effect_of_Interest, SaveUseModel, ModelProvided, lmFamily)
+    ModelResult = test_Hypothesis_CK( Name_Test,lm_formula, Subset, columns_to_keep, Effect_of_Interest, SaveUseModel, ModelProvided, lmFamily, Nullmodel)
     
     # Test Direction ??? 
     if (!SaveUseModel == "exportModel") {
-      if(!is.character(ModelResult)  &&  any(!grepl( "Error", ModelResult))) {
+      if(!is.character(ModelResult)  &&  any(!grepl( "Error", ModelResult))  && all((!is.na(DirectionEffect)))) {
         if(!is.na(ModelResult$value_EffectSize)){
           ModelResult = test_DirectionEffect(DirectionEffect, Subset, ModelResult) 
         }}}
@@ -110,184 +111,212 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   }
   
   
+  
+  
   Estimates = data.frame()
-  #########################################################
-  # (3) Test Hypothesis set 1 for Behavior: RT/ACC     ####
-  # Dispositional CEI relates to behavioral indices    ####
-  # Above and beyond Intelligence                      ####
-  #########################################################
-  for (control_Block in c("", "_withBlock")) {
-    for (BehavDV in c("RT", "ACC")) {
-      for (control_IST in c("", "_withIST")) {
-
- 
-    print(paste("Test Effect on ", BehavDV))
-      if (control_IST == "_withIST") {
-        lm_formula =   paste( BehavDV, " ~ (( Congruency * Personality_CEI) + IST ) ", Covariate_Formula)
-        columns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, BehavDV, "Congruency_notCentered", 
-                            "IST")        
-      } else {
-    lm_formula =   paste( BehavDV, " ~ (( Congruency * Personality_CEI) ) ", Covariate_Formula)
-    columns_to_keep = c("Congruency", "Personality_CEI", Covariate_Name, BehavDV, "Congruency_notCentered")
-      }
-      
-      if (control_Block == "_withBlock") {
-        columns_to_keep = c(columns_to_keep, "Block" )
-        lm_formula = paste(lm_formula, "+ Block")
-      }
-      
-    Effect_of_Interest = c("Personality_CEI")
-    Effect_of_Interest_IA = c("Personality_CEI", "Congruency")
-    DirectionEffect = list("Effect" = "correlation",
-                           "Personality" = "Personality_CEI",
-                           "DV" = BehavDV)
-    DirectionEffect_IA = list("Effect" = "interaction_correlation",
-                              "Larger" = c("Congruency_notCentered", "0"),
-                              "Smaller" = c("Congruency_notCentered", "1"),
-                              "Personality" = "Personality_CEI",
-                              "DV" = BehavDV)
+  for (Personality in c("Personality_CEI", "Personality_COM", "Personality_ESC")) {
     
-    if (BehavDV == "ACC") { lmFamily  = "binominal"} else {lmFamily = "standard" }
-    
-    H_1_Model = wrap_test_Hypothesis("",lm_formula, output,
-                                     "",  "", 
-                                     columns_to_keep, "Behav",
-                                     "exportModel", "", lmFamily )
-    # Test main Effect of CEI  
-    Name_Test = paste0(BehavDV,"_CEI", control_IST)
-    Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                                                      DirectionEffect, columns_to_keep, "Behav",
-                                                      "previousModel", H_1_Model))
-    
-    # Test IA with CEI and Demand Level
-    Name_Test = paste0(BehavDV, "_CEI_Congruency", control_IST)
-    Estimates = rbind(Estimates,wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest_IA,
-                                                     DirectionEffect_IA, columns_to_keep, "Behav",
-                                                     "previousModel", H_1_Model)  )
-  }}
- 
-  
-  
-  #########################################################
-  # (4) Test Hypothesis set 1 for EEG                  ####
-  # Dispositional CEI relates to neurophysiological indices#
-  # Above and beyond Intelligence                      ####
-  #########################################################
-
-  DirectionEffect = list("Effect" = "correlation",
-                         "Personality" = "Personality_CEI")
-  DirectionEffect_IA = list("Effect" = "interaction_correlation",
-                            "Larger" = c("Congruency_notCentered", "0"),
-                            "Smaller" = c("Congruency_notCentered", "1"),
-                            "Personality" = "Personality_CEI")
-  for (control_IST in c("", "_withIST")) {  
-    if (control_IST == "_withIST") {
-      lm_formula =   paste( "EEG_Signal ~ ((( Congruency * Personality_CEI) ", 
-                            additional_Factor_Formula, ")", Covariate_Formula, "+ IST )")
-      columns_to_keep = c("Congruency", "Personality_CEI", "Congruency_notCentered",
-                          Covariate_Name, additional_Factors_Name, "IST") 
-      
-    } else {
-      lm_formula =   paste( "EEG_Signal ~ (( Congruency * Personality_CEI) ", 
-                            additional_Factor_Formula, ")", Covariate_Formula)
-      columns_to_keep = c("Congruency", "Personality_CEI", "Congruency_notCentered",
-                          Covariate_Name, additional_Factors_Name) 
-      
-    }
-  for (DV in c("N2", "P3", "FMT")) {
-    print(paste("Test Effect on ", DV))
-    H_4_Model = wrap_test_Hypothesis("",lm_formula, output,
-                                     "",  "", 
-                                     columns_to_keep, DV,
-                                     "exportModel")
-    
-    
-    # Test main Effect of CEI  
-    Name_Test = paste0(DV, "_CEI", control_IST)
-    Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
-                                                      DirectionEffect, columns_to_keep, DV,
-                                                      "previousModel", H_4_Model))
-    
-    # Test IA with CEI and Demand Level
-    Name_Test = paste0(DV, "_CEI_Congruency", control_IST)
-    Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest_IA,
-                                                      DirectionEffect_IA, columns_to_keep, DV,
-                                                      "previousModel", H_4_Model)  )
-  }}}
-  
-  
-
-  
-  
-  ######################################################################################
-  ### INTERLAB VARIANCE?
-  ## !! Control for Lab is not done for all forking paths => manually add for main path
-  ######################################################################################
-  
-  
-  
-  ############################
-  # Hypthesis 4: Correlations
-  ############################
-  Subset = output[,c("ID", "Personality_LE_Positiv", "Personality_NFC_NeedForCognition",  "Personality_CEI" )]
-  Subset = Subset[!duplicated(Subset),]
-  Subset = Subset[,-1]
-
-  # psych::corr.test(x, y = NULL, use = "pairwise",method="pearson",adjust="holm", alpha=.05,ci=TRUE,minlength=5,normal=TRUE)
-  if (!choice == "None") {
-    Cors  = psych::corr.test(Subset, adjust = tolower(choice)) 
-    p_s = Cors$p.adj
-  } else {
-    Cors  = psych::corr.test(Subset) 
-    p_s = Cors$ci$p
-  }
-  
-  Cors_Estimates = cbind(
-    c("Correlation_LE_NFC", "Correlation_LE_CEI", "Correlation_CEI_NFC")  ,
-    "pearsonR", "r",
-    Cors$ci$r, Cors$ci$lower, Cors$ci$upper, p_s,
-    nrow(Subset),
-    matrix(data=NA,nrow=3,ncol=26))
-  colnames(Cors_Estimates) = colnames(Estimates)
-  Estimates = rbind(Estimates,Cors_Estimates)
+    for (control_Lab in c("")) {
+      #    for (control_Lab in c("", "_withLabRand")) {
+      for (test_Lab in c("")) {
+        # for (test_Lab in c("", "_withLabFix")) {
+        for (control_Block in c( "_withBlock")) {
+          #for (control_Block in c("", "_withBlock")) {
+          for (control_IST in c("", "_withIST")) {
+            for (DV in c("RT", "ACC", "N2", "P3", "FMT")) {
+              tryCatch({
+                
+                if(control_IST=="_withIST" && !Personality == "Personality_CEI") next
+                if(control_IST== "" && Personality == "Personality_CEI") next
+                
+                
+                
+                if(test_Lab == "_withLabFix" && !control_Lab == "") next
+                
+                
+                
+                if(test_Lab == "_withLabFix" && !control_Block == "_withBlock") next
+                
+               if (test_Lab == "_withLabFix") {  itest = itest + 2 }
                  
+                print(paste("Test Effect of ", Personality, "on", DV, control_IST, control_Block, test_Lab, control_Lab))
+                
+                
+                
+                
+                columns_to_keep = c("Congruency", Personality, Covariate_Name, "Congruency_notCentered")
+                Nullmodel = ""
+                
+                if (DV %in% c("N2", "P3", "FMT")) {
+                  DV_formula = "EEG_Signal"
+                  Component = DV
+                  lm_formula =  paste( "EEG_Signal ~ (( Congruency * ", Personality, ") ", Covariate_Formula, ")",
+                                       additional_Factor_Formula)
+                  columns_to_keep = c(columns_to_keep, additional_Factors_Name, DV_formula)
+                  lmFamily = "standard"
+                  
+                } else {
+                  DV_formula = DV
+                  Component = "Behav"
+                  columns_to_keep = c(columns_to_keep,  DV_formula)
+                  lm_formula =  paste( DV_formula, " ~ ( Congruency * ", Personality, " )", Covariate_Formula)
+                  if (DV == "ACC") { lmFamily  = "binominal"} else {lmFamily = "standard" }
+                }
+                
+                
+                
+                
+                if (control_IST == "_withIST") {
+                  lm_formula =   paste( lm_formula, " + IST  ")
+                  columns_to_keep = c(columns_to_keep, "IST")      
+                  Nullmodel = "\\+ IST"
+                  
+                }
+                
+                if (control_Block == "_withBlock") {
+                  columns_to_keep = c(columns_to_keep, "Block" )
+                  lm_formula = paste(lm_formula, "+ Block")
+                  Nullmodel = paste0(Nullmodel,"|\\+ Block")
+                }
+                
+                if (test_Lab == "_withLabFix") {
+                  columns_to_keep = c(columns_to_keep, "Block", "Lab")
+                  lm_formula = paste(lm_formula, "+ Congruency*Lab")
+                  Nullmodel = paste0(Nullmodel,"|\\+ Congruency\\*Lab") }
+                
+                
+                if (control_Lab == "_withLabRand") {
+                  columns_to_keep = c(columns_to_keep, "Lab")
+                  lm_formula = paste(lm_formula, "+ (1|Lab)")
+                }
+                
+                
+                Effect_of_Interest = c(Personality)
+                Effect_of_Interest_IA = c(Personality, "Congruency")
+                DirectionEffect = list("Effect" = "correlation",
+                                       "Personality" = Personality,
+                                       "DV" = DV_formula)
+                DirectionEffect_IA = list("Effect" = "interaction_correlation",
+                                          "Larger" = c("Congruency_notCentered", "0"),
+                                          "Smaller" = c("Congruency_notCentered", "1"),
+                                          "Personality" = Personality,
+                                          "DV" = DV_formula)
+                
+                
+                
+                
+                
+                H_1_Model = wrap_test_Hypothesis("",lm_formula, output,
+                                                 "",  "", 
+                                                 columns_to_keep, Component,
+                                                 "exportModel", "", lmFamily, Nullmodel )
+                
+                
+                # Test main Effect of CEI  
+                Name_Test = paste0(DV,gsub("Personality", "", Personality), control_IST, control_Block, test_Lab, control_Lab)
+                Estimates = rbind(Estimates, wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest,
+                                                                  DirectionEffect, columns_to_keep, Component,
+                                                                  "previousModel", H_1_Model, lmFamily, Nullmodel))
+                
+                # Test IA with Personality and Demand Level
+                Name_Test = paste0(DV, gsub("Personality", "", Personality),"_Congruency", control_IST, control_Block, test_Lab, control_Lab)
+                Estimates = rbind(Estimates,wrap_test_Hypothesis(Name_Test,lm_formula, output, Effect_of_Interest_IA,
+                                                                 DirectionEffect_IA, columns_to_keep, Component,
+                                                                 "previousModel", H_1_Model, lmFamily, Nullmodel)  )
+                
+                
+                if (test_Lab == "_withLabFix") {
+                  itest = itest + 2
+                  
+                  Name_Test = paste0(DV, "_Lab", control_IST, control_Block, gsub("Personality", "", Personality))
+                  Estimates = rbind(Estimates,wrap_test_Hypothesis(Name_Test,lm_formula, output, "Lab",
+                                                                   NA, columns_to_keep, Component,
+                                                                   "previousModel", H_1_Model, lmFamily, Nullmodel)  )
+                  
+                  Name_Test = paste0(DV, "_Lab_Congruency", control_IST, control_Block, gsub("Personality", "", Personality))
+                  Estimates = rbind(Estimates,wrap_test_Hypothesis(Name_Test,lm_formula, output, c("Lab", "Congruency"),
+                                                                   NA, columns_to_keep, Component,
+                                                                   "previousModel", H_1_Model, lmFamily, Nullmodel)  )
+                  
+                  
+                }
+              })}}
+        }}
+      
+      
+    }}
   
-  ############################
-  # Hypthesis 5: Exploratory ESC and COM?
-  ############################
-  #????? TO DO????
   
- 
   #########################################################
-  # (5) Correct for Multiple Comparisons for Hypothesis 1 
+  # (4) Correct for Multiple Comparisons for Hypothesis 1 - 3
   #########################################################
+  
+  
   if (!choice == "None") {
     for( Subtests in c("RT|ACC", "FMT|N2|P3")) {
       nrTests = length(str_split_1(Subtests,  "\\|"))
       for (Test_of_interest in c("_CEI", "_Congruency", "CEI_Congruency")) {
-        for (withIST in c("", "_withIST")) {
-        Idx =  grepl(Subtests, Estimates$Effect_of_Interest) &
-          endsWith(Estimates$Effect_of_Interest, paste0(Test_of_interest,withIST ))
-        Idx1 = Idx & is.na(Estimates$pvalue) # one from std coefficients
-        Idx2 = Idx & is.na(Estimates$p_value) # one from anova
-        
-        Estimates$pvalue[Idx1] = p.adjust(Estimates$pvalue[Idx1],
-                                                    method = tolower(choice), n = nrTests)
-        Estimates$pvalue[Idx2] = p.adjust(Estimates$pvalue[Idx2],
-                                          method = tolower(choice), n = nrTests)
-        }
+
+        #for (control_Lab in c("", "_withLabRand")) {
+        #  for (test_Lab in c("", "_withLabFix")) {
+        #    for (control_Block in c("", "_withBlock")) {
+        #      for (control_IST in c("", "_withIST")) {
+
+          Idx =  grepl(Subtests, Estimates$Effect_of_Interest) &
+            endsWith(Estimates$Effect_of_Interest, paste0(Test_of_interest, control_IST, control_Block, test_Lab,control_Lab ))
+          Idx1 = Idx & is.na(Estimates$pvalue) # one from std coefficients
+          Idx2 = Idx & is.na(Estimates$p_value) # one from anova
+
+          Estimates$pvalue[Idx1] = p.adjust(Estimates$pvalue[Idx1],
+                                            method = tolower(choice), n = nrTests)
+          Estimates$pvalue[Idx2] = p.adjust(Estimates$pvalue[Idx2],
+                                            method = tolower(choice), n = nrTests)
+        #}
+      #}
+    #}
+      #}
       }
     }
   }
-    
-
   
+  
+  ############################
+  # (5) Hypthesis 4: Correlations
+  ############################
+  # Personality = "Personality_CEI"
+  # Subset = output[,c("ID", "Personality_LE_Positiv", "Personality_NFC_NeedForCognition",  Personality)]
+  # Subset = Subset[!duplicated(Subset),]
+  # Subset = Subset[,-1]
+  # 
+  # Cors  = psych::corr.test(Subset) 
+  # p_s = Cors$ci$p[1:2]
+  # 
+  # 
+  # if (!choice == "None") {
+  #   p_s = p.adjust(p_s,
+  #            method = tolower(choice), n = 2)
+  # } 
+  # 
+  # 
+  # Cors_Estimates = cbind(
+  #   c("Correlation_LE_NFC",
+  #     "Correlation_LE_CEI")  ,
+  #   "pearsonR", "r",
+  #   Cors$ci$r[1:2], Cors$ci$lower[1:2], Cors$ci$upper[1:2], p_s,
+  #   nrow(Subset),
+  #   matrix(data=NA,nrow=2,ncol=30))
+  # colnames(Cors_Estimates) = colnames(Estimates)
+  # Estimates = rbind(Estimates,Cors_Estimates)
+  
+  
+
   #########################################################
   # (6) Export as CSV file
   #########################################################
   FileName= input$stephistory[["Final_File_Name"]]
   write.csv(Estimates,FileName, row.names = FALSE)
   
+ 
   
   #No change needed below here - just for bookkeeping
   stephistory = input$stephistory

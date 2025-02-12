@@ -36,7 +36,7 @@ StepName = "Cluster_Electrodes";
 Choices = ["no_cluster", "no_cluster_butAV", "cluster"]; 
 Conditional = ["NaN", "NaN", "Reference ~= ""CSD"" "]; 
 SaveInterim = logical([0]); 
-Order = [18]; 
+Order = [22]; 
 
 
 % ****** Updating the OUTPUT structure ******

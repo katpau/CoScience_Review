@@ -40,10 +40,14 @@ Normalize = function(input = NULL, choice = NULL) {
         
         # Apply Log
       } else if (choice == "Log")  {
-        # Add Constant to each collum to make all values > 0
+        # Add Constant to each column to make all values > 0
         Min = min(data, na.rm = TRUE)
+        mean_before = mean(data, na.rm = TRUE)
         if (Min<=0) { data = data + abs(Min) +1 }
         normal = log(data)
+        # For N300H : keep original mean, as this influences the intercept 
+        mean_after = mean(normal, na.rm = TRUE)
+        normal = normal - mean_after + mean_before
       } 
       return (normal)
     }
@@ -70,9 +74,10 @@ Normalize = function(input = NULL, choice = NULL) {
     
     
     # Apply Normalization
+    
     if (length(Not_Normal_CollumnNames)>1) {
       Personality[,Not_Normal_CollumnNames] = lapply(Personality[,Not_Normal_CollumnNames], function(col) normalize_data(col, choice))
-    } else {
+    } else if (length(Not_Normal_CollumnNames)==1)  {
       Personality[,Not_Normal_CollumnNames] = normalize_data(Personality[,Not_Normal_CollumnNames], choice)
     }
     

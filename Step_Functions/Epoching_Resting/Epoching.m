@@ -33,7 +33,7 @@ function  OUTPUT = Epoching(INPUT, Choice)
 % saved on the harddrive (in order to be loaded and forked from there).
 % Order determines when it should be run.
 StepName = "Epoching";
-Choices = ["2_s_50_overlap", "1_s_50_overlap"];
+Choices = ["2_s_50_overlap", "1_s_50_overlap" ];
 Conditional = ["NaN", "NaN"];
 SaveInterim = logical([0]);
 Order = [12];
