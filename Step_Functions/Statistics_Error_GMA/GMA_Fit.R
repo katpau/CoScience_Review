@@ -21,7 +21,7 @@ GMA_Fit = function(input = NULL, choice = NULL) {
   # Since we cannot use data of a failed GMA, we already drop them here
   output <- output %>%
     group_by(subject, task, channel) %>%
-    filter(!any(is.na(shape)) & all(fit == 1) & all(r > minCorr)) %>%
+    filter(!any(is.na(shape)) & all(fit == 1) & all(r >= minCorr)) %>%
     ungroup()
 
 
