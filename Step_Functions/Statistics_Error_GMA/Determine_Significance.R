@@ -131,8 +131,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # b) we want to correct the p-values for the whole group of parameters — as opposed to the correction per model.
 
   # [Elisa 29.01.25] removed rate, shape, scaling/yscale, added mode
-  Names_GMA <- c("excess", "skewness", "mode", "mode_ms", "inflection1", "inflection2", "Ne")
-  GMA_colnames <- c("excess", "skew","mode", "mode_ms", "ip1_ms", "ip2_ms", "eeg_mean_win")
+  Names_GMA <- c("excess", "skewness", "mode_ms", "inflection1", "inflection2", "onset", "offset", "Ne")
+  GMA_colnames <- c("excess", "skew", "mode_ms", "ip1_ms", "ip2_ms", "onset_ms", "offset_ms", "eeg_mean_win")
   nGmaNames <- length(GMA_colnames)
   columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal")
   lm_formula <- paste("EEG_Signal ~  Condition ", Covariate_Formula)
@@ -168,11 +168,6 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # (4) Personality Effect: GMA (Exploration)
   #########################################################
   # The models in including personality predictors will be p-adjusted per model.
-
-  # Add the Gamma onset and offset values for exploration
-  Names_GMA <- c(Names_GMA, "onset", "offset")
-  GMA_colnames <- c(GMA_colnames, "onset_ms", "offset_ms")
-  nGmaNames <- length(GMA_colnames)
 
   columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal",
                        "Personality_MPS_PersonalStandards_z", "Personality_MPS_ConcernOverMistakes_z")
