@@ -70,7 +70,7 @@ Outliers_ACC <- function(input = NULL, choice = NULL) {
       summarize(
         Task = "GoNoGo",
         TaskPerf = sum(Accuracy) / n() * 100,
-        chance_tresh = chance_level(n())
+        chance_tresh = chance_level(n_trials = n(), p_correct = 2/3)
       )
 
     BehavData <- bind_rows(Behav_Flanker, Behav_GoNoGo)

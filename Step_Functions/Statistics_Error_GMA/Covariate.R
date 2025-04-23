@@ -145,6 +145,11 @@ Covariate = function(input = NULL, choice = NULL) {
   output[GroupingVariables] = lapply(output[GroupingVariables], as.factor)
   output[NumericVariables] = lapply(output[NumericVariables], as.numeric)
   
+  # [Elisa 04/25] delete cases without perfectionism data
+  output <- output %>%
+    group_by(ID, Task) %>%
+    filter(!any(is.na(Personality_MPS_PersonalStandards)), !any(is.na(Personality_MPS_ConcernOverMistakes))) %>%
+    ungroup()
   
   # Grouping Variables in all Files and Merge with additional Factors
   # [Elisa 01/25] commented line below bc it's redundant
