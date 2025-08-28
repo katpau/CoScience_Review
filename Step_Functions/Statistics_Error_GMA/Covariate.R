@@ -103,13 +103,133 @@ Covariate = function(input = NULL, choice = NULL) {
     offset_ms = quantileMs(0.975, shape, rate, eeg_srate, mode, mode_ms),
     .after = excess
   )
+  
+  # First derivation of Gamma Density [elisa 23/05/25]
+  dgamma_prime <- function(x, yscale, shape, rate) {
+    yscale * dgamma(x, shape, rate) * ((shape - 1)/x - rate)
+  }
+  
+  # Second derivation of Gamma Density [elisa 23/05/25]  
+  dgamma_double_prime <- function(x, yscale, shape, rate)  {
+    yscale * dgamma(x, shape, rate) * (((shape - 1)/x - rate)^2 - (shape - 1)/x^2)
+  }
+  
+  
+  # Define the third derivative function
+  dgamma_triple_prime <- function(x, a, shape, rate) {
+    term1 <- ((shape - 1)/x - rate)^3
+    term2 <- -3 * (shape - 1)*(shape - 2)/x^3
+    term3 <- 3 * (shape - 1)*rate/x^2
+    
+    y <- a * dgamma(x, shape, rate) * (term1 + term2 + term3)
+    
+    return(y)
+  }
+  
+  get_onset <- function(a, shape, rate, mode) {
+  
+    x <- seq(0.1, mode, length.out = 1000)
+    y <- dgamma_triple_prime(x, a = a, shape = shape, rate = rate)
+    
+    # Determine lower limit of search window
+    lower_lim <- x[y == max(y)]
+    
+    # Determine upper limit of search window
+    upper_lim <- x[y == min(y)]
+    
+    if (any(is.na(c(lower_lim, upper_lim)))) {
+      return(NA)
+    } else {
+      tryCatch({
+        out <- uniroot(dgamma_triple_prime, interval = c(lower_lim, upper_lim), a = a, shape = shape, rate = rate)
+        return(out$root)
+      }, 
+      error = function(x) return(NA))
+      
+    }
+    
+  }
+  
+  # determine empirical offset [elisa 27.08.25]
+  
+  # determine local maxima of 3rd derivation to limit search window
+  find_localmax <- function(y) {
+    
+    # First differences and their signs
+    dy <- diff(y)
+    s  <- sign(dy)
+    
+    # Turning points occur where sign changes in s_use
+    turn <- diff(s)
+    
+    # Local maxima: slope goes + to -  => diff(s_use) == -2
+    # Local minima: slope goes - to +  => diff(s_use) == +2
+    i_max <- which(turn == -2) + 1L
+    return(i_max)
+  }
+  
+  find_localmin <- function(y) {
+    
+    # First differences and their signs
+    dy <- diff(y)
+    s  <- sign(dy)
+    
+    # Turning points occur where sign changes in s_use
+    turn <- diff(s)
+    
+    # Local maxima: slope goes + to -  => diff(s_use) == -2
+    # Local minima: slope goes - to +  => diff(s_use) == +2
+    i_min <- which(turn == 2) + 1L
+    return(i_min)
+  }
+  
+  
+  get_offset <- function(a, shape, rate) {
+    
+    x <- seq(0.1, 300, length.out = 1000)
+    y <- dgamma_triple_prime(x, a = a, shape = shape, rate = rate)
+    
+    # Determine lower limit of search window
+    i_max <- find_localmax(y)
+    lower_lim <- x[max(i_max)]
+    
+    # Determine upper limit of search window
+    i_min <- find_localmin(y)
+    upper_lim <- x[max(i_min)]
+    
+    if (any(is.na(c(lower_lim, upper_lim)))) {
+      return(NA)
+    } else {
+      tryCatch({
+        out <- uniroot(dgamma_triple_prime, interval = c(lower_lim, upper_lim), a = a, shape = shape, rate = rate)
+        return(out$root)
+      }, 
+      error = function(x) return(NA))
+      
+    }
+    
+  }
+  
+ 
+  # compute inflection slopes, mode peak, empirical on- & offset [elisa 23/05/25]  
+  output <- output %>%
+    rowwise() %>%
+    mutate(mode_peak = yscale * dgamma(mode, shape, rate),
+          ip1_slope = dgamma_prime(ip1, yscale, shape, rate),
+          ip2_slope = dgamma_prime(ip2, yscale, shape, rate),
+          onset_emp = get_onset(a = yscale, shape = shape, rate = rate, mode = mode),
+          offset_emp = get_offset(a = yscale, shape = shape, rate = rate) # added 27.08.25 by elisa
+    )
+
 
   # Restructure wide into Long 
   output = output %>% 
     # [Elisa 01/2025] added eeg_mean_win, mode, removed shape, rate, yscale
+    # [Elisa 27/05/2025] added mode_peak and ip_slopes
     select(subject,lab,experimenter,task,condition,channel,component,n_trials, eeg_mean_win, 
-           skew, excess, mode, mode_ms, ip1_ms, ip2_ms, onset_ms, offset_ms) %>%
-    gather(GMA_Measure, EEG_Signal, eeg_mean_win:offset_ms)
+           skew, excess, mode_ms, ip1_ms, ip2_ms, onset_ms, offset_ms, mode_peak, ip1_slope, 
+           ip2_slope, onset_emp, offset_emp) %>%
+        gather(GMA_Measure, EEG_Signal, eeg_mean_win:offset_emp)
   colnames(output)[1:8] = str_to_title(colnames(output)[1:8])
   
   output = output %>%  # consistence across Projects
@@ -145,7 +265,7 @@ Covariate = function(input = NULL, choice = NULL) {
   output[GroupingVariables] = lapply(output[GroupingVariables], as.factor)
   output[NumericVariables] = lapply(output[NumericVariables], as.numeric)
   
-  # [Elisa 04/25] delete caseswithout perfectionism data
+  # [Elisa 04/25] delete cases without perfectionism data
   output <- output %>%
     group_by(ID, Task) %>%
     filter(!any(is.na(Personality_MPS_PersonalStandards)), !any(is.na(Personality_MPS_ConcernOverMistakes))) %>%
