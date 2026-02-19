@@ -132,9 +132,11 @@ Determine_Significance = function(input = NULL, choice = NULL) {
 
   # [Elisa 29.01.25] removed rate, shape, scaling/yscale, added mode, onset and offset 
   # [Elisa 27.08.25] added empirical onsets and offsets
-  Names_GMA <- c("excess", "skewness", "mode_ms", "inflection1", "inflection2", "onset", "offset", 
+  Names_GMA <- c("excess", "skewness", "mode_ms", "inflection1", "inflection2", 
+                 #"onset", "offset", 
                  "mode_peak", "ip1_slope", "ip2_slope", "onset_emp", "offset_emp")
-  GMA_colnames <- c("excess", "skew", "mode_ms", "ip1_ms", "ip2_ms", "onset_ms", "offset_ms", 
+  GMA_colnames <- c("excess", "skew", "mode_ms", "ip1_ms", "ip2_ms", 
+                    #"onset_ms", "offset_ms", 
                     "mode_peak", "ip1_slope", "ip2_slope", "onset_emp", "offset_emp")
   nGmaNames <- length(GMA_colnames)
   columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal")

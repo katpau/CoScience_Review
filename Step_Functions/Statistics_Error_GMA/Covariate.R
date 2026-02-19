@@ -98,11 +98,12 @@ Covariate = function(input = NULL, choice = NULL) {
     return((qSmp - xOff) * frate)
   }
 
-  output <- output %>% rowwise() %>% mutate(
-    onset_ms = quantileMs(0.025, shape, rate, eeg_srate, mode, mode_ms),
-    offset_ms = quantileMs(0.975, shape, rate, eeg_srate, mode, mode_ms),
-    .after = excess
-  )
+# onset is computed empirically (see below), not with a fixed threshold [elisa 17/02/26]
+# output <- output %>% rowwise() %>% mutate(
+#    onset_ms = quantileMs(0.025, shape, rate, eeg_srate, mode, mode_ms),
+#    offset_ms = quantileMs(0.975, shape, rate, eeg_srate, mode, mode_ms),
+#    .after = excess
+#  )
   
   # First derivation of Gamma Density [elisa 23/05/25]
   dgamma_prime <- function(x, yscale, shape, rate) {
@@ -227,8 +228,9 @@ Covariate = function(input = NULL, choice = NULL) {
     # [Elisa 01/2025] added eeg_mean_win, mode, removed shape, rate, yscale
     # [Elisa 27/05/2025] added mode_peak and ip_slopes
     select(subject,lab,experimenter,task,condition,channel,component,n_trials, eeg_mean_win, 
-           skew, excess, mode_ms, ip1_ms, ip2_ms, onset_ms, offset_ms, mode_peak, ip1_slope, 
-           ip2_slope, onset_emp, offset_emp) %>%
+           skew, excess, mode_ms, ip1_ms, ip2_ms, 
+           #onset_ms, offset_ms, 
+           mode_peak, ip1_slope, ip2_slope, onset_emp, offset_emp) %>%
         gather(GMA_Measure, EEG_Signal, eeg_mean_win:offset_emp)
   colnames(output)[1:8] = str_to_title(colnames(output)[1:8])
   
