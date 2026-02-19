@@ -100,6 +100,13 @@ test_Hypothesis = function (Name_Test,lm_formula, Subset, Effect_of_Interest, Sa
         # lm_formula_noAdd_Random = lm_formula
         lm_formula = paste(lm_formula, " + (1|ID)")  
         
+        # Check contrasts for categorical predictors
+        for (i in 1:length(Subset[,Predictors])){
+          if (sapply(Subset[,Predictors[i]], nlevels) == 2) {
+            sapply(Subset[,Predictors[i]], contrasts)
+          }
+        }
+
         
         # # check how many levels per predictor 
         # if (length(Predictors)>1) {
