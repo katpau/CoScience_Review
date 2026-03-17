@@ -90,13 +90,13 @@ Covariate = function(input = NULL, choice = NULL) {
   # (4) Prepare Output
   #########################################################
 
-  quantileMs <- function (p, shape, rate, srate, modeSmp, modeMs) {
-    frate <- 1000 / srate
-    # Calculate the measurement sample offset from a given transformation
-    xOff <- -(modeMs / frate - modeSmp)
-    qSmp <- qgamma(p, shape = shape, rate = rate)
-    return((qSmp - xOff) * frate)
-  }
+  # quantileMs <- function (p, shape, rate, srate, modeSmp, modeMs) {
+  #   frate <- 1000 / srate
+  #   # Calculate the measurement sample offset from a given transformation
+  #   xOff <- -(modeMs / frate - modeSmp)
+  #   qSmp <- qgamma(p, shape = shape, rate = rate)
+  #   return((qSmp - xOff) * frate)
+  # }
 
 # onset is computed empirically (see below), not with a fixed threshold [elisa 17/02/26]
 # output <- output %>% rowwise() %>% mutate(
@@ -132,10 +132,10 @@ Covariate = function(input = NULL, choice = NULL) {
     x <- seq(0.1, mode, length.out = 1000)
     y <- dgamma_triple_prime(x, a = a, shape = shape, rate = rate)
     
-    # Determine lower limit of search window
+    # Determine lower limit of search window as first maximum of third derivation
     lower_lim <- x[y == max(y)]
     
-    # Determine upper limit of search window
+    # Determine upper limit of search window as first minimum of third derivation
     upper_lim <- x[y == min(y)]
     
     if (any(is.na(c(lower_lim, upper_lim)))) {
@@ -212,16 +212,36 @@ Covariate = function(input = NULL, choice = NULL) {
   }
   
  
-  # compute inflection slopes, mode peak, empirical on- & offset [elisa 23/05/25]  
+  # compute mode peak, empirical on- & offset [elisa 23/05/25]  
   output <- output %>%
     rowwise() %>%
     mutate(mode_peak = yscale * dgamma(mode, shape, rate),
-          ip1_slope = dgamma_prime(ip1, yscale, shape, rate),
-          ip2_slope = dgamma_prime(ip2, yscale, shape, rate),
-          onset_emp = get_onset(a = yscale, shape = shape, rate = rate, mode = mode),
-          offset_emp = get_offset(a = yscale, shape = shape, rate = rate) # added 27.08.25 by elisa
+          onset_emp_dp = get_onset(a = yscale, shape = shape, rate = rate, mode = mode),
+          offset_emp_dp = get_offset(a = yscale, shape = shape, rate = rate) # added 27.08.25 by elisa
     )
 
+  # transform onset, offset and IP slopes from dp to ms
+  convert <- output %>% 
+    group_by(lab) %>% 
+    nest() %>% 
+    mutate(model = purrr::map(data, ~lm(mode_ms ~ mode, .)), 
+           coefs = purrr::map(model, ~tidy(.))) %>% 
+    select(lab, coefs) %>% 
+    unnest("coefs") %>% 
+    mutate(term = recode(term, "(Intercept)" = "shift", "mode" = "factor")) %>% 
+    select(lab, term, estimate) %>% 
+    spread(term, estimate)
+  
+  output <- merge(output, convert, by = "lab")
+  
+  # convert on- and offsets from dp to ms
+  #compute ip slopes based on ms-parameters (without shifting as we are only interested in the slope)
+  output <- output %>%
+    mutate(onset_emp = onset_emp_dp * factor + shift,
+           offset_emp = offset_emp_dp * factor + shift,
+           ip1_slope = dgamma_prime(ip1*factor, yscale, shape, rate/factor)*factor,
+           ip2_slope = dgamma_prime(ip2*factor, yscale, shape, rate/factor)*factor) 
+    
 
   # Restructure wide into Long 
   output = output %>% 
@@ -229,7 +249,6 @@ Covariate = function(input = NULL, choice = NULL) {
     # [Elisa 27/05/2025] added mode_peak and ip_slopes
     select(subject,lab,experimenter,task,condition,channel,component,n_trials, eeg_mean_win, 
            skew, excess, mode_ms, ip1_ms, ip2_ms, 
-           #onset_ms, offset_ms, 
            mode_peak, ip1_slope, ip2_slope, onset_emp, offset_emp) %>%
         gather(GMA_Measure, EEG_Signal, eeg_mean_win:offset_emp)
   colnames(output)[1:8] = str_to_title(colnames(output)[1:8])
