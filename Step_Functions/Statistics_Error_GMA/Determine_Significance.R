@@ -175,8 +175,8 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # The models in including personality predictors will be p-adjusted per model.
 
   # Add the Ne/c which is not part of the main effects above
-  Names_GMA <- c(Names_GMA, "Ne")
-  GMA_colnames <- c(GMA_colnames, "eeg_mean_win")
+  Names_GMA <- c(Names_GMA, "Ne", "Ne_lat")
+  GMA_colnames <- c(GMA_colnames, "eeg_mean_win", "eeg_peak_win_ms")
   nGmaNames <- length(GMA_colnames)
 
   columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal",
@@ -212,7 +212,51 @@ Determine_Significance = function(input = NULL, choice = NULL) {
     }
   }
 
-
+  #standardize DV and IVs to obtain standardized beta coefficients [EP 06/08/26]
+  # DV
+  for (i_GMA in 1:nGmaNames) {
+    output$EEG_Signal_stand[output$GMA_Measure==GMA_colnames[i_GMA]] <- scale(output$EEG_Signal[output$GMA_Measure==GMA_colnames[i_GMA]], center = T, scale = T)
+  }
+  # IVs
+  output$Personality_MPS_ConcernOverMistakes_stand <- as.numeric(scale(output$Personality_MPS_ConcernOverMistakes_z, center = F, scale = T)) # already mean-centered
+  output$Personality_MPS_PersonalStandards_stand <- as.numeric(scale(output$Personality_MPS_PersonalStandards_z, center = F, scale = T)) # already mean-centered
+  
+  # lm formula with standardized variables
+  columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal_stand",
+                       "Personality_MPS_PersonalStandards_stand", "Personality_MPS_ConcernOverMistakes_stand")
+  lm_formula <- paste("EEG_Signal_stand ~  (Condition * Personality_MPS_PersonalStandards_stand * Personality_MPS_ConcernOverMistakes_stand) ", Covariate_Formula)
+  
+  
+  # GMA: All complete cases, this time for standardized beta coefficients
+  GmaSet <- output %>%
+    filter(GMA_Measure %in% GMA_colnames) %>%
+    group_by(ID, Task, Electrode) %>%
+    filter(!any(is.na(EEG_Signal_stand))) %>%
+    ungroup()
+  
+  for (i_task in c("GoNoGo", "Flanker")) {
+    for (ch in allElectrodes) {
+      for (i_GMA in 1:nGmaNames) {
+        # One p-adjustment group per model (DV)
+        testGroup <- testGroup + 1
+        
+        print(paste("Test ", i_task, Names_GMA[i_GMA], ch))
+        Name_Test <- paste0(Names_GMA[i_GMA], "_", i_task, "_", ch, "_stand")
+        
+        
+        Estimates <- rbind(Estimates,
+                           wrap_test_Hypothesis(Name_Test,
+                                                lm_formula, 
+                                                GmaSet %>% filter(Electrode == ch),
+                                                GMA_colnames[i_GMA], 
+                                                i_task,
+                                                columns_to_keep) %>%
+                             mutate(t_group = testGroup))
+      }
+    }
+  }
+  
+  
   ######################################
   # (6) Correct for Multiple Comparisons
   ######################################
