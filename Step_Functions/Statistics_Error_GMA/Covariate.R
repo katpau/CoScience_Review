@@ -247,7 +247,8 @@ Covariate = function(input = NULL, choice = NULL) {
   output = output %>% 
     # [Elisa 01/2025] added eeg_mean_win, mode, removed shape, rate, yscale
     # [Elisa 27/05/2025] added mode_peak and ip_slopes
-    select(subject,lab,experimenter,task,condition,channel,component,n_trials, eeg_mean_win, 
+    # [Elisa 09/07/2026] added eeg_peak_win_ms to compare G-PDF parameters with traditional peak latency
+    select(subject,lab,experimenter,task,condition,channel,component,n_trials, eeg_mean_win, eeg_peak_win_ms,
            skew, excess, mode_ms, ip1_ms, ip2_ms, 
            mode_peak, ip1_slope, ip2_slope, onset_emp, offset_emp) %>%
         gather(GMA_Measure, EEG_Signal, eeg_mean_win:offset_emp)
