@@ -132,12 +132,15 @@ Determine_Significance = function(input = NULL, choice = NULL) {
 
   # [Elisa 29.01.25] removed rate, shape, scaling/yscale, added mode, onset and offset 
   # [Elisa 27.08.25] added empirical onsets and offsets
+  # [Elisa 06.08.26] added Ne/c amp + lat here
   Names_GMA <- c("excess", "skewness", "mode_ms", "inflection1", "inflection2", 
                  #"onset", "offset", 
-                 "mode_peak", "ip1_slope", "ip2_slope", "onset_emp", "offset_emp")
+                 "mode_peak", "ip1_slope", "ip2_slope", "onset_emp", "offset_emp",
+                 "Ne", "Ne_lat")
   GMA_colnames <- c("excess", "skew", "mode_ms", "ip1_ms", "ip2_ms", 
                     #"onset_ms", "offset_ms", 
-                    "mode_peak", "ip1_slope", "ip2_slope", "onset_emp", "offset_emp")
+                    "mode_peak", "ip1_slope", "ip2_slope", "onset_emp", "offset_emp",
+                    "eeg_mean_win", "eeg_peak_win_ms")
   nGmaNames <- length(GMA_colnames)
   columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal")
   lm_formula <- paste("EEG_Signal ~  Condition ", Covariate_Formula)
@@ -173,11 +176,6 @@ Determine_Significance = function(input = NULL, choice = NULL) {
   # (4) Personality Effect: GMA (Exploration)
   #########################################################
   # The models in including personality predictors will be p-adjusted per model.
-
-  # Add the Ne/c which is not part of the main effects above
-  Names_GMA <- c(Names_GMA, "Ne", "Ne_lat")
-  GMA_colnames <- c(GMA_colnames, "eeg_mean_win", "eeg_peak_win_ms")
-  nGmaNames <- length(GMA_colnames)
 
   columns_to_keep <- c("Condition", Covariate_Name, "GMA_Measure", "EEG_Signal",
                        "Personality_MPS_PersonalStandards_z", "Personality_MPS_ConcernOverMistakes_z")
